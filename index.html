@@ -1,0 +1,3072 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CT Quest — Computational Thinking Kelas X</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   ROOT & RESET
+════════════════════════════════════════ */
+:root {
+  --bg:       #080b14;
+  --bg2:      #0d1120;
+  --surface:  #111827;
+  --surface2: #1a2035;
+  --surface3: #202840;
+  --border:   #253050;
+  --border2:  #1e2a45;
+
+  --teal:     #00e5c8;
+  --teal-dim: rgba(0,229,200,.12);
+  --orange:   #ff7043;
+  --orange-dim: rgba(255,112,67,.12);
+  --violet:   #818cf8;
+  --violet-dim: rgba(129,140,248,.12);
+  --gold:     #fbbf24;
+  --gold-dim: rgba(251,191,36,.12);
+  --rose:     #f43f5e;
+  --green:    #10b981;
+  --green-dim:rgba(16,185,129,.12);
+
+  --text:       #f0f4ff;
+  --text-2:     #8899bb;
+  --text-3:     #4a5a7a;
+
+  --correct: #10b981;
+  --wrong:   #f43f5e;
+  --warn:    #fbbf24;
+
+  --radius:  16px;
+  --shadow:  0 8px 32px rgba(0,0,0,.4);
+}
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:99px; }
+
+/* ── ANIMATED BG ── */
+.bg-layer {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 50% at 80% 10%, rgba(0,229,200,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 80%, rgba(129,140,248,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(255,112,67,.03) 0%, transparent 70%);
+}
+.bg-grid {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,229,200,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,200,.025) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+
+/* ════════════════════════════════════════
+   SCREENS
+════════════════════════════════════════ */
+.screen { display:none; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; min-height:100vh; }
+
+/* ════════════════════════════════════════
+   ── SCREEN: LOGIN ──
+════════════════════════════════════════ */
+#screen-login {
+  align-items:center; justify-content:center;
+  padding:2rem; min-height:100vh;
+}
+
+.login-wrap {
+  width:100%; max-width:440px;
+  animation: riseIn .6s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(40px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.login-eyebrow {
+  display:flex; align-items:center; gap:10px;
+  margin-bottom:1.5rem;
+}
+.login-pill {
+  background:var(--teal-dim); border:1px solid rgba(0,229,200,.3);
+  border-radius:99px; padding:5px 14px;
+  font-size:.7rem; font-weight:600; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--teal);
+  font-family:'JetBrains Mono',monospace;
+}
+
+.login-title {
+  font-family:'Syne',sans-serif;
+  font-size:2.6rem; font-weight:800; line-height:1.05;
+  margin-bottom:.75rem;
+  background:linear-gradient(135deg, #fff 30%, var(--teal));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+}
+
+.login-desc { color:var(--text-2); font-size:.95rem; margin-bottom:2rem; line-height:1.7; }
+
+.login-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px; padding:2rem;
+  box-shadow:0 0 0 1px rgba(0,229,200,.05), var(--shadow);
+}
+
+.form-label {
+  display:block; font-size:.72rem; font-weight:600;
+  text-transform:uppercase; letter-spacing:.12em;
+  color:var(--text-2); margin-bottom:.5rem;
+}
+
+.form-select {
+  width:100%;
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; padding:.8rem 1rem;
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:.95rem;
+  appearance:none; cursor:pointer;
+  transition:border-color .2s, box-shadow .2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238899bb' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 1rem center;
+  background-size:16px;
+}
+.form-select:focus { outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(0,229,200,.15); }
+
+.form-select option { background:var(--surface); }
+
+.form-group { margin-bottom:1.25rem; }
+
+.name-list-wrap {
+  max-height:200px; overflow-y:auto;
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; display:none;
+}
+.name-list-wrap.visible { display:block; }
+.name-item {
+  padding:.7rem 1rem; cursor:pointer;
+  font-size:.9rem; transition:background .15s;
+  border-bottom:1px solid var(--border2);
+}
+.name-item:last-child { border-bottom:none; }
+.name-item:hover { background:var(--teal-dim); color:var(--teal); }
+.name-item.selected { background:var(--teal-dim); color:var(--teal); font-weight:600; }
+
+.name-search {
+  width:100%; background:transparent; border:none;
+  border-bottom:1px solid var(--border);
+  padding:.7rem 1rem; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:.9rem;
+}
+.name-search:focus { outline:none; border-color:var(--teal); }
+.name-search::placeholder { color:var(--text-3); }
+
+.selected-name-display {
+  background:var(--teal-dim); border:1px solid rgba(0,229,200,.3);
+  border-radius:10px; padding:.6rem 1rem;
+  font-size:.9rem; font-weight:600; color:var(--teal);
+  display:none; margin-top:.5rem;
+}
+.selected-name-display.visible { display:block; }
+
+.btn-login {
+  width:100%; padding:1rem;
+  background:linear-gradient(135deg, var(--teal), #00b8a0);
+  border:none; border-radius:12px;
+  color:#050d10; font-family:'Syne',sans-serif;
+  font-size:1rem; font-weight:700; cursor:pointer;
+  transition:transform .15s, box-shadow .2s, opacity .2s;
+  box-shadow:0 4px 24px rgba(0,229,200,.3);
+  margin-top:.5rem;
+}
+.btn-login:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 32px rgba(0,229,200,.45); }
+.btn-login:disabled { opacity:.35; cursor:not-allowed; }
+
+.login-note { text-align:center; color:var(--text-3); font-size:.78rem; margin-top:1rem; }
+
+/* ════════════════════════════════════════
+   ── SCREEN: HOME/DASHBOARD ──
+════════════════════════════════════════ */
+#screen-home { padding:0; }
+
+.home-nav {
+  position:sticky; top:0; z-index:50;
+  background:rgba(8,11,20,.85); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+  padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+}
+.nav-logo {
+  font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800;
+  color:var(--teal); letter-spacing:.05em;
+}
+.nav-logo span { color:var(--text-2); font-weight:400; }
+.nav-user {
+  display:flex; align-items:center; gap:.75rem;
+}
+.nav-avatar {
+  width:36px; height:36px; border-radius:10px;
+  background:linear-gradient(135deg,var(--teal),var(--violet));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-size:.9rem; font-weight:800;
+  color:#050d10;
+}
+.nav-info { line-height:1.2; }
+.nav-name { font-size:.85rem; font-weight:600; }
+.nav-kelas { font-size:.72rem; color:var(--text-2); }
+
+.home-hero {
+  padding:3rem 2rem 2rem; max-width:900px; margin:0 auto;
+  animation:riseIn .5s ease both;
+}
+.hero-greeting { color:var(--teal); font-size:.85rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase; margin-bottom:.5rem; }
+.hero-title { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; margin-bottom:.5rem; }
+.hero-sub { color:var(--text-2); font-size:.95rem; max-width:540px; }
+
+.ct-pillars {
+  max-width:900px; margin:0 auto; padding:0 2rem 2rem;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem;
+}
+
+.pillar-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.5rem;
+  cursor:pointer; transition:all .2s; position:relative; overflow:hidden;
+  animation:riseIn .5s ease both;
+}
+.pillar-card::before {
+  content:''; position:absolute; inset:0;
+  background:var(--pillar-color); opacity:0;
+  transition:opacity .2s;
+}
+.pillar-card:hover::before { opacity:.05; }
+.pillar-card:hover { border-color:var(--pillar-color-raw); transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,.3); }
+.pillar-card.locked { cursor:default; opacity:.55; }
+.pillar-card.locked:hover { transform:none; box-shadow:none; }
+.pillar-card.done { border-color:var(--green); }
+.pillar-card.done::after {
+  content:'✓'; position:absolute; top:.75rem; right:.75rem;
+  width:22px; height:22px; border-radius:99px;
+  background:var(--green); color:#050d10;
+  font-size:.7rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+  display:flex;
+}
+
+.pillar-icon { font-size:2rem; margin-bottom:.75rem; }
+.pillar-num {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem;
+  color:var(--text-3); letter-spacing:.1em; margin-bottom:.25rem;
+}
+.pillar-name { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.5rem; }
+.pillar-desc { font-size:.8rem; color:var(--text-2); line-height:1.5; }
+.pillar-pts {
+  margin-top:1rem; font-family:'JetBrains Mono',monospace;
+  font-size:.72rem; color:var(--text-3);
+}
+.pillar-pts span { color:var(--pillar-color-raw); font-weight:600; }
+
+.locked-badge {
+  display:inline-flex; align-items:center; gap:4px;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:99px; padding:3px 10px;
+  font-size:.68rem; color:var(--text-3); margin-top:.75rem;
+}
+
+.home-bottom { max-width:900px; margin:0 auto; padding:0 2rem 2rem; display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+/* LEADERBOARD CARD */
+.leaderboard-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.5rem;
+  animation:riseIn .6s ease both;
+}
+.card-title {
+  font-family:'Syne',sans-serif; font-size:.95rem; font-weight:700;
+  display:flex; align-items:center; gap:.5rem; margin-bottom:1.25rem;
+}
+.card-title .badge {
+  font-family:'JetBrains Mono',monospace; font-size:.65rem;
+  background:var(--gold-dim); border:1px solid rgba(251,191,36,.3);
+  border-radius:99px; padding:2px 8px; color:var(--gold);
+}
+
+.lb-item {
+  display:flex; align-items:center; gap:.75rem;
+  padding:.6rem 0; border-bottom:1px solid var(--border2);
+}
+.lb-item:last-child { border-bottom:none; }
+.lb-rank {
+  font-family:'JetBrains Mono',monospace; font-size:.8rem;
+  font-weight:600; width:22px; text-align:center; flex-shrink:0;
+}
+.lb-rank.gold { color:var(--gold); }
+.lb-rank.silver { color:#94a3b8; }
+.lb-rank.bronze { color:#cd7c46; }
+.lb-avatar {
+  width:30px; height:30px; border-radius:8px;
+  background:linear-gradient(135deg,var(--violet),var(--teal));
+  flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:.75rem; font-weight:700; color:#050d10;
+}
+.lb-name { flex:1; font-size:.85rem; font-weight:500; }
+.lb-score {
+  font-family:'JetBrains Mono',monospace; font-size:.8rem;
+  color:var(--teal); font-weight:600;
+}
+.lb-me { background:var(--teal-dim); border-radius:10px; padding:.6rem .75rem; margin:0 -.75rem; }
+
+/* PROGRESS CARD */
+.progress-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.5rem;
+  animation:riseIn .65s ease both;
+}
+.total-score-big {
+  font-family:'Syne',sans-serif; font-size:3rem; font-weight:800;
+  background:linear-gradient(135deg,var(--teal),var(--violet));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  line-height:1; margin-bottom:.25rem;
+}
+.total-score-label { font-size:.8rem; color:var(--text-2); margin-bottom:1.5rem; }
+.mini-progress { margin-bottom:.75rem; }
+.mini-progress-top { display:flex; justify-content:space-between; font-size:.78rem; margin-bottom:.35rem; }
+.mini-progress-top span:first-child { color:var(--text-2); }
+.mini-progress-top span:last-child { font-family:'JetBrains Mono',monospace; font-size:.72rem; }
+.mini-bar { height:6px; background:var(--surface2); border-radius:99px; overflow:hidden; }
+.mini-bar-fill { height:100%; border-radius:99px; transition:width .6s ease; }
+
+/* ════════════════════════════════════════
+   ── SCREEN: LEARN (Materi) ──
+════════════════════════════════════════ */
+#screen-learn { padding:0; }
+
+.learn-header {
+  position:sticky; top:0; z-index:50;
+  background:rgba(8,11,20,.85); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+  padding:1rem 2rem; display:flex; align-items:center; gap:1rem;
+}
+.btn-back {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:10px; padding:.5rem .875rem;
+  color:var(--text-2); font-family:'DM Sans',sans-serif;
+  font-size:.85rem; cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; gap:6px;
+}
+.btn-back:hover { border-color:var(--text-2); color:var(--text); }
+.learn-header-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; }
+
+.learn-progress-bar { height:3px; background:var(--border2); }
+.learn-progress-fill { height:100%; background:linear-gradient(90deg,var(--teal),var(--violet)); transition:width .4s; }
+
+.learn-body { max-width:760px; margin:0 auto; padding:2rem; }
+
+/* Chapter navigation */
+.chapter-nav {
+  display:flex; gap:.5rem; margin-bottom:2rem; flex-wrap:wrap;
+}
+.chapter-btn {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:.45rem .9rem;
+  font-size:.78rem; font-weight:500; cursor:pointer; color:var(--text-2);
+  transition:all .2s; font-family:'DM Sans',sans-serif;
+}
+.chapter-btn:hover { border-color:var(--text-2); color:var(--text); }
+.chapter-btn.active { background:var(--teal-dim); border-color:rgba(0,229,200,.4); color:var(--teal); font-weight:600; }
+.chapter-btn.done { background:var(--green-dim); border-color:rgba(16,185,129,.4); color:var(--green); }
+
+/* Materi content */
+.chapter-content { animation:fadeSlide .35s ease both; }
+@keyframes fadeSlide { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+.chapter-hero {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:2rem; margin-bottom:1.5rem;
+  position:relative; overflow:hidden;
+}
+.chapter-hero::before {
+  content:''; position:absolute; inset:0;
+  background:var(--hero-gradient); opacity:.07;
+}
+.chapter-hero-label {
+  font-size:.7rem; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--text-2); margin-bottom:.5rem; font-family:'JetBrains Mono',monospace;
+}
+.chapter-hero-title {
+  font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; margin-bottom:.75rem;
+}
+.chapter-hero-subtitle { color:var(--text-2); font-size:.95rem; line-height:1.7; max-width:580px; }
+
+/* Content blocks */
+.content-block {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.5rem; margin-bottom:1rem;
+}
+
+.block-label {
+  font-size:.68rem; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  margin-bottom:.75rem; font-family:'JetBrains Mono',monospace;
+}
+
+.analogy-box {
+  background:var(--orange-dim); border:1px solid rgba(255,112,67,.25);
+  border-radius:12px; padding:1.25rem; margin:1rem 0;
+  border-left:3px solid var(--orange);
+}
+.analogy-label { font-size:.7rem; font-weight:700; color:var(--orange); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.5rem; }
+.analogy-text { font-size:.9rem; color:var(--text); line-height:1.75; }
+
+.highlight-box {
+  background:var(--teal-dim); border:1px solid rgba(0,229,200,.2);
+  border-radius:12px; padding:1.25rem; margin:1rem 0;
+}
+.highlight-text { font-size:.9rem; color:var(--text); line-height:1.75; }
+
+.example-list { display:flex; flex-direction:column; gap:.5rem; margin:1rem 0; }
+.example-item {
+  display:flex; align-items:flex-start; gap:.75rem;
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:10px; padding:.875rem 1rem; font-size:.9rem; line-height:1.6;
+}
+.example-icon { font-size:1.1rem; flex-shrink:0; margin-top:.1rem; }
+
+.steps-list { display:flex; flex-direction:column; gap:.75rem; margin:1rem 0; }
+.step-item { display:flex; align-items:flex-start; gap:1rem; }
+.step-num {
+  width:28px; height:28px; border-radius:8px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--teal),var(--violet));
+  color:#050d10; font-family:'Syne',sans-serif; font-size:.8rem; font-weight:800;
+  display:flex; align-items:center; justify-content:center; margin-top:.1rem;
+}
+.step-content { flex:1; }
+.step-title { font-weight:600; font-size:.9rem; margin-bottom:.2rem; }
+.step-desc { font-size:.85rem; color:var(--text-2); line-height:1.6; }
+
+.comparison-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin:1rem 0; }
+.compare-card {
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:12px; padding:1rem;
+}
+.compare-title { font-size:.78rem; font-weight:700; margin-bottom:.5rem; }
+.compare-items { font-size:.82rem; color:var(--text-2); line-height:1.8; }
+
+.key-concept {
+  display:inline-block; background:var(--violet-dim); border:1px solid rgba(129,140,248,.3);
+  border-radius:6px; padding:1px 8px; color:var(--violet); font-weight:600;
+}
+
+/* Knowledge check (mini quiz inside materi) */
+.knowledge-check {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:14px; padding:1.5rem; margin-top:1.5rem;
+}
+.kc-title {
+  font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700;
+  display:flex; align-items:center; gap:.5rem; margin-bottom:1rem;
+}
+.kc-q { font-size:.9rem; font-weight:600; margin-bottom:.75rem; }
+.kc-options { display:flex; flex-direction:column; gap:.5rem; }
+.kc-opt {
+  background:var(--surface); border:1.5px solid var(--border);
+  border-radius:10px; padding:.7rem 1rem;
+  font-size:.85rem; cursor:pointer; text-align:left;
+  color:var(--text); font-family:'DM Sans',sans-serif;
+  transition:all .15s; display:flex; align-items:center; gap:.75rem;
+}
+.kc-opt:hover:not(:disabled) { border-color:var(--teal); background:var(--teal-dim); }
+.kc-opt.correct { border-color:var(--correct); background:rgba(16,185,129,.1); color:var(--correct); }
+.kc-opt.wrong { border-color:var(--wrong); background:rgba(244,63,94,.1); color:var(--wrong); }
+.kc-opt:disabled { cursor:default; }
+.kc-feedback { font-size:.82rem; margin-top:.75rem; padding:.75rem; border-radius:8px; line-height:1.6; display:none; }
+.kc-feedback.correct { background:rgba(16,185,129,.1); color:var(--correct); }
+.kc-feedback.wrong { background:rgba(244,63,94,.1); color:var(--wrong); }
+.kc-feedback.show { display:block; }
+
+.btn-next-chapter {
+  width:100%; padding:.9rem; margin-top:1.5rem;
+  background:linear-gradient(135deg,var(--teal),#00b8a0);
+  border:none; border-radius:12px; color:#050d10;
+  font-family:'Syne',sans-serif; font-size:.95rem; font-weight:700;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 20px rgba(0,229,200,.25);
+}
+.btn-next-chapter:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,229,200,.4); }
+
+.btn-start-quiz {
+  width:100%; padding:1rem; margin-top:1rem;
+  background:linear-gradient(135deg,var(--orange),#e64a19);
+  border:none; border-radius:12px; color:#fff;
+  font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 20px rgba(255,112,67,.3);
+}
+.btn-start-quiz:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(255,112,67,.45); }
+
+/* ════════════════════════════════════════
+   ── SCREEN: QUIZ ──
+════════════════════════════════════════ */
+#screen-quiz { padding:0; }
+
+.quiz-header {
+  position:sticky; top:0; z-index:50;
+  background:rgba(8,11,20,.9); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+  padding:1rem 2rem; display:flex; align-items:center; justify-content:space-between;
+}
+.quiz-info { display:flex; align-items:center; gap:1rem; }
+.quiz-topic-badge {
+  background:var(--violet-dim); border:1px solid rgba(129,140,248,.3);
+  border-radius:99px; padding:4px 12px;
+  font-size:.72rem; font-weight:600; color:var(--violet);
+  font-family:'JetBrains Mono',monospace;
+}
+.quiz-counter {
+  font-family:'JetBrains Mono',monospace; font-size:.8rem; color:var(--text-2);
+}
+.quiz-score-live {
+  font-family:'JetBrains Mono',monospace; font-size:.85rem;
+  background:var(--gold-dim); border:1px solid rgba(251,191,36,.3);
+  border-radius:99px; padding:4px 14px; color:var(--gold); font-weight:600;
+}
+
+.quiz-progress { height:3px; background:var(--border2); }
+.quiz-progress-fill { height:100%; background:linear-gradient(90deg,var(--orange),var(--gold)); transition:width .4s; border-radius:99px; }
+
+.quiz-body { max-width:720px; margin:0 auto; padding:2rem; }
+
+.question-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:20px; padding:2rem; margin-bottom:1.5rem;
+  animation:fadeSlide .35s ease both;
+}
+
+.q-tag {
+  display:inline-flex; align-items:center; gap:6px;
+  border-radius:99px; padding:4px 12px;
+  font-size:.68rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.1em; margin-bottom:1rem;
+}
+.q-tag.mcq { background:var(--teal-dim); border:1px solid rgba(0,229,200,.3); color:var(--teal); }
+.q-tag.drag { background:var(--violet-dim); border:1px solid rgba(129,140,248,.3); color:var(--violet); }
+.q-tag.order { background:var(--orange-dim); border:1px solid rgba(255,112,67,.3); color:var(--orange); }
+.q-tag.reflect { background:var(--gold-dim); border:1px solid rgba(251,191,36,.3); color:var(--gold); }
+
+.q-pts-badge {
+  float:right; font-family:'JetBrains Mono',monospace; font-size:.7rem;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:99px; padding:3px 10px; color:var(--text-2);
+}
+
+.q-scenario {
+  background:var(--surface2); border-left:3px solid var(--orange);
+  border-radius:0 10px 10px 0; padding:1rem 1.25rem; margin-bottom:1.25rem;
+}
+.q-scenario-label { font-size:.65rem; font-weight:700; color:var(--orange); letter-spacing:.1em; text-transform:uppercase; margin-bottom:.4rem; }
+.q-scenario-text { font-size:.88rem; color:var(--text); line-height:1.7; }
+
+.q-text { font-size:1rem; font-weight:600; line-height:1.5; margin-bottom:1.25rem; }
+
+/* MCQ options */
+.options-list { display:flex; flex-direction:column; gap:.625rem; }
+.opt-btn {
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; padding:.875rem 1.125rem;
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:.9rem;
+  cursor:pointer; text-align:left; transition:all .18s;
+  display:flex; align-items:flex-start; gap:.875rem;
+}
+.opt-btn:hover:not(:disabled) { border-color:var(--teal); background:var(--teal-dim); transform:translateX(4px); }
+.opt-btn.selected { border-color:var(--teal); background:var(--teal-dim); }
+.opt-btn.correct { border-color:var(--correct); background:rgba(16,185,129,.1); }
+.opt-btn.wrong { border-color:var(--wrong); background:rgba(244,63,94,.08); }
+.opt-btn:disabled { cursor:default; }
+.opt-letter {
+  width:26px; height:26px; border-radius:7px; flex-shrink:0;
+  background:var(--border); display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:600;
+  color:var(--text-2); margin-top:.05rem;
+}
+.opt-btn.selected .opt-letter { background:rgba(0,229,200,.3); color:var(--teal); }
+.opt-btn.correct .opt-letter { background:rgba(16,185,129,.3); color:var(--correct); }
+.opt-btn.wrong .opt-letter { background:rgba(244,63,94,.2); color:var(--wrong); }
+
+/* DRAG & DROP */
+.dnd-instructions { font-size:.82rem; color:var(--text-2); margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+
+.dnd-pool-title, .dnd-zone-title {
+  font-size:.68rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--text-2); margin-bottom:.6rem; font-family:'JetBrains Mono',monospace;
+}
+
+.dnd-pool {
+  display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.25rem;
+  min-height:40px;
+}
+
+.dnd-item {
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:10px; padding:.7rem 1rem;
+  font-size:.88rem; cursor:grab; user-select:none;
+  display:flex; align-items:center; gap:.75rem;
+  transition:all .15s;
+}
+.dnd-item:hover { border-color:var(--violet); transform:translateX(3px); }
+.dnd-item.dragging { opacity:.35; }
+.dnd-handle { color:var(--text-3); font-size:.9rem; flex-shrink:0; }
+
+.dnd-zones { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.dnd-zone {
+  background:rgba(129,140,248,.04); border:1.5px dashed rgba(129,140,248,.25);
+  border-radius:14px; padding:1rem; min-height:120px; transition:all .2s;
+}
+.dnd-zone.drag-over { background:var(--violet-dim); border-color:var(--violet); }
+.dnd-zone-items { display:flex; flex-direction:column; gap:.5rem; min-height:60px; }
+.dnd-zone-empty { color:var(--text-3); font-size:.82rem; text-align:center; padding:.75rem; }
+
+/* ORDERING */
+.order-list { display:flex; flex-direction:column; gap:.5rem; }
+.order-item {
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; padding:.8rem 1rem;
+  font-size:.9rem; cursor:grab; user-select:none;
+  display:flex; align-items:center; gap:.875rem;
+  transition:all .15s;
+}
+.order-item:hover { border-color:var(--orange); }
+.order-item.dragging { opacity:.3; }
+.order-num {
+  width:28px; height:28px; border-radius:7px; flex-shrink:0;
+  background:var(--surface3); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'JetBrains Mono',monospace; font-size:.75rem; font-weight:600;
+  color:var(--text-2);
+}
+
+/* REFLECTION */
+.reflect-textarea {
+  width:100%; background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:12px; padding:1rem; color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:.9rem; line-height:1.7;
+  resize:vertical; min-height:130px; transition:border-color .2s, box-shadow .2s;
+}
+.reflect-textarea:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(251,191,36,.15); }
+.reflect-count { text-align:right; font-size:.74rem; color:var(--text-3); margin-top:.4rem; font-family:'JetBrains Mono',monospace; }
+
+/* FEEDBACK */
+.q-feedback {
+  border-radius:12px; padding:1rem 1.125rem; margin-top:1rem;
+  display:none; animation:fadeSlide .3s ease;
+}
+.q-feedback.show { display:block; }
+.q-feedback.correct { background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.3); }
+.q-feedback.wrong { background:rgba(244,63,94,.08); border:1px solid rgba(244,63,94,.25); }
+.q-feedback.partial { background:var(--gold-dim); border:1px solid rgba(251,191,36,.3); }
+.q-feedback-title { font-weight:700; font-size:.88rem; margin-bottom:.3rem; }
+.q-feedback.correct .q-feedback-title { color:var(--correct); }
+.q-feedback.wrong .q-feedback-title { color:var(--wrong); }
+.q-feedback.partial .q-feedback-title { color:var(--gold); }
+.q-feedback-text { font-size:.84rem; color:var(--text-2); line-height:1.65; }
+
+/* NAV BUTTONS */
+.quiz-nav { display:flex; gap:.75rem; justify-content:flex-end; margin-top:1.25rem; }
+
+.btn-check {
+  padding:.75rem 1.5rem;
+  background:linear-gradient(135deg,var(--teal),#00b8a0);
+  border:none; border-radius:12px; color:#050d10;
+  font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 16px rgba(0,229,200,.25);
+}
+.btn-check:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,229,200,.4); }
+.btn-check:disabled { opacity:.35; cursor:not-allowed; }
+
+.btn-next-q {
+  padding:.75rem 1.5rem;
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:12px; color:var(--text);
+  font-family:'Syne',sans-serif; font-size:.9rem; font-weight:600;
+  cursor:pointer; transition:all .2s;
+}
+.btn-next-q:hover:not(:disabled) { border-color:var(--text-2); background:var(--surface3); }
+.btn-next-q:disabled { opacity:.3; cursor:not-allowed; }
+
+/* ════════════════════════════════════════
+   ── SCREEN: RESULT ──
+════════════════════════════════════════ */
+#screen-result { align-items:center; justify-content:center; padding:2rem; }
+
+.result-wrap { max-width:560px; width:100%; animation:riseIn .5s ease both; }
+
+.result-top-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:24px; padding:2.5rem; text-align:center; margin-bottom:1rem;
+  position:relative; overflow:hidden;
+}
+.result-top-card::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,229,200,.06), transparent 60%);
+}
+
+.result-trophy-wrap { position:relative; display:inline-block; margin-bottom:1.25rem; }
+.result-trophy { font-size:5rem; display:block; animation:trophyBounce .6s .3s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes trophyBounce {
+  0% { transform:scale(0) rotate(-20deg); }
+  60% { transform:scale(1.2) rotate(5deg); }
+  100% { transform:scale(1) rotate(0); }
+}
+.result-confetti {
+  position:absolute; inset:0; pointer-events:none;
+}
+
+.result-title { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; margin-bottom:.25rem; }
+.result-name { color:var(--text-2); font-size:.9rem; margin-bottom:1.5rem; }
+
+.score-ring-wrap { position:relative; width:140px; height:140px; margin:0 auto 1.5rem; }
+.score-ring-wrap svg { transform:rotate(-90deg); }
+.score-ring-bg { fill:none; stroke:var(--surface2); stroke-width:12; }
+.score-ring-fill {
+  fill:none; stroke-width:12; stroke-linecap:round;
+  stroke-dasharray:377; stroke-dashoffset:377;
+  transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1) .3s;
+}
+.score-ring-text {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.score-num { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; line-height:1; }
+.score-denom { font-size:.72rem; color:var(--text-2); font-family:'JetBrains Mono',monospace; }
+
+.predikat-pill {
+  display:inline-block; border-radius:99px; padding:.45rem 1.25rem;
+  font-size:.85rem; font-weight:700; margin-bottom:1.25rem;
+}
+
+.breakdown-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:.5rem; margin-bottom:1.5rem; }
+.breakdown-item {
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:10px; padding:.75rem .5rem; text-align:center;
+}
+.breakdown-val { font-family:'JetBrains Mono',monospace; font-size:1rem; font-weight:700; }
+.breakdown-label { font-size:.65rem; color:var(--text-3); margin-top:.2rem; line-height:1.3; }
+
+.btn-submit-main {
+  width:100%; padding:1rem;
+  background:linear-gradient(135deg,var(--green),#059669);
+  border:none; border-radius:14px; color:#fff;
+  font-family:'Syne',sans-serif; font-size:1rem; font-weight:700;
+  cursor:pointer; transition:all .2s; box-shadow:0 4px 20px rgba(16,185,129,.3);
+}
+.btn-submit-main:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 8px 28px rgba(16,185,129,.4); }
+.btn-submit-main:disabled { opacity:.5; cursor:not-allowed; }
+
+.submit-status { text-align:center; font-size:.82rem; color:var(--text-2); margin-top:.75rem; min-height:1rem; }
+.submit-status.ok { color:var(--green); }
+.submit-status.err { color:var(--wrong); }
+
+.btn-home-again {
+  width:100%; padding:.875rem; margin-top:.75rem;
+  background:transparent; border:1px solid var(--border);
+  border-radius:14px; color:var(--text-2);
+  font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:500;
+  cursor:pointer; transition:all .2s;
+}
+.btn-home-again:hover { border-color:var(--text-2); color:var(--text); }
+
+/* ════════════════════════════════════════
+   TOAST & MODAL
+════════════════════════════════════════ */
+.toast {
+  position:fixed; bottom:2rem; left:50%;
+  transform:translateX(-50%) translateY(100px);
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:99px; padding:.65rem 1.5rem;
+  font-size:.88rem; font-weight:500; z-index:9999;
+  transition:transform .3s cubic-bezier(.16,1,.3,1);
+  white-space:nowrap;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border-color:rgba(16,185,129,.4); color:var(--green); }
+.toast.error { border-color:rgba(244,63,94,.3); color:var(--wrong); }
+
+/* ════════════════════════════════════════
+   CONFETTI CANVAS
+════════════════════════════════════════ */
+#confetti-canvas {
+  position:fixed; inset:0; pointer-events:none; z-index:9998;
+}
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
+@media(max-width:640px) {
+  .ct-pillars { grid-template-columns:1fr 1fr; }
+  .home-bottom { grid-template-columns:1fr; }
+  .dnd-zones { grid-template-columns:1fr; }
+  .comparison-grid { grid-template-columns:1fr; }
+  .quiz-body, .learn-body { padding:1rem; }
+  .login-title { font-size:2rem; }
+  .hero-title { font-size:1.6rem; }
+  .chapter-hero-title { font-size:1.6rem; }
+}
+
+/* ════════════════════════════════════════
+   UTILITY
+════════════════════════════════════════ */
+.text-teal { color:var(--teal); }
+.text-orange { color:var(--orange); }
+.text-violet { color:var(--violet); }
+.text-gold { color:var(--gold); }
+.fw-600 { font-weight:600; }
+.fw-700 { font-weight:700; }
+.mt-1 { margin-top:.5rem; }
+.mt-2 { margin-top:1rem; }
+
+/* Leaderboard filter buttons */
+.lb-filter-btn {
+  background:var(--surface2); border:1px solid var(--border);
+  border-radius:99px; padding:3px 10px;
+  font-size:.72rem; font-weight:600; cursor:pointer;
+  color:var(--text-2); font-family:'DM Sans',sans-serif;
+  transition:all .15s;
+}
+.lb-filter-btn:hover { border-color:var(--text-2); color:var(--text); }
+.lb-filter-btn.active { background:var(--teal-dim); border-color:rgba(0,229,200,.4); color:var(--teal); }
+
+/* Shimmer for leaderboard loading */
+.shimmer {
+  background:linear-gradient(90deg,var(--surface2) 25%,var(--surface3) 50%,var(--surface2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:8px; height:40px;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<div class="bg-grid"></div>
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: LOGIN
+════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-eyebrow">
+      <div class="login-pill">CT Quest · Informatika X · MAN 2 Bogor</div>
+    </div>
+    <h1 class="login-title">Belajar Berpikir<br>Kayak Ahli Komputer 🧠</h1>
+    <p class="login-desc">Selamat datang di <strong>CT Quest</strong><br> Di balik tampilan ini ada usaha seorang guru…<br>
+      jangan sampai cuma jadi pajangan ya 🤭</p>
+
+    <div class="login-card">
+      <div class="form-group">
+        <label class="form-label">Kelas kamu</label>
+        <select class="form-select" id="sel-kelas" onchange="onKelasChange()">
+          <option value="">— Pilih kelas dulu —</option>
+          <option value="X-A">X-A</option>
+          <option value="X-B">X-B</option>
+          <option value="X-C">X-C</option>
+          <option value="X-D">X-D</option>
+          <option value="X-E">X-E</option>
+          <option value="X-F">X-F</option>
+          <option value="X-G">X-G</option>
+          <option value="X-H">X-H</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="name-group" style="display:none">
+        <label class="form-label">Nama kamu</label>
+        <div class="name-list-wrap visible" id="name-list-wrap">
+          <input type="text" class="name-search" id="name-search" placeholder="🔍 Cari namamu..." oninput="filterNames()" autocomplete="off">
+          <div id="name-list"></div>
+        </div>
+        <div class="selected-name-display" id="selected-name-display"></div>
+      </div>
+
+      <button class="btn-login" id="btn-login" disabled onclick="doLogin()">Gaskeun Belajar →</button>
+      <p class="login-note">⚠️ Pastikan nama dan kelas benar — nilaimu langsung dikirim ke guru setelah selesai.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: HOME / DASHBOARD
+════════════════════════════════════════ -->
+<div id="screen-home" class="screen">
+  <nav class="home-nav">
+    <div class="nav-logo">CT<span>Quest</span></div>
+    <div class="nav-user">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <div class="nav-info">
+        <div class="nav-name" id="nav-name">—</div>
+        <div class="nav-kelas" id="nav-kelas">—</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="home-hero">
+    <p class="hero-greeting" id="hero-greeting">Halo!</p>
+    <h2 class="hero-title" id="hero-title">Pilih misi yang mau kamu mulai 🚀</h2>
+    <p class="hero-sub">Ada 4 pilar Computational Thinking yang perlu kamu kuasai sebelum bisa coding dengan benar. Selesaikan satu per satu ya!</p>
+  </div>
+
+  <div class="ct-pillars" id="ct-pillars">
+    <!-- rendered by JS -->
+  </div>
+
+  <div class="home-bottom">
+    <div class="leaderboard-card">
+      <div class="card-title">🏆 Leaderboard <span class="badge" id="lb-kelas-badge">Semua Kelas</span></div>
+      <div id="lb-filter-wrap" style="display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem;">
+        <button class="lb-filter-btn active" onclick="filterLB('all')" data-kelas="all">Semua</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-A')" data-kelas="X-A">X-A</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-B')" data-kelas="X-B">X-B</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-C')" data-kelas="X-C">X-C</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-D')" data-kelas="X-D">X-D</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-E')" data-kelas="X-E">X-E</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-F')" data-kelas="X-F">X-F</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-G')" data-kelas="X-G">X-G</button>
+        <button class="lb-filter-btn" onclick="filterLB('X-H')" data-kelas="X-H">X-H</button>
+      </div>
+      <div id="leaderboard-list"><div class="shimmer"></div><div class="shimmer" style="margin-top:.5rem"></div><div class="shimmer" style="margin-top:.5rem"></div></div>
+    </div>
+
+    <div class="progress-card">
+      <div class="card-title">📊 Progress Kamu</div>
+      <div class="total-score-big" id="prog-total">0</div>
+      <div class="total-score-label">dari 420 poin total</div>
+      <div id="prog-breakdown"><!-- rendered --></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: LEARN (Materi)
+════════════════════════════════════════ -->
+<div id="screen-learn" class="screen">
+  <div class="learn-header">
+    <button class="btn-back" onclick="goHome()">← Kembali</button>
+    <div class="learn-header-title" id="learn-header-title">Materi</div>
+  </div>
+  <div class="learn-progress-bar"><div class="learn-progress-fill" id="learn-prog-fill" style="width:0%"></div></div>
+
+  <div class="learn-body">
+    <div class="chapter-nav" id="chapter-nav"><!-- rendered --></div>
+    <div id="chapter-content"><!-- rendered --></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: QUIZ
+════════════════════════════════════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-info">
+      <span class="quiz-topic-badge" id="quiz-topic-badge">Quiz</span>
+      <span class="quiz-counter" id="quiz-counter">1/8</span>
+    </div>
+    <div class="quiz-score-live" id="quiz-score-live">0 pts</div>
+  </div>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-prog-fill" style="width:0%"></div></div>
+  <div class="quiz-body">
+    <div id="quiz-question-area"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN: RESULT
+════════════════════════════════════════ -->
+<div id="screen-result" class="screen">
+  <div class="result-wrap">
+    <div class="result-top-card">
+      <div class="result-trophy-wrap">
+        <span class="result-trophy" id="result-trophy">🏆</span>
+      </div>
+      <h2 class="result-title" id="result-title">Mantap!</h2>
+      <p class="result-name" id="result-name">—</p>
+
+      <div class="score-ring-wrap">
+        <svg viewBox="0 0 130 130" width="140" height="140">
+          <circle class="score-ring-bg" cx="65" cy="65" r="60"/>
+          <circle class="score-ring-fill" id="score-ring" cx="65" cy="65" r="60"/>
+        </svg>
+        <div class="score-ring-text">
+          <span class="score-num" id="result-score-num">0</span>
+          <span class="score-denom" id="result-score-denom">/100</span>
+        </div>
+      </div>
+
+      <div class="predikat-pill" id="predikat-pill">—</div>
+
+      <div class="breakdown-grid" id="result-breakdown"></div>
+    </div>
+
+    <button class="btn-submit-main" id="btn-submit" onclick="submitScore()">📤 Kirim Nilai ke Guru</button>
+    <div class="submit-status" id="submit-status"></div>
+    <button class="btn-home-again" onclick="goHome()">← Kembali ke Dashboard</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════ -->
+<script>
+// ═══════════════════════════════════
+// STUDENT DATA
+// ═══════════════════════════════════
+const STUDENTS = {
+  "X-A":["ABDURRAHMAN AL MUSWAH","AHMAD DZAKY SATRIA WIBAWA","AJENG MAHARANI DEWI","AKHDAN FAKHRI NABHAN","ALIKA PUTRI ISLAMI","ANDINTIA","ANGGI ANGRAENI","ARLITA DWI KARTINI","BRILIAN MUROFI NURSYAMBA","CHELSEA FITRIANI","CHELSEA LEADISA PUTRI","DEFA PUTRIANUNNISA","DERINA MARSELINA MAULIDA","DESYIFA MAULANI","DIKA GHULWANI","FAHRI AKBAR RIMANI","KANAYA RAHMI","M. ZIKRI","MOCH AL YASIN AK MESIR","MUHAMMAD ALFATIH KHOIRUL GIBRAN","MUHAMMAD FADLAN PRATAMA","MUHAMMAD HAIKAL ARRUMI","NAJIB KHOTIBUL UMAM","NIZMA NURKAMILA","NOOR BANGKIT WARDIANA","NUFAIZAH HUMAIRAH","NURUL ULA","PUTRI NAZWA UL ZANAH","RAYA RAZKIA SUSANTO","RIPAT MUPIDAH","ROSITA","SERIL RATNA FADILA","SHARAH AULIA","SYIFA AULIA","VINO RAMADHAN MUSTARI","ZAHRA LAILATUN NISHFA"],
+  "X-B":["ADILA SALSABILA","ALMAIDA RAMDANI","ANDAKA ALDI ROSADI","ARYU ZAKIA NURUL AEN","ATIAN SAHPUTRA","AUFA RIZAL RAIS","DAPA HAPID PIRDAUS","DESTI NUR SEPTIAN","DISNA ROSMAWATI","DZIKRA AFNAN JANNATI","GISHA ZAKIRA UMARAN","HIRZAN","IBNU AUFA BIAHDILLAH","INDAH NOVITASARI","INTAN ABDU ROHMAN","KAFA NURUL GHAOTS","KANAYA FITRI YANI","M IRFAN IRWANSYAH","MAULANA RIZKY FAUZI","MUHAMAD LUTHFI KAMIL","MUHAMAD RAUSYAN ZAHRI","MUHAMMAD IRFAN ZINDY","NAURA KAMILAH HAFIDZ","NUN NURHAENI","NUR AIDAH","PRASETYO RAMADHAN","RAKA DHIA ANAQI","REISHYLLA DWI MARTINI","RIFKI ADIRLI","RIRIN ANINDIA PUTRI","SABILA CHAERUNNISA","SALMAN ALFARISY","SITI HAMIDATUL PITRIYAH","SITI HUMAIROH","VIONA KEYLA ANASTASYA","YUS MALIA ANWAR"],
+  "X-C":["AHMAD AWALUDIN","ALYA RAMADHANI","ANISA RUSDAH","DZIKRI MAULANA YUSUF","FAJRIAH NUR ALIYA","FANESA EKA PUTRI","FAZHAN HOERUL HUDA","ILHAM AZAKI","JIHAN KARINA KARIN","JIHAN RAFIFAH","KAWAKIBU AL ABROR","KAYLA FADYA ALTHAFUNNISA","KHOERUNISA","KIPA ATUL KAIS","LUTFI NAJIB DJAUHARI","M. WILDAN SOLIHIN","MAURA KEYZA RAMDAN","MOCHAMAD DHAFA ARIZQI","MUHAMAD DIKI NURDIANSYAH","MUHAMAD JIKRI AL KAHFI","MUHAMAD QAIS AL KAHFI","MUHAMAD RIZKI ALKAESAR","MUHAMMAD BAYU FIRDAUS","MUHAMMAD ROFI ALHAQ","NUR ALISA","NUR FADLAH TUNNISA","REZKI HIDAYATUL FALAH","ROIDATUN NISA","SAHWA QUROTUL AIN","SALSADILLA NINGTYAS","SASKIA FAJRIANI ROHENDI","SEPTIAN RAMADHAN","SITI KHAIRUNNISA","SOPIA APRIL","TATU HAWA","ZAKIYAH NUR ROBBY"],
+  "X-D":["AWAHITA DAHAYU","AZWAR KHAIRURRIZAL","CITRA AULIA","ELIZA HOURA NINA LINDIAWATI SUPARLAN","HAURA AZKIYA","HERDY PHAIRUZ NAZMATIRA","JOE PERMANA PUTRA","KAYLA PUTRI","KHOIRUL MULYA NURASYIFA","LUSI MAULANI","LUSYANA NUR HAPSARI","M. AZZAM PRATAMA PUTRA","M. FADLIYANSYAH","MILATINA NURFAJAILA","MOHAMAD AZZAM SOBANDI","MUHAMAD RIZAL BAKRI","MUHAMAD RIZKI AL-HILMI","MUHAMMAD FARRAS AL-IKBAR BUDIMAN","MUHAMMAD LABIB MAHBUB","MUHAMMAD RIDHO","MUHAMMAD RIVA RAIHAN","NAILA PUTRI MAULIDA","PUTRI SARVINA","RAKA AFRIEZAL ALHAKAM","RATNA MILASARI","RIFA NURAINI","SABIQUL KHOIR AFWANDY","SAFARA QISTINA HASANUDIN","SITI KANDZA ARFA RAHMA IRAWAN","SITI KHOERUNISSA","SRI AMANDA","SYAKILA OKTAPIANI","SYEIRA ASLA ANASTASYA","TAZKIATUL MUSYAROFAH","WILDA AULA SYIFA","ZAHRA MAULIDA"],
+  "X-E":["AINI MAULIDA","ALISA TRI SUTONO","AUFIA MANOARVA ASSAUMI","BAYU PERMANA","BIADIL ALIF","CAHAYU JIHAN KARMILA","CALYSTA ARACELLIA","DANU ARDIANSYAH","DELIA BERLIANA PUTRI","DIVA KHOERUNNISA","HAYANA RAHAYU","ILHAM MAULID","IMAM ALBANI","LARISA PUTRI RAMADHANI","M.HAIKAL ZILVINO YUSUF","MARISHA SALSABILA FITRIADI","MUHAMAD FACHRI FAHRUROZI","MUHAMAD RIDO HERMANTO","MUHAMMAD FADIL","MUHAMMAD TIAN ALPIANSYAH","MULKY ALIFA HAKIM","NAILA NURSABILA","NASYWA HUMAIRA","PELISA ANASTASYA PUTRI","PUTRI NAHARIYAH ZAHRA","RAFA RAHMANSYAH","RAHMATUL ALANI","RESVA YUNITA","RIZKY FAUZI","SILVI HANDAYANI","SITI NAZMA","SITI SOVICYAH","SUROTUL MUAWIJATAIN","SYIFA AWALYA PUTRI","YEVA YOSHI HAIKAL"],
+  "X-F":["AHMAD MUZAKI","AJENG RISALATUL MUAWANAH","AMIRA RAMADHANI","CAHAYA PUTRI ADILAH","DALILLAH EKA PUTRI","DAVI RIZKI PRATAMA","FAYZAN AYDIN ALHASYA","FITRI KABEIRU","GINA SYAHIRA","HILAL IBRAHIM","IFANA FEBRIANI","KALYSA ZULFA RAMADHANI BILQIS","KHAYYIRA QURRATUAIN","LULU ADHWA","M LUTHFI FIRDAUS","M. SURO","MAULIDA MUFLIH HATUNAFISA","MUHAMAD DIKI PRATAMA","MUHAMAD SYAHDAN SYAILANA","MUHAMAD ZACKY ANUGRAH","NADHITA CAHYA KHARISMA","NAJLA QURROTUAIN","NAYSILA AZKA MAULIDA","NAZWA SHOFFIA","PUTRI FATIHATUL AULIA CHANDRANI","RATU NAYSA RIZKIA","RAYYAN ANUGRAH KALBUADI","RIZKY MAULANA","RIZKYA DWI PUTRI","SAHALUDDIN","SOPI ANDINI","SYAIRA MAHARANI","UCU SYAFAAH","UMMU FATIMAH AINUN AQUILAH","YULIANTI"],
+  "X-G":["ADRIANSYAH","AHMAD WADHOWI","AKMAL ZAKWAN RAMADHAN","ALMARIFA RESTIANA","AULIA SURYANI","AYYA ZAHRATU SYIFA","DENIS IRAWAN","HESTI AULIA","HILMI MUSTOPA","IFNA NUR ILMIRA","KARHAN FAUZI","LIE TRESYA MAULIDA","LULU AINUN SYIFA","M. HAIKAL FAJRI YANI","MARTHA YUSLIANI","MUHAMAD FARHAN","MUHAMAD PAISAL","MUHAMMAD PURKON","MUWAFI MAULID MUFTI SUPRIATMAN","NAFILATUL SILMAH","NAILA IZMI ZAHIRA","NEILA MIFTAH PASTIKA","NUR ASYIFA RIZKILLAH","NURAINNI SYAHILLANI","NURHANIPAH AZAHRA","NURUL SAYYIDAH MIRADEWI","RAHMI ISNAWATI","RIFKI RAJAB","RIHLATU NURUL ASSAIDAH","RUBIYAH","SHAKILA UMAIRA","SYIFANI TRIHAPSARI","VANESA FUTRI LESTARI","WILDA ZAHRANNISA KOSASIH","ZIDAN MAULANA"],
+  "X-H":["AISYAH AZRA KURNIA LADANI","ALISYA PUTRI","ANISYA AWALIYA","AYDA NUR QORI'AH","AZZAM DZULKAYSI AL AFGHANY","BAGJA UTAMA PUTRA","BERLY YUNDANI","CHAIRUL AZZAM NURROHIM","CITRA LESTARI","DIMAS RAMADHAN ILHAM","EDWAR SAMUDRA","FARDA PUTRI BIANTORO","FEBI KURNIAWATI","ILIYYIN AZ ZUKHRUF IKLIMA","IMANUDIN","MAHESA RAFFA","MEILATI PUTRI HARYANTO","MUAHAMAD RIDHO ALAMSYAH","MUHAMMAD HIGH NASUTION","MUHAMMAD SYAHDAN EL SHIRAZY","MUHAMMAD VIKRY","NABILA","NILAM ANDINI FAKHIRA","NISRIINA HAANIYAH","NUR ADELA FEBRIYANIH","NURSILA GIANTI","RATU BILQIS AL SHANUM","RESTI","RIFANI WIJAYA","RIKO GHABY MARJUWWA","RIZQIA MANDARIANI","SAHILA HASNA FAJRINA","SATRIA RAKA PADILAH","SEPTRIAN RISQI RAMADHAN","SITI NUR AMALIA","SOFKHAN BIMA PRATAMA"]
+};
+
+// ═══════════════════════════════════
+// CT PILLARS CONFIG
+// ═══════════════════════════════════
+const PILLARS = [
+  {
+    id:'decomposition',
+    icon:'🧩', num:'01',
+    name:'Decomposition',
+    desc:'Pecah masalah gede jadi potongan kecil yang gampang diselesaiin.',
+    color:'var(--teal)', colorRaw:'#00e5c8',
+    gradient:'linear-gradient(135deg,#00e5c8,#0891b2)',
+    pts:110, maxPts:110,
+    chapters:['Apa itu Decomposition?','Decomposition di Kehidupan Nyata','Decomposition Berlapis']
+  },
+  {
+    id:'pattern',
+    icon:'🔍', num:'02',
+    name:'Pattern Recognition',
+    desc:'Temukan pola yang sama biar kamu nggak perlu kerja dari nol terus.',
+    color:'var(--violet)', colorRaw:'#818cf8',
+    gradient:'linear-gradient(135deg,#818cf8,#6366f1)',
+    pts:100, maxPts:100,
+    chapters:['Apa itu Pattern Recognition?','Pola di Sekitar Kita','Manfaat Menemukan Pola']
+  },
+  {
+    id:'abstraction',
+    icon:'🗂️', num:'03',
+    name:'Abstraction',
+    desc:'Fokus ke hal yang penting, abaikan detail yang nggak perlu.',
+    color:'var(--orange)', colorRaw:'#ff7043',
+    gradient:'linear-gradient(135deg,#ff7043,#e64a19)',
+    pts:100, maxPts:100,
+    chapters:['Apa itu Abstraction?','Detail yang Penting vs Nggak Penting','Abstraction dalam Sistem']
+  },
+  {
+    id:'algorithm',
+    icon:'📋', num:'04',
+    name:'Algorithm Design',
+    desc:'Buat langkah-langkah yang jelas dan berurutan untuk selesaiin masalah.',
+    color:'var(--gold)', colorRaw:'#fbbf24',
+    gradient:'linear-gradient(135deg,#fbbf24,#d97706)',
+    pts:110, maxPts:110,
+    chapters:['Apa itu Algoritma?','Ciri-ciri Algoritma yang Baik','Algoritma di Kehidupan Sehari-hari']
+  }
+];
+
+// ═══════════════════════════════════
+// MATERI CONTENT
+// ═══════════════════════════════════
+const MATERI = {
+  decomposition: {
+    chapters: [
+      {
+        id:'dc1', title:'Apa itu Decomposition?',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#00e5c8,#0891b2)">
+  <div class="chapter-hero-label">Misi 01 · Chapter 1</div>
+  <h2 class="chapter-hero-title">Apa itu Decomposition? 🧩</h2>
+  <p class="chapter-hero-subtitle">Kamu pernah nggak ngerasa overwhelmed karena tugas atau masalahnya kegedean? Nah, itulah kenapa Decomposition itu penting banget.</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">💡 Definisi</div>
+  <p><strong>Decomposition</strong> adalah kemampuan <span class="key-concept">memecah masalah besar menjadi bagian-bagian kecil</span> yang lebih mudah dipahami dan diselesaikan.</p>
+  <div class="analogy-box">
+    <div class="analogy-label">🍕 Analogi: Pizza!</div>
+    <div class="analogy-text">Bayangin kamu pesan pizza besar sendiri. Kamu nggak akan coba makan semuanya dalam satu suapan kan? Kamu pasti potong dulu jadi slice-slice kecil, terus makannya satu per satu. <strong>Itulah Decomposition.</strong> Masalah besar = pizza utuh. Bagian kecil = slice pizza.</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">🎯 Kenapa Penting?</div>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">😵</span><div>Tanpa decomposition, kita sering <strong>nggak tahu harus mulai dari mana</strong> karena masalahnya keliatan terlalu besar.</div></div>
+    <div class="example-item"><span class="example-icon">✂️</span><div>Dengan decomposition, setiap bagian kecil bisa <strong>dikerjakan satu per satu</strong>, bahkan bisa dibagi ke orang yang berbeda.</div></div>
+    <div class="example-item"><span class="example-icon">🔍</span><div>Masalah kecil lebih <strong>gampang di-debug</strong> — kalau ada yang salah, lebih mudah dicari di mana letak masalahnya.</div></div>
+    <div class="example-item"><span class="example-icon">♻️</span><div>Solusi dari bagian kecil bisa <strong>dipakai lagi</strong> untuk masalah lain yang mirip.</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Saat kamu dapat tugas bikin makalah 20 halaman dalam seminggu, pendekatan mana yang paling mencerminkan Decomposition?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Langsung nulis semua dari halaman 1 sampai selesai tanpa rencana</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">B. Bagi makalah jadi: riset (hari 1-2), outline (hari 3), tulis per bab (hari 4-5), revisi (hari 6-7)</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Tunggu deadline semakin dekat baru mulai panik</button>
+  </div>
+  <div class="kc-feedback correct">✅ Bingo! Membagi jadi sub-tugas dengan jadwal = Decomposition. Kamu udah otomatis sering pake ini, bedanya sekarang kamu tau namanya!</div>
+  <div class="kc-feedback wrong">❌ Hmm, belum tepat. Decomposition artinya memecah jadi bagian-bagian kecil yang terencana — bukan ngerjain secara random atau nunda-nunda 😅</div>
+</div>
+        `
+      },
+      {
+        id:'dc2', title:'Decomposition di Kehidupan Nyata',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#00e5c8,#0891b2)">
+  <div class="chapter-hero-label">Misi 01 · Chapter 2</div>
+  <h2 class="chapter-hero-title">Decomposition di<br>Kehidupan Nyata 🌍</h2>
+  <p class="chapter-hero-subtitle">Sebenernya kamu udah sering melakukan Decomposition tanpa sadar. Yuk lihat contoh-contohnya!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">📱 Contoh 1: Bikin Konten TikTok</div>
+  <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-2)">Kamu mau bikin video TikTok yang viral. Kalau dipecah, masalah "Bikin Konten TikTok" jadi:</p>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Tentukan ide & niche</div><div class="step-desc">Video tentang apa? Comedy? Edukasi? Skincare? Ini sub-masalah pertama.</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Tulis skrip / storyline</div><div class="step-desc">Mau ngomong apa? Berapa detik? Hook-nya gimana?</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Siapkan setting & properti</div><div class="step-desc">Background, pencahayaan, outfit — semua disiapkan dulu.</div></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Rekam video</div><div class="step-desc">Take beberapa kali sampai dapet yang oke.</div></div></div>
+    <div class="step-item"><div class="step-num">5</div><div class="step-content"><div class="step-title">Edit & tambah sound</div><div class="step-desc">CapCut, pilih audio trending, kasih teks.</div></div></div>
+    <div class="step-item"><div class="step-num">6</div><div class="step-content"><div class="step-title">Upload & optimasi</div><div class="step-desc">Caption, hashtag, waktu upload yang tepat.</div></div></div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">🏫 Contoh 2: Pensi Sekolah</div>
+  <p style="margin-bottom:1rem;font-size:.9rem;color:var(--text-2)">OSIS kamu mau adain Pensi. Kalau langsung dipikirin semuanya sekaligus — pusing! Tapi kalau di-decompose:</p>
+  <div class="comparison-grid">
+    <div class="compare-card">
+      <div class="compare-title text-orange">❌ Tanpa Decomposition</div>
+      <div class="compare-items">"Kita harus bikin Pensi yang keren, ada band, dekorasi bagus, banyak yang dateng, konsumsi enak, dokumentasi oke, tiket laku semua..."<br><br><em style="color:var(--wrong)">= Pusing, nggak tau harus mulai dari mana</em></div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-title text-teal">✅ Dengan Decomposition</div>
+      <div class="compare-items">
+        📋 Panitia Acara<br>
+        🎤 Panitia Penampil<br>
+        🎨 Panitia Dekorasi<br>
+        🍱 Panitia Konsumsi<br>
+        📸 Panitia Dokumentasi<br>
+        🎫 Panitia Tiket<br><br>
+        <em style="color:var(--correct)">= Jelas, bisa dikerjain paralel!</em>
+      </div>
+    </div>
+  </div>
+  <div class="analogy-box">
+    <div class="analogy-label">💡 Insight</div>
+    <div class="analogy-text">Decomposition juga bikin kerjaan bisa <strong>dikerjain bareng-bareng secara paralel</strong> — persis kayak di dunia programming, kamu bisa bagi tugas ke banyak fungsi/modul yang jalan bersamaan!</div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Raka mau bikin aplikasi jadwal pelajaran. Mana yang BUKAN sub-masalah langsung dari "Membuat Aplikasi Jadwal Pelajaran"?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Desain tampilan/UI aplikasi</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Menyimpan data jadwal</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">C. Memilih warna favorit untuk wallpaper HP</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">D. Fitur notifikasi pengingat</button>
+  </div>
+  <div class="kc-feedback correct">✅ Tepat! Warna wallpaper HP nggak ada hubungannya dengan membuat aplikasi jadwal. Decomposition harus fokus ke sub-masalah yang relevan!</div>
+  <div class="kc-feedback wrong">❌ Coba pikir lagi. Semua pilihan lain langsung berkaitan dengan membuat aplikasi jadwal. Ada satu pilihan yang sama sekali nggak relevan...</div>
+</div>
+        `
+      },
+      {
+        id:'dc3', title:'Decomposition Berlapis',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#00e5c8,#0891b2)">
+  <div class="chapter-hero-label">Misi 01 · Chapter 3</div>
+  <h2 class="chapter-hero-title">Decomposition Berlapis 🪆</h2>
+  <p class="chapter-hero-subtitle">Sub-masalah bisa di-decompose lagi! Kayak boneka matryoshka — ada level-level di dalamnya.</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">🪆 Konsep Nested Decomposition</div>
+  <p>Sub-masalah yang kamu buat dari decomposition pertama, kadang masih terlalu besar untuk langsung diselesaikan. Jadi kita perlu <strong>decompose lagi</strong>!</p>
+  <div class="analogy-box">
+    <div class="analogy-label">🌳 Analogi: Pohon Keputusan</div>
+    <div class="analogy-text">Bayangin seperti struktur folder di HP kamu. Folder "Foto" → di dalamnya ada "Foto Sekolah", "Foto Liburan", "Foto Makanan" → di dalam "Foto Sekolah" ada "Foto Kelas X-A", "Foto OSIS", dst. <strong>Itulah decomposition berlapis!</strong></div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">📊 Contoh Nyata: Belajar untuk UN</div>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-num">L1</div><div class="step-content"><div class="step-title">Belajar untuk UN</div><div class="step-desc">Masalah utama — masih terlalu besar!</div></div></div>
+    <div class="step-item" style="margin-left:1.5rem"><div class="step-num" style="background:var(--violet-dim);color:var(--violet);border:1px solid rgba(129,140,248,.3)">L2</div><div class="step-content"><div class="step-title">Belajar Matematika</div><div class="step-desc">Sub-masalah level 2 — masih bisa dipecah lagi...</div></div></div>
+    <div class="step-item" style="margin-left:3rem"><div class="step-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,112,67,.3);font-size:.6rem">L3</div><div class="step-content"><div class="step-title">Latihan soal aljabar</div><div class="step-desc">Sub-sub-masalah level 3 — udah cukup spesifik!</div></div></div>
+    <div class="step-item" style="margin-left:3rem"><div class="step-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,112,67,.3);font-size:.6rem">L3</div><div class="step-content"><div class="step-title">Review rumus geometri</div><div class="step-desc">Sub-sub-masalah level 3 — udah bisa langsung dikerjain!</div></div></div>
+  </div>
+  <div class="highlight-box mt-2">
+    <div class="highlight-text">🎯 <strong>Kapan berhenti memecah?</strong> Saat setiap bagian sudah cukup kecil untuk langsung dikerjakan dalam satu waktu oleh satu orang. Kalau udah bisa langsung dikerjain — stop!</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-teal">💻 Decomposition dalam Coding</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Di dunia programming, Decomposition itu <strong>wajib banget</strong>. Kita nggak pernah nulis program dalam satu blok panjang — kita pecah jadi fungsi-fungsi kecil:</p>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">📦</span><div><strong>Function/Method</strong> — setiap tugas kecil dibungkus jadi fungsi sendiri</div></div>
+    <div class="example-item"><span class="example-icon">📁</span><div><strong>Module/File</strong> — kelompok fungsi yang berhubungan dipisah ke file berbeda</div></div>
+    <div class="example-item"><span class="example-icon">🏗️</span><div><strong>Class/Object</strong> — kumpulan data dan fungsi yang punya tanggung jawab sendiri</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman Terakhir</div>
+  <p class="kc-q">Kenapa decomposition berlapis itu berguna, dibandingkan hanya melakukan decomposition satu level saja?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Supaya pekerjaannya makin banyak dan semua orang sibuk</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">B. Agar setiap bagian cukup kecil untuk langsung dikerjakan, lebih mudah dikelola dan didelegasikan</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Karena komputer tidak bisa memproses masalah yang terlalu besar</button>
+  </div>
+  <div class="kc-feedback correct">✅ Mantap! Itulah inti dari nested decomposition — kita berhenti memecah saat setiap bagian sudah cukup konkret dan actionable. Kamu siap untuk quiz! 🔥</div>
+  <div class="kc-feedback wrong">❌ Belum tepat. Decomposition bukan tentang memperbanyak pekerjaan, tapi tentang membuat setiap pekerjaan jadi lebih mudah dan terkelola!</div>
+</div>
+        `
+      }
+    ]
+  },
+  pattern: {
+    chapters: [
+      {
+        id:'pr1', title:'Apa itu Pattern Recognition?',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#818cf8,#6366f1)">
+  <div class="chapter-hero-label">Misi 02 · Chapter 1</div>
+  <h2 class="chapter-hero-title">Apa itu Pattern<br>Recognition? 🔍</h2>
+  <p class="chapter-hero-subtitle">Pernah nonton drama Korea dan bisa nebak endingnya sebelum episode terakhir? Itu Pattern Recognition!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-violet">💡 Definisi</div>
+  <p><strong>Pattern Recognition</strong> adalah kemampuan <span class="key-concept">menemukan kesamaan, tren, atau pola yang berulang</span> dalam sebuah masalah atau sekumpulan data.</p>
+  <div class="analogy-box" style="background:var(--violet-dim);border-color:rgba(129,140,248,.25);border-left-color:var(--violet)">
+    <div class="analogy-label" style="color:var(--violet)">🎵 Analogi: Lagu Favorit</div>
+    <div class="analogy-text">Kamu pernah langsung tebak judul lagu hanya dari intro pertama? Otak kamu mengenali <strong>pola melodi</strong> yang pernah didengar sebelumnya. Itulah Pattern Recognition secara alami!</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-violet">🔗 Hubungannya dengan Decomposition</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Setelah kita decompose masalah, langkah berikutnya adalah cari tahu: <strong>apakah ada bagian-bagian yang mirip atau sama?</strong></p>
+  <div class="highlight-box" style="background:var(--violet-dim);border-color:rgba(129,140,248,.2)">
+    <div class="highlight-text">💡 Kalau ada pola yang sama, kita nggak perlu bikin solusi baru dari nol. Cukup <strong>gunakan solusi yang sudah ada!</strong> Ini yang bikin programmer efisien.</div>
+  </div>
+  <div class="example-list mt-2">
+    <div class="example-item"><span class="example-icon">📱</span><div>Setiap aplikasi punya fitur "login" — daripada bikin login dari nol tiap bikin app baru, developer pakai library/template yang sama.</div></div>
+    <div class="example-item"><span class="example-icon">📐</span><div>Banyak soal matematika punya pola rumus yang mirip — kalau udah ngerti polanya, semua soal sejenis jadi gampang!</div></div>
+    <div class="example-item"><span class="example-icon">🌤️</span><div>Prakiraan cuaca dibuat dengan mengenali pola data cuaca dari bertahun-tahun lalu.</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Seorang programmer membuat 5 halaman website yang semuanya butuh header dan footer yang sama. Pendekatan Pattern Recognition yang paling tepat adalah...</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Tulis kode header dan footer secara manual di setiap halaman</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">B. Buat satu komponen header dan footer, lalu gunakan ulang di semua halaman</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Buat 5 versi header yang berbeda-beda untuk variasi</button>
+  </div>
+  <div class="kc-feedback correct">✅ Betul! Ini namanya "reusable component" — salah satu penerapan Pattern Recognition paling fundamental dalam coding!</div>
+  <div class="kc-feedback wrong">❌ Kalau ada pola yang sama, kita buat sekali dan gunakan berulang. Itulah efisiensi yang diajarkan Pattern Recognition!</div>
+</div>
+        `
+      },
+      {
+        id:'pr2', title:'Pola di Sekitar Kita',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#818cf8,#6366f1)">
+  <div class="chapter-hero-label">Misi 02 · Chapter 2</div>
+  <h2 class="chapter-hero-title">Pola di Sekitar Kita 🌐</h2>
+  <p class="chapter-hero-subtitle">Pattern ada di mana-mana — dari jadwal sekolah sampai algoritma media sosial!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-violet">📅 Pola Waktu & Jadwal</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Perhatikan jadwal pelajaranmu. Ada pola? Pasti ada!</p>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">🔄</span><div>Pelajaran yang sama selalu hadir di hari dan jam yang sama setiap minggu → <strong>pola mingguan</strong></div></div>
+    <div class="example-item"><span class="example-icon">📖</span><div>Setiap pelajaran selalu dimulai dengan guru masuk → absen → materi → latihan → penutup → <strong>pola struktur pelajaran</strong></div></div>
+    <div class="example-item"><span class="example-icon">📝</span><div>Ujian selalu diadakan di akhir semester → <strong>pola akademik</strong></div></div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-violet">📲 Pola di Media Sosial</div>
+  <div class="analogy-box" style="background:var(--violet-dim);border-color:rgba(129,140,248,.25);border-left-color:var(--violet)">
+    <div class="analogy-label" style="color:var(--violet)">🤖 Analogi: Algoritma FYP TikTok</div>
+    <div class="analogy-text">TikTok bisa rekomendasiin video yang kamu suka karena algoritmanya <strong>mengenali pola perilaku kamu</strong> — video apa yang kamu tonton sampai habis, video apa yang di-skip, jam berapa kamu biasanya buka TikTok, dll. Semua itu adalah Pattern Recognition yang dilakukan oleh AI!</div>
+  </div>
+  <div class="comparison-grid mt-2">
+    <div class="compare-card">
+      <div class="compare-title text-violet">Pola yang dikenali TikTok</div>
+      <div class="compare-items">
+        • Video yang ditonton >80%<br>
+        • Video yang di-like & share<br>
+        • Topik yang sering dicari<br>
+        • Waktu aktif pengguna<br>
+        • Interaksi dengan kreator
+      </div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-title text-violet">Hasilnya</div>
+      <div class="compare-items">
+        → FYP yang sesuai selera<br>
+        → Notifikasi di waktu tepat<br>
+        → Rekomendasi akun sejenis<br>
+        → Iklan yang relevan<br>
+        → Kamu makin lama main TikTok 😅
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Dari data penjualan toko online, ditemukan bahwa penjualan selalu naik 300% di bulan Ramadan setiap tahunnya. Ini adalah contoh Pattern Recognition jenis apa?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Pola spasial (berdasarkan lokasi)</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">B. Pola temporal (berdasarkan waktu/musim)</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Pola perilaku (berdasarkan kebiasaan pengguna)</button>
+  </div>
+  <div class="kc-feedback correct">✅ Tepat! Pola yang berulang berdasarkan periode waktu (tahun, bulan, musim) disebut pola temporal. Ini yang dipakai bisnis untuk prediksi stok barang!</div>
+  <div class="kc-feedback wrong">❌ Coba perhatikan — polanya berulang di waktu yang sama setiap tahun. Itu adalah tanda pola yang berdasarkan waktu!</div>
+</div>
+        `
+      },
+      {
+        id:'pr3', title:'Manfaat Menemukan Pola',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#818cf8,#6366f1)">
+  <div class="chapter-hero-label">Misi 02 · Chapter 3</div>
+  <h2 class="chapter-hero-title">Manfaat Menemukan Pola 🎯</h2>
+  <p class="chapter-hero-subtitle">Kenapa sih menemukan pola itu bisa menghemat banyak waktu dan energi?</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-violet">⚡ 4 Manfaat Utama Pattern Recognition</div>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-num">1</div><div class="step-content"><div class="step-title">Efisiensi — Nggak Kerja Dua Kali</div><div class="step-desc">Kalau kamu udah pernah selesaikan masalah dengan pola tertentu, kamu bisa pakai solusi yang sama untuk masalah serupa. Nggak perlu mikir dari nol lagi!</div></div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-content"><div class="step-title">Prediksi — Bisa Nebak yang Belum Terjadi</div><div class="step-desc">Dari pola data historis, kita bisa memprediksi apa yang akan terjadi selanjutnya. Prakiraan cuaca, prediksi saham, prediksi tren — semua pakai ini!</div></div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-content"><div class="step-title">Generalisasi — Satu Solusi untuk Banyak Masalah</div><div class="step-desc">Pola yang ditemukan bisa dibuat menjadi solusi umum (general solution) yang berlaku untuk banyak kasus sekaligus.</div></div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-content"><div class="step-title">Deteksi Anomali — Kenali yang Ganjil</div><div class="step-desc">Kalau kamu tahu pola normalnya, kamu bisa langsung tahu kalau ada yang aneh/tidak sesuai pola. Ini yang dipakai sistem keamanan bank!</div></div></div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-violet">🤖 Pattern Recognition dalam AI & Machine Learning</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Sebagian besar teknologi AI yang kamu pakai sehari-hari bekerja berdasarkan Pattern Recognition:</p>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">🎤</span><div><strong>Siri, Google Assistant</strong> — mengenali pola suaramu untuk memahami perintah</div></div>
+    <div class="example-item"><span class="example-icon">📸</span><div><strong>Face ID</strong> — mengenali pola wajahmu dari ribuan titik referensi</div></div>
+    <div class="example-item"><span class="example-icon">💬</span><div><strong>ChatGPT/Claude</strong> — mengenali pola bahasa manusia dari miliaran teks</div></div>
+    <div class="example-item"><span class="example-icon">🚗</span><div><strong>Mobil self-driving</strong> — mengenali pola rambu lalu lintas, pejalan kaki, kendaraan lain</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman Terakhir</div>
+  <p class="kc-q">Bank mendeteksi bahwa kartu kredit Budi tiba-tiba dipakai untuk transaksi di luar negeri padahal Budi tidak pernah ke luar negeri. Bank langsung memblokir kartunya. Kemampuan CT apa yang digunakan sistem bank tersebut?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'correct')">A. Pattern Recognition — sistem mengetahui pola normal transaksi Budi, lalu mendeteksi anomali</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Decomposition — sistem memecah transaksi menjadi bagian-bagian kecil</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Algorithm Design — sistem mengikuti langkah-langkah yang telah ditentukan</button>
+  </div>
+  <div class="kc-feedback correct">✅ Persis! Ini namanya anomaly detection — salah satu aplikasi Pattern Recognition yang paling penting di dunia keamanan digital. Kamu udah siap quiz! 🔥</div>
+  <div class="kc-feedback wrong">❌ Kuncinya ada di kata "mendeteksi yang tidak sesuai pola normal" — itu adalah ciri khas Pattern Recognition!</div>
+</div>
+        `
+      }
+    ]
+  },
+  abstraction: {
+    chapters: [
+      {
+        id:'ab1', title:'Apa itu Abstraction?',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#ff7043,#e64a19)">
+  <div class="chapter-hero-label">Misi 03 · Chapter 1</div>
+  <h2 class="chapter-hero-title">Apa itu Abstraction? 🗂️</h2>
+  <p class="chapter-hero-subtitle">Kamu pakai Google Maps tapi nggak perlu tau cara kerjanya di dalam — itulah Abstraction!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-orange">💡 Definisi</div>
+  <p><strong>Abstraction</strong> adalah kemampuan <span class="key-concept">memilih informasi penting dan mengabaikan detail yang tidak relevan</span> untuk menyelesaikan suatu masalah.</p>
+  <div class="analogy-box">
+    <div class="analogy-label">🗺️ Analogi: Peta vs Foto Satelit</div>
+    <div class="analogy-text">Peta kota hanya menampilkan jalan, nama tempat, dan landmark penting. Dia <strong>tidak menampilkan</strong> warna cat tembok, jumlah jendela tiap rumah, atau jenis pohon di pinggir jalan — karena detail itu nggak relevan kalau kamu lagi nyari rute ke sekolah. Itulah Abstraction!</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-orange">🔑 Dua Aspek Abstraction</div>
+  <div class="comparison-grid">
+    <div class="compare-card" style="border-color:rgba(16,185,129,.3)">
+      <div class="compare-title text-teal">✅ Yang DIPERTAHANKAN</div>
+      <div class="compare-items">Informasi yang penting dan relevan untuk menyelesaikan masalah yang sedang dihadapi.</div>
+    </div>
+    <div class="compare-card" style="border-color:rgba(244,63,94,.3)">
+      <div class="compare-title" style="color:var(--wrong)">❌ Yang DIABAIKAN</div>
+      <div class="compare-items">Detail yang tidak berpengaruh terhadap solusi. Boleh ada, tapi nggak perlu dipikirkan sekarang.</div>
+    </div>
+  </div>
+  <div class="highlight-box mt-2">
+    <div class="highlight-text">⚠️ <strong>Penting:</strong> Sesuatu yang "tidak penting" bersifat relatif — tergantung konteks masalahnya! Detail yang tidak penting untuk satu masalah, bisa sangat penting untuk masalah lain.</div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Kamu mau buat jadwal belajar untuk ujian besok. Informasi mana yang PERLU diabstraksikan (diabaikan)?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Mata pelajaran apa saja yang diujikan</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Jam mulai dan selesai belajar</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">C. Warna pulpen yang akan dipakai untuk mencatat</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">D. Bab mana yang belum dipahami</button>
+  </div>
+  <div class="kc-feedback correct">✅ Betul! Warna pulpen tidak berpengaruh terhadap kualitas belajarmu. Itu adalah detail yang harus diabaikan agar fokus pada hal yang penting!</div>
+  <div class="kc-feedback wrong">❌ Hampir! Coba cari pilihan yang paling tidak relevan dengan membuat jadwal belajar yang efektif...</div>
+</div>
+        `
+      },
+      {
+        id:'ab2', title:'Detail Penting vs Tidak Penting',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#ff7043,#e64a19)">
+  <div class="chapter-hero-label">Misi 03 · Chapter 2</div>
+  <h2 class="chapter-hero-title">Detail Penting vs<br>Tidak Penting 🎯</h2>
+  <p class="chapter-hero-subtitle">Kuncinya: detail penting itu kontekstual — tergantung masalah yang lagi diselesaikan!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-orange">🚗 Studi Kasus: Beli Mobil vs Service Mobil</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Detail yang sama bisa penting di satu konteks tapi nggak penting di konteks lain:</p>
+  <div class="comparison-grid">
+    <div class="compare-card">
+      <div class="compare-title text-orange">🛒 Konteks: Beli Mobil</div>
+      <div class="compare-items">
+        <span style="color:var(--correct)">✓ Penting:</span> Harga, warna, tipe<br><br>
+        <span style="color:var(--wrong)">✗ Diabaikan:</span> Cara kerja mesin secara detail
+      </div>
+    </div>
+    <div class="compare-card">
+      <div class="compare-title text-orange">🔧 Konteks: Service Mobil</div>
+      <div class="compare-items">
+        <span style="color:var(--correct)">✓ Penting:</span> Detail mesin, komponen<br><br>
+        <span style="color:var(--wrong)">✗ Diabaikan:</span> Warna cat mobil
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-orange">📱 Contoh: Desain Aplikasi</div>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">👤</span><div>Saat bikin fitur <strong>"Profil User"</strong>, yang penting: nama, foto, bio. Yang diabaikan: password (ada di sistem auth), histori server, ID database.</div></div>
+    <div class="example-item"><span class="example-icon">🔐</span><div>Saat bikin fitur <strong>"Login"</strong>, yang penting: username, password, validasi. Yang diabaikan: nama lengkap user, tanggal lahir, hobi.</div></div>
+    <div class="example-item"><span class="example-icon">🛒</span><div>Saat bikin fitur <strong>"Keranjang Belanja"</strong>, yang penting: nama produk, harga, jumlah. Yang diabaikan: nama pabrik pembuat produk.</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Seorang dokter sedang mendiagnosis pasien yang demam. Dalam konteks ini, mana yang merupakan abstraksi yang tepat?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'correct')">A. Fokus pada: suhu tubuh, gejala, riwayat penyakit. Abaikan: warna baju pasien, hobi pasien.</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Fokus pada: semua informasi tentang pasien tanpa terkecuali</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Fokus pada: nama lengkap dan alamat pasien saja</button>
+  </div>
+  <div class="kc-feedback correct">✅ Tepat! Dokter melakukan abstraksi — fokus ke informasi medis yang relevan, abaikan hal-hal yang tidak berpengaruh terhadap diagnosis!</div>
+  <div class="kc-feedback wrong">❌ Ingat — abstraksi artinya memilih detail yang RELEVAN dengan masalah yang diselesaikan. Dokter butuh informasi medis, bukan semua informasi tentang pasien!</div>
+</div>
+        `
+      },
+      {
+        id:'ab3', title:'Abstraction dalam Sistem',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#ff7043,#e64a19)">
+  <div class="chapter-hero-label">Misi 03 · Chapter 3</div>
+  <h2 class="chapter-hero-title">Abstraction dalam Sistem 🏗️</h2>
+  <p class="chapter-hero-subtitle">Teknologi yang kamu pakai setiap hari bekerja karena ada banyak lapisan abstraksi di dalamnya!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-orange">🧅 Lapisan Abstraksi (Layers of Abstraction)</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Sistem kompleks selalu dibangun dengan banyak lapisan, di mana setiap lapisan menyembunyikan detail dari lapisan di bawahnya:</p>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,112,67,.3)">4</div><div class="step-content"><div class="step-title">Aplikasi (yang kamu pakai)</div><div class="step-desc">WhatsApp, TikTok, Instagram — kamu tinggal ketik & kirim</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,112,67,.3)">3</div><div class="step-content"><div class="step-title">Sistem Operasi</div><div class="step-desc">Android/iOS — mengelola semua app dan hardware</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,112,67,.3)">2</div><div class="step-content"><div class="step-title">Hardware Drivers</div><div class="step-desc">Software yang "berbicara" langsung ke chip dan komponen</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--orange-dim);color:var(--orange);border:1px solid rgba(255,112,67,.3)">1</div><div class="step-content"><div class="step-title">Hardware Fisik</div><div class="step-desc">Transistor, kapasitor, chip — pulsa listrik 0 dan 1</div></div></div>
+  </div>
+  <div class="analogy-box">
+    <div class="analogy-label">💡 Insight</div>
+    <div class="analogy-text">Kamu nggak perlu tau cara kerja transistor untuk bisa chat di WhatsApp. Abstraksi berlapis inilah yang membuat teknologi bisa dipakai semua orang, bukan hanya para insinyur!</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-orange">💻 Abstraction dalam Programming</div>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">📦</span><div><strong>Function</strong> — kamu tinggal panggil fungsinya, nggak perlu tau detail implementasinya</div></div>
+    <div class="example-item"><span class="example-icon">📚</span><div><strong>Library/API</strong> — pakai Google Maps API tanpa perlu tau cara kerja GPS secara internal</div></div>
+    <div class="example-item"><span class="example-icon">🗄️</span><div><strong>Database</strong> — kamu tinggal "simpan data" atau "ambil data", nggak perlu tau cara data disimpan di disk</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman Terakhir</div>
+  <p class="kc-q">Kenapa abstraction itu penting dalam pengembangan software yang kompleks?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Supaya programmer tidak perlu belajar banyak hal</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">B. Agar setiap developer bisa fokus pada bagian pekerjaannya tanpa harus memahami semua detail sistem secara keseluruhan</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Karena komputer hanya bisa memproses informasi yang sedikit</button>
+  </div>
+  <div class="kc-feedback correct">✅ Mantap! Itulah kekuatan abstraction — memungkinkan tim besar untuk bekerja pada sistem yang kompleks secara kolaboratif. Siap quiz! 🔥</div>
+  <div class="kc-feedback wrong">❌ Abstraction bukan untuk menghindari belajar, tapi untuk <strong>mengelola kompleksitas</strong> — sehingga setiap orang bisa fokus pada tugasnya masing-masing!</div>
+</div>
+        `
+      }
+    ]
+  },
+  algorithm: {
+    chapters: [
+      {
+        id:'al1', title:'Apa itu Algoritma?',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#fbbf24,#d97706)">
+  <div class="chapter-hero-label">Misi 04 · Chapter 1</div>
+  <h2 class="chapter-hero-title">Apa itu Algoritma? 📋</h2>
+  <p class="chapter-hero-subtitle">Setiap kali kamu ikutin resep masakan atau petunjuk arah, kamu lagi jalanin algoritma!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-gold">💡 Definisi</div>
+  <p><strong>Algoritma</strong> adalah <span class="key-concept">sekumpulan langkah-langkah yang terdefinisi dengan jelas, berurutan, dan terbatas</span> untuk menyelesaikan suatu masalah atau mencapai tujuan tertentu.</p>
+  <div class="analogy-box" style="background:var(--gold-dim);border-color:rgba(251,191,36,.25);border-left-color:var(--gold)">
+    <div class="analogy-label" style="color:var(--gold)">🍜 Analogi: Resep Indomie</div>
+    <div class="analogy-text">Resep di belakang bungkus Indomie itu adalah algoritma! Ada langkah-langkah yang <strong>jelas</strong> (rebus air 400ml), <strong>berurutan</strong> (masak mie dulu, baru bumbu), dan <strong>terbatas</strong> (selesai setelah mie diangkat dan bumbu dituang). Kalau urutannya dibalik — bumbu duluan, baru air direbus — hasilnya aneh!</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-gold">🔑 4 Karakteristik Algoritma yang Baik</div>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">1</div><div class="step-content"><div class="step-title">Input yang Jelas</div><div class="step-desc">Algoritma harus tahu apa yang menjadi "bahan masukan"-nya sebelum bekerja.</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">2</div><div class="step-content"><div class="step-title">Output yang Jelas</div><div class="step-desc">Harus ada hasil yang jelas dan bisa diprediksi dari algoritma tersebut.</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">3</div><div class="step-content"><div class="step-title">Definitif (Tidak Ambigu)</div><div class="step-desc">Setiap langkah harus jelas dan tidak bisa diinterpretasikan dengan dua cara berbeda.</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">4</div><div class="step-content"><div class="step-title">Terbatas (Finite)</div><div class="step-desc">Algoritma harus berhenti pada suatu titik — tidak boleh berjalan selamanya (infinite loop).</div></div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Mana yang BUKAN karakteristik algoritma yang baik?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Setiap langkah harus jelas dan tidak ambigu</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Harus menghasilkan output yang bisa diprediksi</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">C. Boleh berjalan selamanya selama masalah belum selesai</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">D. Harus ada titik akhir (berhenti pada kondisi tertentu)</button>
+  </div>
+  <div class="kc-feedback correct">✅ Betul! Algoritma HARUS berhenti (finite). Kalau tidak berhenti, itu namanya infinite loop — salah satu bug paling berbahaya dalam programming!</div>
+  <div class="kc-feedback wrong">❌ Algoritma yang baik harus bisa berhenti! Algoritma yang berjalan selamanya justru adalah tanda ada masalah serius.</div>
+</div>
+        `
+      },
+      {
+        id:'al2', title:'Ciri-ciri Algoritma yang Baik',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#fbbf24,#d97706)">
+  <div class="chapter-hero-label">Misi 04 · Chapter 2</div>
+  <h2 class="chapter-hero-title">Algoritma yang Baik<br>vs Buruk 📊</h2>
+  <p class="chapter-hero-subtitle">Nggak semua langkah-langkah yang ada bisa disebut algoritma yang baik!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-gold">⚖️ Perbandingan: Algoritma Baik vs Buruk</div>
+  <div class="comparison-grid">
+    <div class="compare-card" style="border-color:rgba(244,63,94,.3)">
+      <div class="compare-title" style="color:var(--wrong)">❌ Algoritma Buruk</div>
+      <div class="compare-items" style="font-size:.8rem">
+        "Masak nasi sampai matang"<br><br>
+        → Berapa lama? Bagaimana tahu sudah matang? Berapa banyak air? Semua AMBIGU!
+      </div>
+    </div>
+    <div class="compare-card" style="border-color:rgba(16,185,129,.3)">
+      <div class="compare-title" style="color:var(--correct)">✅ Algoritma Baik</div>
+      <div class="compare-items" style="font-size:.8rem">
+        1. Cuci 2 cup beras hingga air jernih<br>
+        2. Tambahkan air 2.5 cup<br>
+        3. Masak di rice cooker 20 menit<br>
+        4. Diamkan 5 menit<br>
+        5. Nasi siap disajikan<br><br>
+        → Jelas, terukur, bisa direplikasi!
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-gold">🏎️ Efisiensi Algoritma</div>
+  <p style="font-size:.9rem;color:var(--text-2);margin-bottom:1rem">Dua algoritma bisa menghasilkan output yang sama, tapi satu bisa jauh lebih efisien:</p>
+  <div class="analogy-box" style="background:var(--gold-dim);border-color:rgba(251,191,36,.25);border-left-color:var(--gold)">
+    <div class="analogy-label" style="color:var(--gold)">🔍 Analogi: Cari Nama di Buku Telepon</div>
+    <div class="analogy-text">
+      <strong>Algoritma A (Buruk):</strong> Cari dari halaman 1 satu per satu sampai ketemu — bisa butuh ribuan langkah!<br><br>
+      <strong>Algoritma B (Baik):</strong> Buka halaman tengah, kalau nama yang dicari ada di lebih awal → cari di separuh kiri, kalau lebih akhir → separuh kanan. Ulangi. Ini <strong>Binary Search</strong> — jauh lebih cepat!
+    </div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman</div>
+  <p class="kc-q">Instruksi "Tambahkan gula secukupnya ke dalam teh" — apa masalah dengan instruksi ini jika dipakai sebagai langkah dalam algoritma?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'correct')">A. Ambigu — "secukupnya" tidak terukur dan berbeda bagi setiap orang</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Salah — gula tidak boleh ditambahkan ke teh</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">C. Tidak ada masalah, instruksi sudah jelas</button>
+  </div>
+  <div class="kc-feedback correct">✅ Tepat! Algoritma harus definitif dan tidak ambigu. "Secukupnya" tidak memenuhi syarat ini karena artinya beda bagi setiap orang. Seharusnya: "Tambahkan 2 sendok teh gula".</div>
+  <div class="kc-feedback wrong">❌ Masalahnya ada di kata "secukupnya" — itu ambigu! Komputer (atau siapapun yang mengikuti algoritma) tidak tahu berapa banyak "secukupnya" itu.</div>
+</div>
+        `
+      },
+      {
+        id:'al3', title:'Algoritma di Kehidupan Sehari-hari',
+        content: `
+<div class="chapter-hero" style="--hero-gradient:linear-gradient(135deg,#fbbf24,#d97706)">
+  <div class="chapter-hero-label">Misi 04 · Chapter 3</div>
+  <h2 class="chapter-hero-title">Algoritma di Kehidupan<br>Sehari-hari 🌎</h2>
+  <p class="chapter-hero-subtitle">Dari bangun tidur sampai tidur lagi, kamu terus-terusan jalanin algoritma!</p>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-gold">🌅 Algoritma Rutinitas Pagi</div>
+  <div class="steps-list">
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">1</div><div class="step-content"><div class="step-title">Alarm berbunyi → Bangun</div><div class="step-desc">Input: suara alarm. Output: badan dalam posisi duduk/berdiri.</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">2</div><div class="step-content"><div class="step-title">Cek waktu → Keputusan</div><div class="step-desc">JIKA masih ada 30 menit → mandi dulu. JIKA cuma 10 menit → langsung pakai baju.</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">3</div><div class="step-content"><div class="step-title">Siapkan tas</div><div class="step-desc">Cek jadwal pelajaran → masukkan buku yang sesuai → masukkan bekal.</div></div></div>
+    <div class="step-item"><div class="step-num" style="background:var(--gold-dim);color:var(--gold);border:1px solid rgba(251,191,36,.3)">4</div><div class="step-content"><div class="step-title">Berangkat sekolah</div><div class="step-desc">Output akhir: kamu sampai di sekolah tepat waktu!</div></div></div>
+  </div>
+  <div class="highlight-box mt-2">
+    <div class="highlight-text">💡 Perhatikan langkah 2 — ada <strong>kondisi (IF-ELSE)</strong>! Ini adalah salah satu konsep paling penting dalam algoritma: percabangan berdasarkan kondisi. Di coding, ini jadi <code>if-else statement</code>!</div>
+  </div>
+</div>
+
+<div class="content-block">
+  <div class="block-label text-gold">🔄 Jenis-jenis Struktur Algoritma</div>
+  <div class="example-list">
+    <div class="example-item"><span class="example-icon">➡️</span><div><strong>Sequence (Urutan)</strong> — langkah dikerjakan satu per satu secara berurutan. Contoh: resep masakan.</div></div>
+    <div class="example-item"><span class="example-icon">🔀</span><div><strong>Selection (Percabangan)</strong> — ada kondisi IF-ELSE. Contoh: "Kalau hujan → bawa payung, kalau nggak → nggak usah".</div></div>
+    <div class="example-item"><span class="example-icon">🔁</span><div><strong>Iteration (Perulangan)</strong> — langkah diulang sampai kondisi terpenuhi. Contoh: "Ulangi cuci piring sampai semua piring selesai".</div></div>
+  </div>
+</div>
+
+<div class="knowledge-check">
+  <div class="kc-title">⚡ Cek Pemahaman Terakhir</div>
+  <p class="kc-q">Instruksi "Periksa setiap soal ujian satu per satu, JIKA jawabannya benar beri tanda ✓, JIKA salah beri tanda ✗, LANJUTKAN sampai semua soal selesai diperiksa." Struktur algoritma apa yang ada di sini?</p>
+  <div class="kc-options">
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">A. Hanya Sequence</button>
+    <button class="kc-opt" onclick="checkKC(this,'wrong')">B. Hanya Selection</button>
+    <button class="kc-opt" onclick="checkKC(this,'correct')">C. Iteration + Selection (Perulangan dengan percabangan di dalamnya)</button>
+  </div>
+  <div class="kc-feedback correct">✅ Brilliant! Ada perulangan ("sampai semua soal selesai") dan di dalamnya ada percabangan ("JIKA benar / JIKA salah"). Ini adalah kombinasi yang paling sering muncul dalam algoritma nyata. Siap quiz! 🔥</div>
+  <div class="kc-feedback wrong">❌ Perhatikan dua hal: ada pengulangan sampai kondisi terpenuhi, DAN ada pilihan berdasarkan kondisi. Dua struktur ini hadir bersamaan!</div>
+</div>
+        `
+      }
+    ]
+  }
+};
+
+// ═══════════════════════════════════
+// QUIZ QUESTIONS
+// ═══════════════════════════════════
+const QUIZZES = {
+  decomposition: {
+    topicLabel:'🧩 Decomposition', maxPts:110,
+    questions:[
+      // Q1 — Konsep dasar
+      {id:'d1',type:'mcq',pts:8,
+       tag:'mcq',tagLabel:'Konsep Dasar',
+       text:'Saat kamu mau bikin acara ulang tahun teman tapi bingung mau mulai dari mana, kamu akhirnya tulis daftar: "beli kue, siapkan dekorasi, undang tamu, pesan tempat". Proses berpikir ini paling tepat disebut...',
+       options:['Pattern Recognition — karena acara ulang tahun punya pola yang sama tiap tahun','Decomposition — karena kamu memecah satu masalah besar jadi tugas-tugas kecil yang bisa dikerjakan','Abstraction — karena kamu mengabaikan detail yang tidak penting','Algorithm Design — karena kamu membuat langkah yang berurutan'],
+       correct:1,
+       feedback:{c:'✅ Tepat! Memecah "bikin acara ultah" jadi tugas-tugas spesifik = Decomposition. Kamu udah sering lakuin ini tanpa sadar!',w:'❌ Fokus ke kata "memecah satu masalah besar jadi tugas-tugas kecil" — itu ciri khas Decomposition, bukan yang lain.'}},
+
+      // Q2 — Identifikasi sub-masalah
+      {id:'d2',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Identifikasi',
+       scenario:'Dika diminta guru untuk membuat presentasi PowerPoint tentang "Dampak Media Sosial terhadap Remaja". Dia mau gunakan Decomposition untuk mulai.',
+       text:'Mana yang merupakan cara decompose yang PALING TEPAT untuk tugas ini?',
+       options:[
+         'Langsung buka PowerPoint dan mulai ketik apa pun yang terlintas di pikiran',
+         'Pecah menjadi: riset data & fakta → tentukan poin utama → desain slide → latihan presentasi',
+         'Minta teman untuk mengerjakan bagiannya masing-masing tanpa koordinasi',
+         'Cari referensi sebanyak mungkin dulu sebelum memikirkan struktur'
+       ],
+       correct:1,
+       feedback:{c:'✅ Betul! Decomposition yang baik menghasilkan sub-tugas yang berurutan logis dan bisa langsung dikerjakan satu per satu.',w:'❌ Decomposition bukan sekadar "bagi-bagi tugas" — tapi memecah secara sistematis dengan urutan yang logis.'}},
+
+      // Q3 — Drag & Drop kategorisasi
+      {id:'d3',type:'dragdrop',pts:13,
+       tag:'drag',tagLabel:'Drag & Drop',
+       scenario:'Kelompok kamu mau bikin aplikasi "Toko Buku Online" sederhana sebagai proyek sekolah.',
+       text:'Kategorikan fitur-fitur berikut: mana yang sub-masalah INTI (harus ada) dan mana yang OPSIONAL (nice to have)?',
+       items:[
+         {id:'dg1',text:'📚 Daftar buku dengan harga',correct:'inti'},
+         {id:'dg2',text:'🛒 Keranjang belanja',correct:'inti'},
+         {id:'dg3',text:'💳 Proses pembayaran',correct:'inti'},
+         {id:'dg4',text:'🌙 Dark mode tema',correct:'opsional'},
+         {id:'dg5',text:'🎵 Musik latar toko',correct:'opsional'},
+         {id:'dg6',text:'🤖 Chatbot AI rekomendasi',correct:'opsional'},
+       ],
+       zones:[{id:'inti',label:'🔑 Sub-masalah Inti'},{id:'opsional',label:'✨ Fitur Opsional'}],
+       feedback:{c:'✅ Klasifikasi sempurna! Decomposition yang baik juga membantu kita prioritaskan mana yang harus diselesaikan dulu.',p:'⚠️ Hampir! Fitur inti = tanpa ini aplikasi tidak bisa berfungsi. Fitur opsional = bagus punya tapi bukan keharusan.',w:'❌ Pikirkan: fitur mana yang HARUS ada agar toko buku online bisa beroperasi? Itulah sub-masalah inti.'}},
+
+      // Q4 — Ordering (konteks berbeda dari materi)
+      {id:'d4',type:'ordering',pts:13,
+       tag:'order',tagLabel:'Urutkan',
+       scenario:'Naila mau buat akun TikTok baru dari nol dan mulai posting konten.',
+       text:'Bantu Naila urutkan langkah-langkah ini dari yang pertama dilakukan!',
+       items:[
+         {id:'do1',text:'📲 Download dan install aplikasi TikTok',order:1},
+         {id:'do2',text:'📧 Daftar akun dengan email/nomor HP',order:2},
+         {id:'do3',text:'👤 Set up profil: foto, bio, username',order:3},
+         {id:'do4',text:'🎬 Rekam dan edit video pertama',order:4},
+         {id:'do5',text:'🚀 Upload video dengan caption dan hashtag',order:5},
+       ],
+       feedback:{c:'✅ Urutan logis! Kamu nggak bisa upload video sebelum punya akun, dan nggak bisa setup profil sebelum daftar. Itulah dependency dalam decomposition!',w:'❌ Perhatikan urutan dependency-nya — ada langkah yang tidak bisa dilakukan sebelum langkah sebelumnya selesai.'}},
+
+      // Q5 — Analisis kesalahan decomposition
+      {id:'d5',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Analisis Kritis',
+       scenario:'Mamad meng-decompose tugas "Belajar Bahasa Inggris" menjadi:\n① Beli buku grammar tebal\n② Hafal 10.000 kosa kata\n③ Lancar speaking',
+       text:'Apa masalah utama dengan decomposition yang Mamad buat?',
+       options:[
+         'Sub-tugasnya sudah cukup baik dan logis',
+         'Sub-tugas ① dan ② masih terlalu besar dan tidak konkret — "hafal 10.000 kosa kata" tidak bisa dikerjakan dalam satu sesi belajar',
+         'Belajar bahasa Inggris tidak bisa di-decompose karena terlalu kompleks',
+         'Rizky seharusnya langsung ikut kursus saja tanpa perlu decompose'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat banget! Sub-tugas yang baik harus cukup kecil untuk bisa dikerjakan. "Hafal 10.000 kata" masih terlalu besar — perlu dipecah lagi jadi "hafal 10 kata baru per hari".',w:'❌ Masalahnya ada di ukuran sub-tugas. Decomposition yang baik menghasilkan potongan yang cukup kecil dan konkret untuk dikerjakan.'}},
+
+      // Q6 — Hubungan decomposition dengan coding
+      {id:'d6',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Koneksi ke Coding',
+       scenario:'Di Python, ada program panjang yang melakukan banyak hal: validasi input, hitung total, format output, kirim email. Programmer memisahkannya menjadi function: validate_input(), calculate_total(), format_output(), send_email().',
+       text:'Prinsip Computational Thinking apa yang diterapkan programmer ini?',
+       options:[
+         'Pattern Recognition — karena setiap function punya pola yang sama',
+         'Abstraction — karena detail implementasi disembunyikan',
+         'Decomposition — karena masalah besar dipecah jadi function-function kecil yang masing-masing punya tanggung jawab sendiri',
+         'Algorithm Design — karena urutannya sudah ditentukan'
+       ],
+       correct:2,
+       feedback:{c:'✅ Tepat! Function dalam programming adalah wujud nyata Decomposition — setiap function = satu sub-masalah dengan tanggung jawab yang jelas.',w:'❌ Perhatikan bahwa setiap function menangani SATU tugas spesifik dari keseluruhan program. Itu adalah Decomposition!'}},
+
+      // Q7 — Drag & Drop: dependency
+      {id:'d7',type:'dragdrop',pts:13,
+       tag:'drag',tagLabel:'Drag & Drop',
+       scenario:'Kamu mau masak Mie Goreng. Ada beberapa langkah yang urutannya tidak bisa dibolak-balik (dependent) dan ada yang bisa dilakukan kapan saja (independent).',
+       text:'Kelompokkan langkah-langkah ini!',
+       items:[
+         {id:'dg7',text:'🍳 Goreng mie setelah ditiriskan',correct:'dependent'},
+         {id:'dg8',text:'🌊 Rebus mie sebelum ditiriskan',correct:'dependent'},
+         {id:'dg9',text:'🧅 Iris bawang dan cabai',correct:'independent'},
+         {id:'dg10',text:'🥚 Goreng telur terpisah',correct:'independent'},
+         {id:'dg11',text:'🍽️ Sajikan setelah semua dimasak',correct:'dependent'},
+         {id:'dg12',text:'🛒 Siapkan semua bahan dari kulkas',correct:'independent'},
+       ],
+       zones:[{id:'dependent',label:'🔗 Harus Berurutan (Dependent)'},{id:'independent',label:'🔀 Bisa Kapan Saja (Independent)'}],
+       feedback:{c:'✅ Mantap! Memahami mana yang dependent dan independent membantu kita mengerjakan sub-masalah secara paralel — lebih efisien!',p:'⚠️ Hampir! Dependent = urutan tidak bisa dibalik (rebus dulu baru tiriskan). Independent = bisa dilakukan kapan saja sambil nunggu yang lain.',w:'❌ Coba pikir: ada langkah yang TIDAK BISA dilakukan sebelum langkah tertentu selesai? Itulah yang dependent.'}},
+
+      // Q8 — Transfer Task ke situasi baru
+      {id:'d8',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Transfer Task',
+       scenario:'Guru olahraga minta kamu latih teman-teman untuk lomba lari 100m. Banyak hal yang harus disiapkan dan kamu bingung.',
+       text:'Kalau kamu pakai Decomposition, langkah pertama yang paling tepat adalah...',
+       options:[
+         'Langsung latihan lari setiap hari tanpa rencana',
+         'Identifikasi sub-masalah: analisis kemampuan peserta, buat program latihan, siapkan jadwal, evaluasi progress',
+         'Tanya ke guru lebih dulu semua jawaban tentang cara melatih lari',
+         'Cari video YouTube tentang latihan lari dan tiru persis'
+       ],
+       correct:1,
+       feedback:{c:'✅ Transfer berhasil! Kamu mengaplikasikan Decomposition ke konteks yang sama sekali baru. Itu tandanya kamu benar-benar paham, bukan sekadar hafal definisi!',w:'❌ Decomposition selalu dimulai dengan mengidentifikasi sub-masalah dari masalah besarnya — bukan langsung eksekusi atau cari referensi dulu.'}},
+
+      // Q9 — Sintesis (higher order thinking)
+      {id:'d9',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Berpikir Tingkat Tinggi',
+       scenario:'Aisyah punya waktu 2 jam untuk belajar 3 mata pelajaran sebelum ujian besok: Matematika (sulit), Bahasa Indonesia (sedang), dan Seni Budaya (mudah). Dia sudah decompose tugasnya.',
+       text:'Strategi mana yang paling cerdas untuk mengurutkan sub-tugas hasil decomposition tersebut?',
+       options:[
+         'Urutkan dari yang paling mudah dulu: Seni → Bahasa → Matematika, agar lebih semangat',
+         'Urutkan dari yang paling sulit dulu: Matematika → Bahasa → Seni, saat energi dan fokus masih penuh',
+         'Bagi waktu sama rata: 40 menit untuk masing-masing mata pelajaran',
+         'Pilih acak saja karena semua sama pentingnya'
+       ],
+       correct:1,
+       feedback:{c:'✅ Brilian! Decomposition bukan cuma tentang memecah, tapi juga tentang MEMPRIORITASKAN. Kerjakan yang paling kritis saat energi paling besar.',w:'❌ Decomposition yang baik tidak hanya memecah, tapi juga memprioritaskan berdasarkan tingkat kesulitan dan kepentingan.'}},
+
+      // Q10 — Refleksi mendalam
+      {id:'d10',type:'reflection',pts:15,
+       tag:'reflect',tagLabel:'Refleksi Mendalam',
+       text:'Pilih satu masalah nyata yang sedang kamu hadapi saat ini (PR menumpuk, rencana belajar, kegiatan ekskul, dll). Tulis: (1) apa masalah besarnya, (2) pecah menjadi minimal 4 sub-masalah, (3) mana yang harus dikerjakan dulu dan kenapa.',
+       minChars:120,placeholder:'Masalah: ...\nSub-masalah: ① ... ② ... ③ ... ④ ...\nPrioritas pertama: ... karena ...'}
+    ]
+  },
+
+  pattern: {
+    topicLabel:'🔍 Pattern Recognition', maxPts:100,
+    questions:[
+      // Q1
+      {id:'p1',type:'mcq',pts:8,
+       tag:'mcq',tagLabel:'Konsep Dasar',
+       text:'Kamu perhatikan bahwa setiap kali ada ujian, kamu selalu begadang sehari sebelumnya dan nilainya selalu jelek. Tapi kalau belajar 3 hari sebelum ujian, nilainya bagus. Kemampuan berpikir apa yang kamu gunakan?',
+       options:[
+         'Decomposition — karena kamu memecah jadwal belajar',
+         'Pattern Recognition — karena kamu mengenali pola hubungan antara kapan belajar dan hasilnya',
+         'Abstraction — karena kamu mengabaikan detail yang tidak penting',
+         'Algorithm Design — karena kamu membuat rencana belajar'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat! Mengenali bahwa "pola X selalu menghasilkan Y" adalah inti dari Pattern Recognition — dan sekarang kamu bisa buat keputusan yang lebih baik!',w:'❌ Kamu mengenali pola berulang (begadang = nilai jelek), bukan memecah masalah atau membuat langkah-langkah.'}},
+
+      // Q2
+      {id:'p2',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Identifikasi Pola',
+       scenario:'Data nilai ulangan Informatika kelas X-A selama 5 bulan:\nBulan 1: 72 | Bulan 2: 68 | Bulan 3: 75 | Bulan 4: 70 | Bulan 5: 73\nData kehadiran guru:\nBulan 1: 95% | Bulan 2: 70% | Bulan 3: 96% | Bulan 4: 75% | Bulan 5: 94%',
+       text:'Pola apa yang bisa kamu kenali dari data di atas?',
+       options:[
+         'Tidak ada pola yang jelas dari data tersebut',
+         'Nilai Informatika cenderung lebih tinggi di bulan ketika kehadiran guru lebih tinggi',
+         'Nilai Informatika selalu naik setiap bulannya',
+         'Kehadiran guru tidak berpengaruh sama sekali terhadap nilai'
+       ],
+       correct:1,
+       feedback:{c:'✅ Analisis tajam! Kamu berhasil menemukan korelasi dari dua set data. Inilah yang dilakukan data scientist setiap hari!',w:'❌ Bandingkan bulan dengan kehadiran tinggi (1,3,5) vs rendah (2,4) — ada pola yang cukup jelas di antara nilainya!'}},
+
+      // Q3 — Ordering
+      {id:'p3',type:'ordering',pts:13,
+       tag:'order',tagLabel:'Urutkan',
+       scenario:'Sistem rekomendasi Shopee menggunakan Pattern Recognition untuk rekomendasikan produk ke kamu.',
+       text:'Urutkan proses Pattern Recognition yang dilakukan sistem rekomendasi Shopee!',
+       items:[
+         {id:'po1',text:'📦 Kumpulkan data: produk yang dilihat, dibeli, di-wishlist',order:1},
+         {id:'po2',text:'🔍 Temukan pola: "user yang beli A sering juga beli B"',order:2},
+         {id:'po3',text:'🤝 Kelompokkan user dengan perilaku serupa',order:3},
+         {id:'po4',text:'🎯 Rekomendasikan produk yang dibeli user serupa',order:4},
+         {id:'po5',text:'📊 Evaluasi: apakah rekomendasi diklik/dibeli?',order:5},
+       ],
+       feedback:{c:'✅ Urutan sempurna! Itulah cara kerja collaborative filtering — salah satu algoritma Pattern Recognition paling umum di e-commerce!',w:'❌ Ingat alurnya: kumpulkan data → temukan pola → kelompokkan → rekomendasikan → evaluasi. Nggak bisa rekomendasikan sebelum temukan polanya!'}},
+
+      // Q4 — Drag & Drop
+      {id:'p4',type:'dragdrop',pts:13,
+       tag:'drag',tagLabel:'Drag & Drop',
+       scenario:'Seorang guru sedang menganalisis data nilai siswa. Kelompokkan temuan-temuan berikut!',
+       text:'Pisahkan mana yang merupakan POLA (berulang dan dapat diprediksi) dan mana yang ANOMALI (tidak sesuai pola)!',
+       items:[
+         {id:'pg1',text:'📈 Nilai selalu turun mendekati liburan',correct:'pola'},
+         {id:'pg2',text:'🔄 Siswa yang aktif bertanya cenderung nilai lebih tinggi',correct:'pola'},
+         {id:'pg3',text:'⭐ Siswa yang jarang hadir tiba-tiba nilai tertinggi',correct:'anomali'},
+         {id:'pg4',text:'📚 Nilai naik setelah ada remedial intensif',correct:'pola'},
+         {id:'pg5',text:'😴 Siswa yang selalu tidur di kelas tiba-tiba perfect score',correct:'anomali'},
+         {id:'pg6',text:'📅 Nilai ujian tengah semester selalu lebih rendah dari UAS',correct:'pola'},
+       ],
+       zones:[{id:'pola',label:'🔄 Pola Normal'},{id:'anomali',label:'⚠️ Anomali'}],
+       feedback:{c:'✅ Klasifikasi sempurna! Mengenali anomali sama pentingnya dengan mengenali pola — keduanya memberi informasi berharga!',p:'⚠️ Hampir! Pola = sesuatu yang konsisten terjadi berulang. Anomali = sesuatu yang bertentangan dengan pola yang sudah dikenali.',w:'❌ Coba bedakan: mana yang terjadi secara konsisten dan berulang (pola) vs mana yang tiba-tiba tidak masuk akal (anomali)?'}},
+
+      // Q5
+      {id:'p5',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Analisis',
+       scenario:'Netflix memperhatikan bahwa:\n• User yang nonton film thriller malam hari → sering lanjut nonton horor\n• User yang nonton romance sore hari → sering lanjut nonton drama Korea\n• User yang pause di menit ke-15 → 80% tidak lanjut nonton film itu',
+       text:'Informasi pola mana yang paling berguna untuk membuat fitur "auto-play next episode" yang lebih pintar?',
+       options:[
+         'Hanya pola genre saja yang perlu diperhatikan',
+         'Semua pola relevan: genre berikutnya, waktu nonton, dan perilaku pause untuk prediksi kapan user akan berhenti',
+         'Waktu nonton tidak relevan — genre yang paling penting',
+         'Perilaku pause tidak bisa dijadikan indikator apapun'
+       ],
+       correct:1,
+       feedback:{c:'✅ Brilian! Pattern Recognition yang powerful menggabungkan multiple patterns sekaligus — bukan hanya satu faktor.',w:'❌ Pattern Recognition yang canggih mempertimbangkan semua pola yang relevan secara bersamaan, bukan hanya satu!'}},
+
+      // Q6
+      {id:'p6',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Koneksi ke Coding',
+       scenario:'Seorang programmer punya 5 function berbeda yang semuanya punya langkah yang persis sama di awal: "cek apakah user sudah login, kalau belum redirect ke halaman login".',
+       text:'Apa yang seharusnya dilakukan programmer berdasarkan Pattern Recognition?',
+       options:[
+         'Biarkan saja, karena copy-paste lebih cepat',
+         'Ekstrak langkah yang sama itu jadi satu function sendiri (middleware), lalu panggil dari semua function yang butuh',
+         'Hapus cek login dari semua function karena terlalu repetitif',
+         'Ubah semua 5 function jadi satu function raksasa'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat! Ini namanya "Don\'t Repeat Yourself (DRY)" — prinsip coding yang lahir dari Pattern Recognition. Satu pola yang sama → satu solusi yang dipakai berulang.',w:'❌ Kalau ada pola kode yang sama berulang → buat sekali, panggil berkali-kali. Itulah Pattern Recognition dalam action!'}},
+
+      // Q7
+      {id:'p7',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Transfer Task',
+       scenario:'Kamu perhatikan bahwa ketika kamu makan siang di kantin sebelum jam 12, antrian pendek dan makanan masih lengkap. Tapi kalau jam 12 lewat, antrian panjang dan lauk sudah habis.',
+       text:'Bagaimana Pattern Recognition ini bisa kamu gunakan secara praktis?',
+       options:[
+         'Selalu bawa bekal dari rumah agar tidak perlu ke kantin',
+         'Jadikan pola ini dasar keputusan: usahakan selalu makan sebelum jam 12 agar dapat makanan lebih baik dan tidak antri',
+         'Laporkan ke OSIS bahwa porsi kantin kurang',
+         'Tidak bisa berbuat apa-apa karena jadwal pelajaran tidak bisa diubah'
+       ],
+       correct:1,
+       feedback:{c:'✅ Persis! Pattern Recognition bukan sekadar "oh iya ada pola" — tapi dipakai untuk membuat KEPUTUSAN yang lebih baik!',w:'❌ Pattern Recognition berguna saat polanya bisa dijadikan dasar tindakan yang lebih efektif. Apa tindakan paling langsung yang bisa diambil?'}},
+
+      // Q8 — Ordering
+      {id:'p8',type:'ordering',pts:10,
+       tag:'order',tagLabel:'Urutkan',
+       scenario:'Ilham ingin menggunakan Pattern Recognition untuk meningkatkan nilai Matematikanya.',
+       text:'Urutkan langkah-langkah yang harus Ilham lakukan!',
+       items:[
+         {id:'po6',text:'📝 Kumpulkan semua hasil ulangan Matematika 3 bulan terakhir',order:1},
+         {id:'po7',text:'🔍 Identifikasi: bab apa yang paling sering salah?',order:2},
+         {id:'po8',text:'💡 Temukan pola: di kondisi apa nilainya bagus vs jelek?',order:3},
+         {id:'po9',text:'📚 Fokus belajar pada pola kelemahan yang ditemukan',order:4},
+         {id:'po10',text:'✅ Evaluasi apakah strategi baru berhasil di ulangan berikutnya',order:5},
+       ],
+       feedback:{c:'✅ Urutan tepat! Inilah cara menggunakan Pattern Recognition untuk perbaikan diri yang sistematis dan berbasis data.',w:'❌ Kamu tidak bisa "fokus belajar" sebelum tahu pola kelemahanmu, dan tidak bisa evaluasi sebelum mencoba strategi baru!'}},
+
+      // Q9 — Sintesis
+      {id:'p9',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Berpikir Tingkat Tinggi',
+       scenario:'Dua orang pedagang gorengan di sekolah:\n• Pedagang A: tidak pernah catat penjualan, stok selalu kurang atau sisa banyak\n• Pedagang B: catat penjualan tiap hari selama sebulan, temukan pola (hari Senin selalu ramai, hari Jumat paling sepi), sesuaikan stok berdasarkan pola tersebut',
+       text:'Apa keunggulan kompetitif yang dimiliki Pedagang B dibanding Pedagang A?',
+       options:[
+         'Pedagang B lebih rajin karena mau mencatat — itu saja yang membedakan',
+         'Pedagang B menggunakan Pattern Recognition untuk mengoptimalkan stok, mengurangi pemborosan, dan meningkatkan keuntungan',
+         'Tidak ada perbedaan signifikan — kedua pedagang sama-sama bisa untung',
+         'Pedagang A lebih baik karena tidak membuang waktu untuk mencatat'
+       ],
+       correct:1,
+       feedback:{c:'✅ Brilliant! Pattern Recognition memberikan competitive advantage nyata — keputusan berbasis data selalu lebih baik dari keputusan berbasis perkiraan.',w:'❌ Ada perbedaan fundamental: satu mengambil keputusan berdasarkan data dan pola, yang lain berdasarkan feeling. Hasilnya berbeda jauh!'}},
+
+      // Q10 — Refleksi
+      {id:'p10',type:'reflection',pts:10,
+       tag:'reflect',tagLabel:'Refleksi Mendalam',
+       text:'Tuliskan satu pola yang kamu temukan tentang dirimu sendiri (kebiasaan belajar, pola produktivitas, pola mood, dll). Kemudian jelaskan: (1) pola apa yang kamu temukan, (2) bagaimana kamu bisa memanfaatkan pola itu untuk jadi lebih efektif.',
+       minChars:100,placeholder:'Pola yang kutemukan: ...\nBuktinya: ...\nCara memanfaatkan pola ini: ...'}
+    ]
+  },
+
+  abstraction: {
+    topicLabel:'🗂️ Abstraction', maxPts:100,
+    questions:[
+      // Q1
+      {id:'a1',type:'mcq',pts:8,
+       tag:'mcq',tagLabel:'Konsep Dasar',
+       text:'Kamu menjelaskan ke adikmu cara pergi ke sekolahmu. Kamu bilang "belok kiri di pertigaan depan warung hijau, lurus sampai ketemu masjid besar, lalu belok kanan". Kamu TIDAK menyebutkan nomor rumah warga, nama-nama pohon di pinggir jalan, atau warna pagar setiap rumah. Proses ini mencerminkan...',
+       options:[
+         'Pattern Recognition — karena rute perjalanan punya pola yang sama',
+         'Abstraction — karena kamu hanya menyampaikan informasi yang relevan untuk tujuan (navigasi), mengabaikan detail yang tidak membantu',
+         'Decomposition — karena kamu memecah perjalanan jadi beberapa langkah',
+         'Algorithm Design — karena kamu memberikan instruksi berurutan'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat! Abstraction bukan cuma soal coding — kamu melakukannya setiap hari saat berkomunikasi! Pilih info relevan, abaikan yang tidak perlu.',w:'❌ Memang ada elemen Decomposition dan Algorithm di sini, tapi inti dari "pilih info relevan, abaikan yang tidak perlu" adalah Abstraction.'}},
+
+      // Q2
+      {id:'a2',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Identifikasi',
+       scenario:'Guru meminta siswa membuat "Model Tata Surya" menggunakan bola-bola berbeda ukuran. Model ini menunjukkan urutan planet dan ukuran relatifnya, tapi tidak menunjukkan komposisi kimia, suhu permukaan, atau isi atmosfer setiap planet.',
+       text:'Mengapa model Tata Surya ini tetap berguna meski tidak menampilkan semua detail?',
+       options:[
+         'Karena membuat model yang detail terlalu mahal dan tidak efisien',
+         'Karena model ini menggunakan Abstraction — hanya menampilkan aspek yang relevan untuk TUJUAN PEMBELAJARAN (urutan dan ukuran relatif), sehingga lebih mudah dipahami',
+         'Karena guru tidak tahu detail komposisi kimia setiap planet',
+         'Karena model fisik tidak bisa menampilkan informasi kimia'
+       ],
+       correct:1,
+       feedback:{c:'✅ Persis! Abstraction yang baik selalu dikaitkan dengan tujuan. Model ini dibuat untuk memahami urutan dan ukuran — bukan kimia planet.',w:'❌ Kunci Abstraction ada di tujuan penggunaan. Detail yang tidak membantu mencapai tujuan = diabaikan, meskipun secara ilmiah penting.'}},
+
+      // Q3 — Drag & Drop
+      {id:'a3',type:'dragdrop',pts:13,
+       tag:'drag',tagLabel:'Drag & Drop',
+       scenario:'Kamu sedang membuat profil untuk aplikasi kenalan teman sebaya (bukan kenalan romantis) — tujuannya cari teman diskusi buku.',
+       text:'Kelompokkan informasi berikut: mana yang PERLU ditampilkan dan mana yang TIDAK PERLU?',
+       items:[
+         {id:'ag1',text:'📚 Genre buku favorit',correct:'perlu'},
+         {id:'ag2',text:'💬 Gaya diskusi (santai/serius)',correct:'perlu'},
+         {id:'ag3',text:'🏠 Alamat rumah lengkap',correct:'tidakperlu'},
+         {id:'ag4',text:'📖 Buku terakhir yang dibaca',correct:'perlu'},
+         {id:'ag5',text:'💰 Penghasilan orang tua',correct:'tidakperlu'},
+         {id:'ag6',text:'🎯 Topik yang ingin didiskusikan',correct:'perlu'},
+       ],
+       zones:[{id:'perlu',label:'✅ Perlu Ditampilkan'},{id:'tidakperlu',label:'🚫 Tidak Perlu'}],
+       feedback:{c:'✅ Abstraksi tepat! Kamu hanya menampilkan info yang relevan untuk tujuan (cari teman diskusi buku), bukan semua informasi tentang dirimu.',p:'⚠️ Ingat tujuannya: mencari teman diskusi buku. Info apa yang membantu orang memutuskan apakah cocok diajak diskusi buku?',w:'❌ Abstraction bergantung pada konteks/tujuan. Untuk cari teman diskusi buku, info relevannya adalah tentang kebiasaan dan selera membaca.'}},
+
+      // Q4 — Ordering
+      {id:'a4',type:'ordering',pts:10,
+       tag:'order',tagLabel:'Urutkan',
+       scenario:'Seorang desainer ingin membuat abstraksi dari sistem "Pembayaran Tagihan Listrik" yang kompleks menjadi interface yang simpel untuk pengguna awam.',
+       text:'Urutkan proses membuat abstraksi yang baik!',
+       items:[
+         {id:'ao1',text:'🎯 Tentukan siapa penggunanya dan apa tujuan mereka',order:1},
+         {id:'ao2',text:'📋 List semua informasi dan proses yang ada di sistem',order:2},
+         {id:'ao3',text:'✂️ Saring: pilih hanya yang relevan untuk tujuan pengguna',order:3},
+         {id:'ao4',text:'🎨 Desain interface berdasarkan informasi yang sudah disaring',order:4},
+         {id:'ao5',text:'🧪 Uji coba dengan pengguna nyata apakah sudah cukup simpel',order:5},
+       ],
+       feedback:{c:'✅ Urutan tepat! Abstraction yang baik selalu dimulai dari memahami siapa penggunanya dan apa yang mereka butuhkan.',w:'❌ Kamu tidak bisa menyaring informasi sebelum tahu semua yang ada, dan tidak bisa desain sebelum menyaring!'}},
+
+      // Q5
+      {id:'a5',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Analisis',
+       scenario:'Dua aplikasi cuaca:\n• Aplikasi A: menampilkan suhu, ikon cuaca, dan perkiraan hujan — sangat simpel\n• Aplikasi B: menampilkan data tekanan udara, kelembapan, kecepatan angin tiap 100m ketinggian, peta isobar, data historis 10 tahun — sangat kompleks',
+       text:'Untuk seorang pelajar yang hanya butuh tahu "apakah perlu bawa payung hari ini?", aplikasi mana yang lebih baik dari sisi Abstraction?',
+       options:[
+         'Aplikasi B — karena datanya lebih lengkap dan akurat',
+         'Aplikasi A — karena abstraksinya tepat sasaran untuk kebutuhan pelajar: simpel dan menjawab pertanyaan yang relevan',
+         'Keduanya sama baiknya tergantung selera pengguna',
+         'Aplikasi B — karena lebih terlihat profesional'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat! Abstraction yang baik = informasi yang CUKUP untuk mencapai TUJUAN SPESIFIK pengguna. Lebih banyak data belum tentu lebih baik!',w:'❌ Ingat: lebih banyak informasi tidak selalu berarti lebih baik. Abstraction yang baik adalah yang tepat untuk kebutuhan penggunanya.'}},
+
+      // Q6
+      {id:'a6',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Koneksi ke Coding',
+       scenario:'Di aplikasi belanja, ada function bernama process_payment(amount, method) yang bisa dipanggil cukup dengan dua parameter itu. Developer yang memakainya tidak perlu tahu bagaimana di dalamnya terhubung ke bank, enkripsi data kartu, atau validasi saldo.',
+       text:'Konsep Abstraction apa yang diterapkan dalam desain function ini?',
+       options:[
+         'Function Overloading — satu function bisa menerima banyak tipe parameter',
+         'Encapsulation/Information Hiding — kompleksitas internal disembunyikan, pengguna cukup tahu input dan output-nya saja',
+         'Inheritance — function mewarisi sifat dari function lain',
+         'Recursion — function memanggil dirinya sendiri'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat! Inilah "black box abstraction" dalam coding — kamu tahu APA yang dilakukan function dan BAGAIMANA memakainya, tanpa perlu tahu detail implementasi dalamnya.',w:'❌ Prinsip menyembunyikan kompleksitas internal dan hanya mengekspos yang perlu diketahui pengguna = Information Hiding / Encapsulation, bagian dari Abstraction.'}},
+
+      // Q7
+      {id:'a7',type:'mcq',pts:9,
+       tag:'mcq',tagLabel:'Transfer Task',
+       scenario:'Kamu diminta presentasi tentang "Cara Kerja Mesin Mobil" untuk teman sekelasmu yang tidak paham teknik otomotif. Audiensnya adalah pelajar biasa, bukan calon mekanik.',
+       text:'Pendekatan Abstraction mana yang paling tepat untuk presentasimu?',
+       options:[
+         'Jelaskan semua detail teknis: siklus 4-tak, timing belt, sistem injeksi bahan bakar — agar terlihat komprehensif',
+         'Gunakan analogi sederhana dan fokus pada konsep utama yang relevan untuk pemahaman dasar — abaikan detail teknis yang tidak perlu untuk tujuan presentasi',
+         'Tidak perlu abstraksi — berikan semua informasi agar audiens bisa memilih sendiri mana yang relevan',
+         'Sederhanakan sampai hanya bilang "mesin mobil mengubah bensin menjadi gerak" saja'
+       ],
+       correct:1,
+       feedback:{c:'✅ Presentasi berbasis Abstraction! Sesuaikan level detail dengan audiens dan tujuan komunikasi — itulah Abstraction yang efektif.',w:'❌ Abstraction yang tepat menyesuaikan level detail dengan audiens dan tujuan. Terlalu detail atau terlalu simpel sama-sama bisa jadi masalah.'}},
+
+      // Q8 — Drag & Drop
+      {id:'a8',type:'dragdrop',pts:10,
+       tag:'drag',tagLabel:'Drag & Drop',
+       scenario:'Sebuah sekolah ingin membuat sistem "Laporan Perkembangan Siswa" untuk orang tua. Kelompokkan informasi yang akan ditampilkan!',
+       text:'Mana yang RELEVAN untuk orang tua vs yang lebih relevan untuk INTERNAL sekolah?',
+       items:[
+         {id:'ag7',text:'📊 Nilai rata-rata per mata pelajaran',correct:'ortu'},
+         {id:'ag8',text:'💬 Catatan perkembangan karakter',correct:'ortu'},
+         {id:'ag9',text:'📅 Absensi dan keterlambatan',correct:'ortu'},
+         {id:'ag10',text:'🔧 Kode internal sistem database siswa',correct:'internal'},
+         {id:'ag11',text:'📝 Log aktivitas guru di sistem',correct:'internal'},
+         {id:'ag12',text:'💾 Backup file rapor format XML',correct:'internal'},
+       ],
+       zones:[{id:'ortu',label:'👨‍👩‍👧 Laporan untuk Orang Tua'},{id:'internal',label:'🏫 Data Internal Sekolah'}],
+       feedback:{c:'✅ Abstraksi tepat! Orang tua hanya perlu info yang relevan untuk memahami perkembangan anaknya — bukan data teknis sistem.',p:'⚠️ Pikirkan dari sudut pandang orang tua: info apa yang mereka butuhkan untuk memahami dan mendukung perkembangan anak?',w:'❌ Orang tua tidak butuh kode database atau log sistem. Abstraction memastikan setiap audiens hanya mendapat info yang relevan untuknya.'}},
+
+      // Q9
+      {id:'a9',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Berpikir Tingkat Tinggi',
+       scenario:'Seiring perkembangan teknologi, smartphone sekarang sangat mudah dipakai oleh semua kalangan usia — termasuk anak kecil dan lansia — meski di baliknya ada jutaan baris kode dan ribuan komponen hardware yang sangat kompleks.',
+       text:'Pernyataan mana yang paling tepat menggambarkan peran Abstraction dalam fenomena ini?',
+       options:[
+         'Abstraction membuat smartphone menjadi lebih murah untuk diproduksi',
+         'Abstraction memungkinkan kompleksitas teknis tersembunyi di balik antarmuka yang simpel, sehingga siapapun bisa menggunakannya tanpa perlu memahami cara kerjanya secara detail',
+         'Abstraction membuat smartphone bekerja lebih cepat',
+         'Abstraction tidak berperan — yang membuat mudah adalah desain fisik yang baik'
+       ],
+       correct:1,
+       feedback:{c:'✅ Brilliant! Itulah dampak terbesar Abstraction di dunia teknologi — demokratisasi teknologi. Semua orang bisa menikmati manfaat teknologi canggih tanpa harus jadi insinyur.',w:'❌ Abstraction adalah "jembatan" antara kompleksitas teknis dan kemudahan penggunaan. Tanpa abstraction, hanya insinyur yang bisa pakai komputer!'}},
+
+      // Q10 — Refleksi
+      {id:'a10',type:'reflection',pts:13,
+       tag:'reflect',tagLabel:'Refleksi Mendalam',
+       text:'Bayangkan kamu diminta jelaskan satu konsep yang kamu kuasai (bisa pelajaran sekolah, hobi, skill, dll) kepada DUA audiens berbeda: (1) teman sebaya, (2) adik kelas 6 SD. Tulis bagaimana penjelasanmu berbeda untuk kedua audiens itu, dan apa yang kamu ubah (level detail, contoh, bahasa). Ini adalah Abstraction!',
+       minChars:100,placeholder:'Konsep yang dipilih: ...\nUntuk teman sebaya: ...\nUntuk adik kelas 6 SD: ...\nYang berbeda: ...'}
+    ]
+  },
+
+  algorithm: {
+    topicLabel:'📋 Algorithm Design', maxPts:110,
+    questions:[
+      // Q1
+      {id:'al1',type:'mcq',pts:8,
+       tag:'mcq',tagLabel:'Konsep Dasar',
+       text:'Instruksi mana di bawah ini yang PALING memenuhi syarat sebagai langkah algoritma yang baik?',
+       options:[
+         '"Masak nasi sampai matang"',
+         '"Panaskan rice cooker dengan 2 cup beras dan 2.5 cup air, tekan tombol Cook, tunggu hingga lampu indikator beralih ke Warm (±20 menit)"',
+         '"Buat nasinya enak"',
+         '"Masak sesuai selera"'
+       ],
+       correct:1,
+       feedback:{c:'✅ Tepat! Langkah algoritma yang baik harus spesifik, terukur, dan tidak ambigu — persis seperti pilihan B.',w:'❌ Kata-kata seperti "sampai matang", "enak", "sesuai selera" semuanya ambigu. Algoritma yang baik harus bisa diikuti oleh siapapun (atau komputer) dengan hasil yang konsisten.'}},
+
+      // Q2
+      {id:'al2',type:'mcq',pts:8,
+       tag:'mcq',tagLabel:'Struktur Algoritma',
+       scenario:'Kamu punya algoritma: "ULANGI: cek notifikasi HP → JIKA ada WA → buka dan balas → JIKA ada IG → scroll 10 menit → HENTIKAN setelah 1 jam".',
+       text:'Struktur algoritma apa saja yang ada dalam algoritma di atas?',
+       options:[
+         'Hanya Sequence (urutan biasa)',
+         'Sequence + Iteration saja',
+         'Iteration + Selection (Iteration: ULANGI, Selection: JIKA ada WA / JIKA ada IG)',
+         'Hanya Selection (percabangan JIKA-MAKA)'
+       ],
+       correct:2,
+       feedback:{c:'✅ Betul! ULANGI = Iteration, JIKA = Selection. Kombinasi ini adalah struktur paling umum dalam algoritma nyata dan kode program!',w:'❌ Perhatikan kata "ULANGI" = Iteration. Dan "JIKA ada WA / JIKA ada IG" = Selection. Dua struktur ini hadir bersamaan!'}},
+
+      // Q3 — Ordering (FIXED: langkah 4 dan 5 diubah agar tidak bisa ditukar)
+      {id:'al3',type:'ordering',pts:12,
+       tag:'order',tagLabel:'Urutkan',
+       scenario:'Kamu mau buat algoritma untuk proses "Upload Foto ke Instagram".',
+       text:'Urutkan langkah-langkah algoritma ini dari awal sampai akhir!',
+       items:[
+         {id:'ali1',text:'📱 Buka aplikasi Instagram',order:1},
+         {id:'ali2',text:'➕ Tap tombol "+" untuk tambah konten',order:2},
+         {id:'ali3',text:'🖼️ Pilih foto dari galeri HP',order:3},
+         {id:'ali4',text:'✏️ Edit: filter, crop, brightness',order:4},
+         {id:'ali5',text:'📝 Tambahkan caption, tag, dan lokasi',order:5},
+         {id:'ali6',text:'🚀 Tap "Share" untuk upload',order:6},
+       ],
+       feedback:{c:'✅ Urutan sempurna! Inilah Sequential Algorithm — setiap langkah bergantung pada langkah sebelumnya. Tidak bisa kamu tag orang sebelum pilih foto!',w:'❌ Perhatikan dependency antar langkah — ada yang tidak bisa dilakukan sebelum langkah sebelumnya selesai. Misalnya, tidak bisa edit foto sebelum memilihnya!'}},
+
+      // Q4
+      {id:'al4',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Analisis Efisiensi',
+       scenario:'Kamu punya 30 soal pilihan ganda yang harus diperiksa. Dua strategi:\n• Strategi A: Periksa satu per satu dari nomor 1 sampai 30\n• Strategi B: Pisahkan dulu: soal mudah (cek cepat), soal sulit (teliti lebih lama), soal ragu (tandai untuk dicek ulang)',
+       text:'Dari perspektif Algorithm Design, strategi mana yang lebih efisien dan kenapa?',
+       options:[
+         'Strategi A lebih baik karena lebih sederhana dan tidak membuang waktu untuk memilah',
+         'Strategi B lebih efisien karena menggunakan klasifikasi untuk mengoptimalkan alokasi waktu dan perhatian sesuai tingkat kesulitan',
+         'Keduanya sama efisiennya karena jumlah soalnya sama',
+         'Strategi A lebih baik karena tidak ada risiko terlewat'
+       ],
+       correct:1,
+       feedback:{c:'✅ Analisis tepat! Algoritma yang efisien tidak hanya mencapai tujuan, tapi juga mengoptimalkan sumber daya (waktu dan energi) yang digunakan.',w:'❌ Algoritma yang lebih efisien menghasilkan output yang sama dengan penggunaan sumber daya yang lebih optimal — bukan sekadar yang paling sederhana.'}},
+
+      // Q5 — Drag & Drop
+      {id:'al5',type:'dragdrop',pts:12,
+       tag:'drag',tagLabel:'Drag & Drop',
+       scenario:'Berikut beberapa instruksi. Kelompokkan mana yang merupakan langkah algoritma yang VALID dan mana yang TIDAK VALID!',
+       text:'Seret setiap instruksi ke kategori yang sesuai!',
+       items:[
+         {id:'alg1',text:'➕ Tambahkan 2 sendok gula pasir',correct:'valid'},
+         {id:'alg2',text:'🎵 Putar musik yang enak',correct:'tidakvalid'},
+         {id:'alg3',text:'⏱️ Rebus selama tepat 10 menit',correct:'valid'},
+         {id:'alg4',text:'🌡️ Panaskan hingga suhu 100°C',correct:'valid'},
+         {id:'alg5',text:'🧂 Tambahkan garam secukupnya',correct:'tidakvalid'},
+         {id:'alg6',text:'💧 Tuang 500ml air putih',correct:'valid'},
+       ],
+       zones:[{id:'valid',label:'✅ Langkah Valid'},{id:'tidakvalid',label:'❌ Tidak Valid (Ambigu)'}],
+       feedback:{c:'✅ Sempurna! Langkah algoritma harus terukur dan tidak ambigu. "Secukupnya" dan "yang enak" adalah kata-kata ambigu yang harus dihindari.',p:'⚠️ Hampir! Cek lagi: apakah setiap langkah bisa diikuti dengan tepat oleh siapapun, atau ada yang masih bisa ditafsirkan berbeda-beda?',w:'❌ Algoritma yang valid harus bisa diikuti secara konsisten oleh siapapun. "Secukupnya" dan "yang enak" = ambigu = tidak valid sebagai langkah algoritma!'}},
+
+      // Q6
+      {id:'al6',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Analisis Kritis',
+       scenario:'Perhatikan pseudocode ini:\n① Mulai\n② Minta user input nilai\n③ JIKA nilai >= 75 → tampilkan "Lulus"\n④ JIKA nilai < 75 → tampilkan "Remedial"\n⑤ Selesai',
+       text:'Ada yang kurang dari algoritma di atas. Apa yang paling perlu ditambahkan agar lebih robust?',
+       options:[
+         'Tidak ada yang kurang, algoritma sudah sempurna',
+         'Perlu tambahkan validasi: JIKA input bukan angka (misalnya huruf) → tampilkan pesan error dan minta input ulang',
+         'Perlu tambahkan langkah untuk mencetak nilai ke printer',
+         'Nilai 75 terlalu rendah, seharusnya 80'
+       ],
+       correct:1,
+       feedback:{c:'✅ Sangat kritis! Algoritma yang robust harus menangani input yang tidak valid. Kalau user iseng ketik "abc" bukan angka, program bisa crash!',w:'❌ Algoritma yang baik harus bisa menangani kondisi tidak terduga (edge cases). Apa yang terjadi kalau user memasukkan sesuatu yang bukan angka?'}},
+
+      // Q7
+      {id:'al7',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Koneksi ke Coding',
+       scenario:'Di Python:\nfor nilai in daftar_nilai:\n    if nilai >= 75:\n        print("Lulus")\n    else:\n        print("Remedial")',
+       text:'Kode Python ini menerapkan struktur algoritma apa?',
+       options:[
+         'Hanya Sequence — karena kode dibaca dari atas ke bawah',
+         'Iteration (for loop) + Selection (if-else) — persis seperti struktur algoritma yang ada dalam pseudocode',
+         'Hanya Selection — karena ada if-else',
+         'Recursion — karena ada pengulangan'
+       ],
+       correct:1,
+       feedback:{c:'✅ Persis! for = Iteration, if-else = Selection. Sekarang kamu tahu bahwa "for loop" dan "if statement" dalam coding bukan sekadar syntax — mereka adalah implementasi struktur algoritma yang sudah kamu pelajari!',w:'❌ for = Iteration (perulangan untuk setiap nilai dalam daftar), if-else = Selection (percabangan berdasarkan kondisi). Dua struktur berbeda yang bekerja bersamaan!'}},
+
+      // Q8 — Ordering
+      {id:'al8',type:'ordering',pts:10,
+       tag:'order',tagLabel:'Urutkan',
+       scenario:'Kamu ingin membuat algoritma untuk "Cari Nilai Tertinggi dari 5 Nilai Ulangan".',
+       text:'Urutkan langkah-langkah algoritma ini dengan benar!',
+       items:[
+         {id:'ali7',text:'📝 Simpan nilai pertama sebagai "nilai tertinggi sementara"',order:1},
+         {id:'ali8',text:'🔄 Ambil nilai berikutnya dari daftar',order:2},
+         {id:'ali9',text:'❓ Apakah nilai ini > nilai tertinggi sementara?',order:3},
+         {id:'ali10',text:'🔄 JIKA ya → ganti nilai tertinggi sementara dengan nilai ini',order:4},
+         {id:'ali11',text:'🔁 Ulangi langkah 2-4 sampai semua nilai dicek',order:5},
+         {id:'ali12',text:'🏆 Tampilkan nilai tertinggi sementara sebagai hasilnya',order:6},
+       ],
+       feedback:{c:'✅ Urutan tepat! Inilah algoritma "Linear Search for Maximum" — salah satu algoritma paling dasar yang wajib diketahui setiap programmer!',w:'❌ Perhatikan logikanya: kamu harus punya "nilai sementara" dulu sebelum bisa membandingkan, dan harus bandingkan semua nilai sebelum bisa declare mana yang tertinggi.'}},
+
+      // Q9
+      {id:'al9',type:'mcq',pts:10,
+       tag:'mcq',tagLabel:'Berpikir Tingkat Tinggi',
+       scenario:'Dua algoritma untuk mencari kata dalam kamus:\n• Algoritma A: cek setiap kata dari halaman pertama satu per satu\n• Algoritma B: buka halaman tengah, kalau kata yang dicari secara alfabet ada di bagian pertama → cari di separuh pertama, kalau di bagian kedua → cari di separuh kedua. Ulangi.\n\nKamus berisi 50.000 kata. Algoritma A butuh rata-rata 25.000 langkah. Algoritma B butuh maksimal 16 langkah.',
+       text:'Apa implikasi praktis dari perbedaan efisiensi yang sangat dramatis ini di dunia nyata?',
+       options:[
+         'Tidak ada implikasi praktis — komputer modern sudah sangat cepat sehingga perbedaan ini tidak berarti',
+         'Saat sistem harus mencari di antara jutaan atau miliaran data (seperti Google Search), perbedaan efisiensi algoritma menjadi perbedaan antara 0.1 detik dan berjam-jam — itulah kenapa Algorithm Design sangat krusial',
+         'Algoritma B lebih susah dibuat jadi tidak worth it untuk proyek kecil',
+         'Efisiensi hanya penting di perusahaan teknologi besar, tidak relevan untuk programmer biasa'
+       ],
+       correct:1,
+       feedback:{c:'✅ Insight yang mendalam! Itulah kenapa Algorithm Design adalah inti dari Computer Science — di skala besar, pilihan algoritma bisa menjadi perbedaan antara "bisa" dan "tidak bisa" diselesaikan sama sekali.',w:'❌ Di skala kecil mungkin tidak terasa. Tapi saat data berjumlah miliaran (seperti semua halaman internet yang diindeks Google), perbedaan efisiensi algoritma = perbedaan antara mungkin dan tidak mungkin!'}},
+
+      // Q10 — Refleksi
+      {id:'al10',type:'reflection',pts:20,
+       tag:'reflect',tagLabel:'Refleksi Mendalam',
+       text:'Buat algoritma untuk satu aktivitas yang kamu lakukan setiap hari (contoh: cara memilih outfit, cara memutuskan mau makan apa, cara belajar sebelum ujian, dll). Tuliskan dalam format langkah-langkah yang jelas, tidak ambigu, dan sertakan minimal SATU percabangan (JIKA...MAKA) dan SATU perulangan (ULANGI...SAMPAI). Jelaskan juga struktur apa yang kamu pakai!',
+       minChars:120,placeholder:'Algoritma: [nama aktivitas]\nMulai\nLangkah 1: ...\nLangkah 2: JIKA ... MAKA ... JIKA TIDAK ...\nLangkah 3: ULANGI ... SAMPAI ...\nSelesai\n\nStruktur yang dipakai: ...'}
+    ]
+  }
+};
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwEl6myw8i1iR0Bmfp-CaYjn15EzFCFV_aiMoqz38QUvTpQqtylaLH0OQCoMczCKK82Ng/exec';
+
+let S = {
+  name:'', kelas:'',
+  scores:{decomposition:null,pattern:null,abstraction:null,algorithm:null},
+  submitted:{decomposition:false,pattern:false,abstraction:false,algorithm:false},
+  // quiz state
+  currentPillar:null,
+  currentQ:0,
+  qScores:{},
+  qAnswers:{},
+  qChecked:{},
+  // learn state
+  currentLearnPillar:null,
+  currentChapter:0,
+  chaptersRead:{}
+};
+
+// ═══════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════
+function titleCase(s){return s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());}
+function initials(s){return s.split(' ').map(w=>w[0]).join('').slice(0,2);}
+function $(id){return document.getElementById(id);}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showToast(msg,type=''){
+  const t=$('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ═══════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════
+let selectedName='';
+
+function onKelasChange(){
+  const k=$('sel-kelas').value;
+  if(!k){$('name-group').style.display='none';return;}
+  $('name-group').style.display='block';
+  selectedName='';
+  $('selected-name-display').classList.remove('visible');
+  $('btn-login').disabled=true;
+  populateNames(k,'');
+}
+
+function populateNames(kelas,filter){
+  const names=(STUDENTS[kelas]||[]).filter(n=>n.includes(filter.toUpperCase()));
+  const list=$('name-list');
+  list.innerHTML=names.map(n=>`<div class="name-item" onclick="selectName('${n}')">${titleCase(n)}</div>`).join('');
+  if(!names.length) list.innerHTML='<div style="padding:1rem;color:var(--text-3);font-size:.85rem">Nama tidak ditemukan</div>';
+}
+
+function filterNames(){
+  const k=$('sel-kelas').value;
+  const q=$('name-search').value;
+  populateNames(k,q);
+}
+
+function selectName(name){
+  selectedName=name;
+  $('selected-name-display').textContent='✓ '+titleCase(name);
+  $('selected-name-display').classList.add('visible');
+  document.querySelectorAll('.name-item').forEach(el=>el.classList.toggle('selected',el.textContent===titleCase(name)));
+  $('btn-login').disabled=false;
+}
+
+function doLogin(){
+  if(!selectedName||!$('sel-kelas').value) return;
+  S.name=selectedName;
+  S.kelas=$('sel-kelas').value;
+  // restore quiz lock & scores from localStorage (inline, isQuizDone defined later)
+  ['decomposition','pattern','abstraction','algorithm'].forEach(pid=>{
+    const lk='ctq_done||'+S.name+'||'+S.kelas+'||'+pid;
+    const sk='ctq_score||'+S.name+'||'+S.kelas+'||'+pid;
+    if(localStorage.getItem(lk)){
+      S.submitted[pid]=true;
+      const sv=localStorage.getItem(sk);
+      if(sv!==null) S.scores[pid]=parseInt(sv);
+    }
+  });
+  renderHome();
+  showScreen('screen-home');
+  loadLeaderboard();
+}
+
+// ═══════════════════════════════════
+// HOME / DASHBOARD
+// ═══════════════════════════════════
+function renderHome(){
+  const fname=titleCase(S.name).split(' ')[0];
+  $('hero-greeting').textContent=`Halo, ${fname}! 👋`;
+  $('hero-title').textContent=`Pilih misi yang mau kamu mulai 🚀`;
+  $('nav-name').textContent=titleCase(S.name);
+  $('nav-kelas').textContent=S.kelas;
+  $('nav-avatar').textContent=initials(S.name);
+  $('lb-kelas-badge').textContent='Semua Kelas';
+  lbCurrentFilter='all';
+
+  // pillars
+  const container=$('ct-pillars');
+  container.innerHTML=PILLARS.map((p,i)=>{
+    const score=S.scores[p.id];
+    const done=score!==null;
+    const locked=i>0&&S.scores[PILLARS[i-1].id]===null;
+    return `
+    <div class="pillar-card ${done?'done':''} ${locked?'locked':''}"
+         style="--pillar-color:${p.gradient};--pillar-color-raw:${p.colorRaw}"
+         onclick="${locked?'showToast(\'Selesaikan misi sebelumnya dulu!\',\'error\')':done?`openPillar('${p.id}')`:`openPillar('${p.id}')`}">
+      <div class="pillar-icon">${p.icon}</div>
+      <div class="pillar-num">MISI ${p.num}</div>
+      <div class="pillar-name">${p.name}</div>
+      <div class="pillar-desc">${p.desc}</div>
+      <div class="pillar-pts">Nilai: <span>${score!==null?score+'/'+p.maxPts:'belum dikerjakan'}</span></div>
+      ${locked?'<div class="locked-badge">🔒 Selesaikan misi sebelumnya</div>':done?'<div class="locked-badge" style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--green)">✅ Quiz sudah selesai</div>':''}
+    </div>`;
+  }).join('');
+
+  renderProgress();
+}
+
+function renderProgress(){
+  const total=Object.values(S.scores).reduce((a,v)=>a+(v||0),0);
+  $('prog-total').textContent=total;
+  $('prog-breakdown').innerHTML=PILLARS.map(p=>{
+    const s=S.scores[p.id]||0;
+    const pct=s/p.maxPts*100;
+    return `
+    <div class="mini-progress">
+      <div class="mini-progress-top">
+        <span>${p.icon} ${p.name}</span>
+        <span style="color:${S.scores[p.id]!==null?p.colorRaw:'var(--text-3)'}">${S.scores[p.id]!==null?s+'/100':'—'}</span>
+      </div>
+      <div class="mini-bar"><div class="mini-bar-fill" style="width:${pct}%;background:${p.gradient}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+function openPillar(pillarId){
+  S.currentLearnPillar=pillarId;
+  S.currentChapter=0;
+  const pillar=PILLARS.find(p=>p.id===pillarId);
+  $('learn-header-title').textContent=pillar.icon+' '+pillar.name;
+  renderLearnChapters();
+  showScreen('screen-learn');
+}
+
+function goHome(){
+  renderHome();
+  showScreen('screen-home');
+  loadLeaderboard();
+}
+
+// ═══════════════════════════════════
+// LEADERBOARD
+// ═══════════════════════════════════
+let lbAllData = []; // cache all leaderboard data
+let lbCurrentFilter = 'all';
+
+// ── Ambil leaderboard dari Sheets via JSONP (bypass CORS) ──
+function fetchLeaderboard(){
+  return new Promise((resolve,reject)=>{
+    const cbName='_lbcb'+Date.now();
+    const script=document.createElement('script');
+    const timeout=setTimeout(()=>{
+      delete window[cbName];
+      script.remove();
+      reject(new Error('timeout'));
+    },8000);
+    window[cbName]=function(data){
+      clearTimeout(timeout);
+      delete window[cbName];
+      script.remove();
+      resolve(data);
+    };
+    script.src=APPS_SCRIPT_URL+'?action=leaderboard&callback='+cbName;
+    script.onerror=()=>{ clearTimeout(timeout); reject(new Error('script error')); };
+    document.head.appendChild(script);
+  });
+}
+
+// ── Bangun data leaderboard dari localStorage (offline/fallback) ──
+function buildLocalLB(){
+  const real=[];
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(!key||!key.startsWith('ctq_score||')) continue;
+    const parts=key.split('||');
+    if(parts.length!==4) continue;
+    const nama=parts[1], kelas=parts[2];
+    const pts=parseInt(localStorage.getItem(key))||0;
+    if(!nama||!kelas||!pts) continue;
+    const existing=real.find(r=>r.name===nama&&r.kelas===kelas);
+    if(existing) existing.score+=pts;
+    else real.push({name:nama,kelas:kelas,score:pts});
+  }
+  return real;
+}
+
+async function loadLeaderboard(){
+  const lb=$('leaderboard-list');
+  // Belum terhubung ke Google Sheets — hanya tampilkan data nyata dari localStorage
+  if(APPS_SCRIPT_URL==='PASTE_YOUR_APPS_SCRIPT_URL_HERE'){
+    const real=[];
+    // Scan semua nilai yang pernah di-submit di browser ini
+    // Key format: ctq_score||NAMA||KELAS||PILLAR
+    for(let i=0;i<localStorage.length;i++){
+      const key=localStorage.key(i);
+      if(!key||!key.startsWith('ctq_score||')) continue;
+      const parts=key.split('||');
+      // parts: ['ctq_score', nama, kelas, pillar]
+      if(parts.length!==4) continue;
+      const nama=parts[1];
+      const kelas=parts[2];
+      const pts=parseInt(localStorage.getItem(key))||0;
+      if(!nama||!kelas||!pts) continue;
+      const existing=real.find(r=>r.name===nama&&r.kelas===kelas);
+      if(existing){ existing.score+=pts; }
+      else{ real.push({name:nama,kelas:kelas,score:pts}); }
+    }
+    // Sertakan skor sesi ini jika belum ada
+    const myTotal=Object.values(S.scores).reduce((a,v)=>a+(v||0),0);
+    if(myTotal>0&&!real.some(r=>r.name===S.name&&r.kelas===S.kelas)){
+      real.push({name:S.name,kelas:S.kelas,score:myTotal});
+    }
+    lbAllData=real;
+    renderLeaderboard(lbAllData,lbCurrentFilter);
+    return;
+  }
+  lb.innerHTML='<div class="shimmer"></div><div class="shimmer" style="margin-top:.5rem"></div><div class="shimmer" style="margin-top:.5rem"></div>';
+  try{
+    // Gunakan fetch dengan no-cors tidak bisa baca response.
+    // Pakai JSONP-style via script tag untuk bypass CORS dari Apps Script
+    const data = await fetchLeaderboard();
+    // Agregasi: jumlahkan semua misi per siswa
+    const map={};
+    data.forEach(row=>{
+      const key=row.nama+'||'+row.kelas;
+      if(!map[key]) map[key]={name:row.nama, kelas:row.kelas, score:0};
+      map[key].score += (parseInt(row.total)||0);
+    });
+    lbAllData=Object.values(map);
+    renderLeaderboard(lbAllData, lbCurrentFilter);
+  }catch(e){
+    // Fallback: hanya tampilkan data dari localStorage saja
+    const real=buildLocalLB();
+    lbAllData=real;
+    if(real.length){
+      renderLeaderboard(lbAllData, lbCurrentFilter);
+    } else {
+      lb.innerHTML='<div style="color:var(--text-3);font-size:.82rem;padding:.75rem;text-align:center">Belum ada data.<br>Pastikan Apps Script URL sudah diisi.</div>';
+    }
+  }
+}
+
+function filterLB(kelas){
+  lbCurrentFilter=kelas;
+  // update active button
+  document.querySelectorAll('.lb-filter-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.kelas===kelas);
+  });
+  // update badge
+  $('lb-kelas-badge').textContent = kelas==='all' ? 'Semua Kelas' : kelas;
+  renderLeaderboard(lbAllData, kelas);
+}
+
+function renderLeaderboard(data, filterKelas){
+  const myTotal=Object.values(S.scores).reduce((a,v)=>a+(v||0),0);
+  // filter by kelas
+  let filtered = filterKelas==='all' ? [...data] : data.filter(d=>(d.kelas||'')===filterKelas);
+  // inject self HANYA jika kelas-nya cocok dengan filter (atau filter = all)
+  const selfMatchesFilter = filterKelas==='all' || filterKelas===S.kelas;
+  const hasMe = filtered.some(d=>d.name===S.name && d.kelas===S.kelas);
+  if(!hasMe && myTotal>0 && selfMatchesFilter){
+    filtered.push({name:S.name, kelas:S.kelas, score:myTotal});
+  }
+  filtered.sort((a,b)=>b.score-a.score);
+
+  const medals=['gold','silver','bronze'];
+  const lb=$('leaderboard-list');
+  if(!filtered.length){
+    lb.innerHTML='<div style="color:var(--text-3);font-size:.82rem;padding:.5rem;text-align:center">Belum ada data untuk kelas ini.</div>';
+    return;
+  }
+  lb.innerHTML=filtered.slice(0,10).map((d,i)=>{
+    const isMe=d.name===S.name&&d.kelas===S.kelas;
+    const kelasTag = filterKelas==='all' ? `<span style="font-size:.65rem;color:var(--text-3);margin-left:4px">${d.kelas||''}</span>` : '';
+    return `
+    <div class="lb-item ${isMe?'lb-me':''}">
+      <div class="lb-rank ${medals[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+      <div class="lb-avatar">${initials(d.name)}</div>
+      <div class="lb-name">${titleCase(d.name)}${kelasTag}${isMe?' <span style="color:var(--teal);font-size:.7rem">(kamu)</span>':''}</div>
+      <div class="lb-score">${d.score}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════
+// LEARN — MATERI
+// ═══════════════════════════════════
+function renderLearnChapters(){
+  const pillar=S.currentLearnPillar;
+  const materi=MATERI[pillar];
+  if(!materi) return;
+
+  // chapter nav
+  const nav=$('chapter-nav');
+  nav.innerHTML=materi.chapters.map((ch,i)=>`
+    <button class="chapter-btn ${i===S.currentChapter?'active':''} ${S.chaptersRead[pillar+i]?'done':''}"
+            onclick="goToChapter(${i})">
+      ${S.chaptersRead[pillar+i]?'✓ ':''} ${ch.title}
+    </button>
+  `).join('');
+
+  renderChapterContent(S.currentChapter);
+  updateLearnProgress();
+}
+
+function goToChapter(idx){
+  S.currentChapter=idx;
+  renderLearnChapters();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderChapterContent(idx){
+  const pillar=S.currentLearnPillar;
+  const materi=MATERI[pillar];
+  const ch=materi.chapters[idx];
+  const isLast=idx===materi.chapters.length-1;
+
+  $('chapter-content').innerHTML=`
+    <div class="chapter-content">
+      ${ch.content}
+      <div style="display:flex;gap:.75rem;margin-top:1.5rem">
+        ${idx>0?`<button class="btn-next-chapter" style="background:var(--surface2);color:var(--text-2);box-shadow:none;border:1px solid var(--border)" onclick="goToChapter(${idx-1})">← Sebelumnya</button>`:''}
+        ${!isLast?`<button class="btn-next-chapter" onclick="nextChapter(${idx})">Selanjutnya →</button>`
+          :`${isQuizDone(pillar) ? '<div style="background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);border-radius:12px;padding:1rem;text-align:center;color:var(--wrong);font-weight:700">🔒 Quiz sudah dikerjakan — tidak bisa diulang lagi</div>' : '<button class="btn-start-quiz" onclick="startQuiz(\'' + pillar + '\')">🎯 Mulai Quiz ' + PILLARS.find(p=>p.id===pillar).name + '!</button>'}`}
+      </div>
+    </div>
+  `;
+}
+
+function nextChapter(current){
+  const pillar=S.currentLearnPillar;
+  S.chaptersRead[pillar+current]=true;
+  S.currentChapter=current+1;
+  renderLearnChapters();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateLearnProgress(){
+  const pillar=S.currentLearnPillar;
+  const materi=MATERI[pillar];
+  const total=materi.chapters.length;
+  const done=Object.keys(S.chaptersRead).filter(k=>k.startsWith(pillar)).length;
+  const pct=((S.currentChapter+1)/total)*100;
+  $('learn-prog-fill').style.width=pct+'%';
+}
+
+// Knowledge check inside materi
+function checkKC(btn,type){
+  const parent=btn.closest('.kc-options');
+  if(parent.dataset.checked) return;
+  parent.dataset.checked='1';
+  parent.querySelectorAll('.kc-opt').forEach(b=>{b.disabled=true;});
+  btn.classList.add(type);
+  const kc=btn.closest('.knowledge-check');
+  kc.querySelectorAll('.kc-feedback').forEach(f=>f.classList.remove('show'));
+  kc.querySelector('.kc-feedback.'+type).classList.add('show');
+}
+
+// ═══════════════════════════════════
+// QUIZ LOCK (localStorage)
+// ═══════════════════════════════════
+function quizLockKey(pid){ return 'ctq_done||'+S.name+'||'+S.kelas+'||'+pid; }
+function quizScoreKey(pid){ return 'ctq_score||'+S.name+'||'+S.kelas+'||'+pid; }
+function isQuizDone(pid){ return !!localStorage.getItem(quizLockKey(pid)); }
+function markQuizDone(pid,score){
+  localStorage.setItem(quizLockKey(pid),'1');
+  localStorage.setItem(quizScoreKey(pid),score);
+  S.submitted[pid]=true;
+}
+
+// ═══════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════
+function startQuiz(pillarId){
+  if(isQuizDone(pillarId)){
+    showToast('Quiz sudah dikerjakan — tidak bisa diulang! 🔒','error');
+    return;
+  }
+  S.currentPillar=pillarId;
+  S.currentQ=0;
+  S.qScores={};
+  S.qAnswers={};
+  S.qChecked={};
+  const pillar=PILLARS.find(p=>p.id===pillarId);
+  $('quiz-topic-badge').textContent=pillar.icon+' '+pillar.name;
+  renderQuizQuestion(0);
+  showScreen('screen-quiz');
+}
+
+function renderQuizQuestion(idx){
+  S.currentQ=idx;
+  const quiz=QUIZZES[S.currentPillar];
+  const q=quiz.questions[idx];
+  const total=quiz.questions.length;
+
+  $('quiz-counter').textContent=`${idx+1}/${total}`;
+  $('quiz-prog-fill').style.width=`${(idx/total)*100}%`;
+  updateQuizScoreDisplay();
+
+  const area=$('quiz-question-area');
+  let html=`
+    <div class="question-card">
+      <span class="q-tag ${q.tag}">${q.tagLabel}</span>
+      <span class="q-pts-badge">+${q.pts} poin</span>
+      ${q.scenario?`<div class="q-scenario"><div class="q-scenario-label">📌 Skenario</div><div class="q-scenario-text">${q.scenario}</div></div>`:''}
+      <div class="q-text">${q.text}</div>
+  `;
+
+  if(q.type==='mcq') html+=renderMCQ(q);
+  else if(q.type==='dragdrop') html+=renderDnD(q);
+  else if(q.type==='ordering') html+=renderOrdering(q);
+  else if(q.type==='reflection') html+=renderReflection(q);
+
+  html+=`
+      <div class="q-feedback" id="qfb"></div>
+      <div class="quiz-nav">
+        <button class="btn-check" id="btn-check" onclick="checkQ()" ${S.qChecked[q.id]?'disabled style="display:none"':''}>Cek Jawaban ✓</button>
+        <button class="btn-next-q" id="btn-next" onclick="nextQ()" ${S.qChecked[q.id]?'':'disabled'}>
+          ${idx<total-1?'Lanjut →':'Lihat Hasil 🏆'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  area.innerHTML=html;
+
+  if(q.type==='dragdrop') initDnD(q);
+  if(q.type==='ordering') initOrdering(q);
+  if(q.type==='reflection') initReflection(q);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// MCQ
+function renderMCQ(q){
+  return `<div class="options-list">${q.options.map((o,i)=>`
+    <button class="opt-btn" id="opt${i}" onclick="selectOpt(${i})">
+      <div class="opt-letter">${String.fromCharCode(65+i)}</div><span>${o}</span>
+    </button>`).join('')}</div>`;
+}
+function selectOpt(i){
+  const q=QUIZZES[S.currentPillar].questions[S.currentQ];
+  if(S.qChecked[q.id]) return;
+  S.qAnswers[q.id]=i;
+  q.options.forEach((_,j)=>document.getElementById('opt'+j)?.classList.toggle('selected',j===i));
+  $('btn-check').disabled=false;
+}
+
+// DRAG & DROP
+function renderDnD(q){
+  return `
+    <div class="dnd-instructions">💡 Seret item dari daftar ke kotak kategori yang sesuai</div>
+    <div class="dnd-pool-title">📋 Daftar Item (seret ke bawah)</div>
+    <div class="dnd-pool" id="dnd-pool">
+      ${q.items.map(item=>`<div class="dnd-item" id="dnd-${item.id}" draggable="true" data-id="${item.id}"><span class="dnd-handle">⠿</span>${item.text}</div>`).join('')}
+    </div>
+    <div class="dnd-zones">
+      ${q.zones.map(z=>`
+        <div class="dnd-zone" id="zone-${z.id}" data-zone="${z.id}">
+          <div class="dnd-zone-title">${z.label}</div>
+          <div class="dnd-zone-items" id="zi-${z.id}"><div class="dnd-zone-empty">Seret ke sini...</div></div>
+        </div>`).join('')}
+    </div>`;
+}
+function initDnD(q){
+  let dragged=null;
+  document.querySelectorAll('.dnd-item').forEach(el=>{
+    el.addEventListener('dragstart',()=>{dragged=el;setTimeout(()=>el.classList.add('dragging'),0);});
+    el.addEventListener('dragend',()=>{el.classList.remove('dragging');dragged=null;checkDnDComplete(q);});
+  });
+  const zones=[document.getElementById('dnd-pool'),...q.zones.map(z=>document.getElementById(`zi-${z.id}`))];
+  zones.forEach(zone=>{
+    if(!zone) return;
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.closest('.dnd-zone')?.classList.add('drag-over');});
+    zone.addEventListener('dragleave',()=>zone.closest('.dnd-zone')?.classList.remove('drag-over'));
+    zone.addEventListener('drop',e=>{
+      e.preventDefault();
+      zone.closest('.dnd-zone')?.classList.remove('drag-over');
+      if(!dragged) return;
+      const ph=zone.querySelector('.dnd-zone-empty');
+      if(ph) ph.remove();
+      zone.appendChild(dragged);
+      checkDnDComplete(q);
+    });
+  });
+}
+function checkDnDComplete(q){
+  const allMoved=q.items.every(item=>{
+    const el=document.getElementById(`dnd-${item.id}`);
+    return el&&!el.closest('#dnd-pool');
+  });
+  if(allMoved) $('btn-check').disabled=false;
+}
+
+// ORDERING
+function renderOrdering(q){
+  const shuffled=[...q.items].sort(()=>Math.random()-.5);
+  return `
+    <div class="dnd-instructions">💡 Seret untuk mengubah urutan</div>
+    <div class="order-list" id="order-list">
+      ${shuffled.map((item,i)=>`
+        <div class="order-item" draggable="true" data-id="${item.id}">
+          <div class="order-num">${i+1}</div>
+          <span>${item.text}</span>
+        </div>`).join('')}
+    </div>`;
+}
+function initOrdering(q){
+  const list=document.getElementById('order-list');
+  let dragged=null;
+  list.querySelectorAll('.order-item').forEach(el=>{
+    el.addEventListener('dragstart',()=>{dragged=el;setTimeout(()=>el.classList.add('dragging'),0);});
+    el.addEventListener('dragend',()=>{el.classList.remove('dragging');updateOrderNums();dragged=null;});
+    el.addEventListener('dragover',e=>{
+      e.preventDefault();
+      const r=el.getBoundingClientRect();
+      if(e.clientY<r.top+r.height/2) list.insertBefore(dragged,el);
+      else list.insertBefore(dragged,el.nextSibling);
+    });
+  });
+  $('btn-check').disabled=false;
+}
+function updateOrderNums(){
+  document.querySelectorAll('.order-item').forEach((el,i)=>{
+    el.querySelector('.order-num').textContent=i+1;
+  });
+}
+
+// REFLECTION
+function renderReflection(q){
+  return `
+    <textarea class="reflect-textarea" id="reflect-ta" placeholder="${q.placeholder}" oninput="onReflect('${q.id}',${q.minChars})"></textarea>
+    <div class="reflect-count" id="reflect-count">0/${q.minChars} karakter minimum</div>`;
+}
+function onReflect(qid,min){
+  const ta=$('reflect-ta');
+  const len=ta.value.trim().length;
+  const cc=$('reflect-count');
+  cc.textContent=len+'/'+min+' karakter minimum';
+  cc.style.color=len>=min?'var(--correct)':'var(--text-3)';
+  S.qAnswers[qid]=ta.value.trim();
+  $('btn-check').disabled=len<min;
+}
+
+// ── CHECK ANSWER ──
+function checkQ(){
+  const quiz=QUIZZES[S.currentPillar];
+  const q=quiz.questions[S.currentQ];
+  if(S.qChecked[q.id]) return;
+  S.qChecked[q.id]=true;
+
+  let earned=0, fbClass='', fbTitle='', fbText='';
+
+  if(q.type==='mcq'){
+    const ans=S.qAnswers[q.id];
+    if(ans===undefined){showToast('Pilih jawaban dulu! 👆');S.qChecked[q.id]=false;return;}
+    const correct=ans===q.correct;
+    earned=correct?q.pts:0;
+    fbClass=correct?'correct':'wrong';
+    fbTitle=correct?'✅ Benar!':'❌ Belum Tepat';
+    fbText=correct?q.feedback.c:q.feedback.w;
+    q.options.forEach((_,i)=>{
+      const b=document.getElementById('opt'+i);
+      if(!b) return;
+      b.disabled=true;
+      if(i===q.correct) b.classList.add('correct');
+      else if(i===ans&&!correct) b.classList.add('wrong');
+    });
+  }
+  else if(q.type==='dragdrop'){
+    let correct=0;
+    q.items.forEach(item=>{
+      const el=document.getElementById(`dnd-${item.id}`);
+      if(el){
+        const zone=el.closest('.dnd-zone');
+        if(zone&&zone.dataset.zone===item.correct) correct++;
+      }
+    });
+    const pct=correct/q.items.length;
+    earned=Math.round(q.pts*pct);
+    if(pct===1){fbClass='correct';fbTitle=`✅ Sempurna! ${correct}/${q.items.length}`;fbText=q.feedback.c;}
+    else if(pct>=.5){fbClass='partial';fbTitle=`⚠️ Hampir! ${correct}/${q.items.length} benar`;fbText=q.feedback.p;}
+    else{fbClass='wrong';fbTitle=`❌ ${correct}/${q.items.length} benar`;fbText=q.feedback.w;}
+    document.querySelectorAll('.dnd-item').forEach(el=>el.setAttribute('draggable',false));
+  }
+  else if(q.type==='ordering'){
+    const orderItems=document.querySelectorAll('#order-list .order-item');
+    const userOrder=[...orderItems].map(el=>el.dataset.id);
+    const correctOrder=[...q.items].sort((a,b)=>a.order-b.order).map(i=>i.id);
+    const allCorrect=userOrder.every((id,i)=>id===correctOrder[i]);
+    earned=allCorrect?q.pts:Math.round(q.pts*.4);
+    if(allCorrect){fbClass='correct';fbTitle='✅ Urutan Sempurna!';fbText=q.feedback.c;}
+    else{
+      fbClass='wrong';fbTitle='❌ Urutan Belum Tepat';
+      fbText=q.feedback.w+`<br><br><strong>Urutan benar:</strong> ${correctOrder.map((id,i)=>`${i+1}. ${q.items.find(it=>it.id===id).text}`).join(' → ')}`;
+    }
+    document.querySelectorAll('.order-item').forEach(el=>el.setAttribute('draggable',false));
+    S.qAnswers[q.id]=userOrder;
+  }
+  else if(q.type==='reflection'){
+    const txt=S.qAnswers[q.id]||'';
+    if(txt.length<q.minChars){showToast('Jawaban terlalu singkat!','error');S.qChecked[q.id]=false;return;}
+    earned=0;fbClass='correct';fbTitle='✅ Refleksi Tersimpan!';
+    fbText='Refleksimu sudah dicatat! Menghubungkan konsep ke pengalaman nyata adalah tanda deep learning yang sesungguhnya 🌟';
+  }
+
+  S.qScores[q.id]=earned;
+  updateQuizScoreDisplay();
+
+  const fb=$('qfb');
+  fb.className='q-feedback show '+fbClass;
+  fb.innerHTML=`<div class="q-feedback-title">${fbTitle}</div><div class="q-feedback-text">${fbText}</div>`;
+
+  $('btn-check').style.display='none';
+  $('btn-next').disabled=false;
+}
+
+function updateQuizScoreDisplay(){
+  const total=Object.values(S.qScores).reduce((a,v)=>a+v,0);
+  $('quiz-score-live').textContent=total+' pts';
+}
+
+function nextQ(){
+  const quiz=QUIZZES[S.currentPillar];
+  if(S.currentQ<quiz.questions.length-1){
+    renderQuizQuestion(S.currentQ+1);
+  } else {
+    showResult();
+  }
+}
+
+// ═══════════════════════════════════
+// RESULT
+// ═══════════════════════════════════
+function showResult(){
+  const quiz=QUIZZES[S.currentPillar];
+  const pillar=PILLARS.find(p=>p.id===S.currentPillar);
+  const total=Object.values(S.qScores).reduce((a,v)=>a+v,0);
+  const maxPts=quiz.maxPts;
+  const pct=total/maxPts;
+
+  S.scores[S.currentPillar]=total;
+  // save score locally so it persists after page refresh
+  localStorage.setItem(quizScoreKey(S.currentPillar), total);
+
+  let trophy,title,predikat,predikatBg,predikatColor;
+  if(pct>=.9){trophy='🏆';title='Luar Biasa!';predikat='Sangat Baik';predikatBg='rgba(16,185,129,.15)';predikatColor='var(--correct)';}
+  else if(pct>=.75){trophy='🥇';title='Kerja Bagus!';predikat='Baik';predikatBg='rgba(0,229,200,.15)';predikatColor='var(--teal)';}
+  else if(pct>=.6){trophy='🥈';title='Lumayan Nih!';predikat='Cukup';predikatBg='rgba(129,140,248,.15)';predikatColor='var(--violet)';}
+  else{trophy='💪';title='Terus Semangat!';predikat='Perlu Latihan';predikatBg='rgba(244,63,94,.1)';predikatColor='var(--wrong)';}
+
+  $('result-trophy').textContent=trophy;
+  $('result-title').textContent=title;
+  $('result-name').textContent=titleCase(S.name)+' · '+S.kelas+' · '+pillar.name;
+  $('result-score-num').textContent=total;
+  $('result-score-denom').textContent='/'+maxPts;
+
+  // ring animation
+  const circumference=2*Math.PI*60;
+  const offset=circumference*(1-pct);
+  const ring=$('score-ring');
+  ring.style.stroke=pillar.colorRaw;
+  ring.style.strokeDasharray=circumference;
+  setTimeout(()=>{ring.style.strokeDashoffset=offset;},100);
+
+  $('predikat-pill').textContent=predikat;
+  $('predikat-pill').style.cssText=`background:${predikatBg};border:1px solid ${predikatColor}55;color:${predikatColor}`;
+
+  $('result-breakdown').innerHTML=quiz.questions.map(q=>`
+    <div class="breakdown-item">
+      <div class="breakdown-val" style="color:${(S.qScores[q.id]||0)>=(q.pts*.6)?'var(--correct)':'var(--wrong)'}">${S.qScores[q.id]||0}${q.pts>0?'/'+q.pts:'✍'}</div>
+      <div class="breakdown-label">${q.tagLabel}</div>
+    </div>`).join('');
+
+  const alreadyDone=isQuizDone(S.currentPillar);
+  const btnSub=$('btn-submit');
+  btnSub.disabled=alreadyDone;
+  if(alreadyDone){
+    btnSub.textContent='✅ Nilai Sudah Terkirim';
+    btnSub.style.background='linear-gradient(135deg,var(--violet),#6366f1)';
+    $('submit-status').textContent='Nilai sudah dikirim ke guru dan quiz tidak bisa diulang. 🔒';
+    $('submit-status').className='submit-status ok';
+  } else {
+    btnSub.textContent='📤 Kirim Nilai ke Guru';
+    btnSub.style.background='';
+    $('submit-status').textContent='';
+  }
+
+  showScreen('screen-result');
+  if(pct>=.75) launchConfetti();
+}
+
+// ═══════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════
+async function submitScore(){
+  if(isQuizDone(S.currentPillar)) return;
+  const btn=$('btn-submit');
+  const status=$('submit-status');
+  btn.disabled=true; btn.textContent='⏳ Mengirim...';
+  status.textContent='Sedang mengirim nilai...'; status.className='submit-status';
+
+  const quiz=QUIZZES[S.currentPillar];
+  const total=S.scores[S.currentPillar]||Object.values(S.qScores).reduce((a,v)=>a+v,0);
+  const pillar=PILLARS.find(p=>p.id===S.currentPillar);
+  const reflQ=quiz.questions.find(q=>q.type==='reflection');
+
+  // Build per-question score breakdown
+  const breakdown={};
+  quiz.questions.forEach(q=>{ breakdown[q.id]=(S.qScores[q.id]||0); });
+
+  const payload={
+    timestamp: new Date().toLocaleString('id-ID'),
+    nama:      S.name,
+    kelas:     S.kelas,
+    misi:      pillar.name,
+    total:     total,
+    maxPts:    quiz.maxPts,
+    detail:    JSON.stringify(breakdown),
+    refleksi:  reflQ ? (S.qAnswers[reflQ.id]||'-') : '-'
+  };
+
+  try{
+    // Kirim sebagai text/plain agar tidak trigger preflight CORS (standar untuk Google Apps Script)
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    // mode no-cors selalu return opaque response — anggap sukses jika tidak throw error
+    markQuizDone(S.currentPillar, total);
+    btn.textContent='✅ Nilai Terkirim!';
+    btn.style.background='linear-gradient(135deg,var(--violet),#6366f1)';
+    btn.disabled=true;
+    status.textContent='Nilai berhasil dikirim ke guru! Quiz tidak bisa diulang lagi. 🔒';
+    status.className='submit-status ok';
+    showToast('Nilai berhasil dikirim! 🎉','success');
+    renderHome(); // update dashboard progress
+  }catch(e){
+    // Fetch gagal total (offline) — tetap simpan lokal agar quiz terkunci
+    markQuizDone(S.currentPillar, total);
+    btn.textContent='⚠️ Tersimpan Lokal';
+    btn.style.background='linear-gradient(135deg,var(--warn),#d97706)';
+    btn.disabled=true;
+    status.textContent='Tidak bisa kirim ke server (offline?). Nilai tersimpan di perangkat ini — minta guru cek manual.';
+    status.className='submit-status err';
+    showToast('Koneksi bermasalah — nilai disimpan lokal','error');
+  }
+}
+
+// ═══════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════
+function launchConfetti(){
+  const canvas=$('confetti-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const pieces=[];
+  const colors=['#00e5c8','#818cf8','#ff7043','#fbbf24','#f43f5e','#10b981'];
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x:Math.random()*canvas.width,y:-20,
+      vx:(Math.random()-0.5)*4,vy:Math.random()*3+2,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      size:Math.random()*8+4,rot:Math.random()*360,rv:(Math.random()-0.5)*8,
+      shape:Math.random()>.5?'rect':'circle'
+    });
+  }
+  let frame=0;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p=>{
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,1-frame/180);
+      if(p.shape==='rect'){ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size/2);}
+      else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;p.vy+=0.05;
+    });
+    frame++;
+    if(frame<200) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
