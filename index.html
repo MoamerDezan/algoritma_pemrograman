@@ -615,6 +615,7 @@ body {
 
 .dnd-item {
   background:var(--surface2); border:1.5px solid var(--border);
+  touch-action:none;
   border-radius:10px; padding:.7rem 1rem;
   font-size:.88rem; cursor:grab; user-select:none;
   display:flex; align-items:center; gap:.75rem;
@@ -640,7 +641,7 @@ body {
   border-radius:12px; padding:.8rem 1rem;
   font-size:.9rem; cursor:grab; user-select:none;
   display:flex; align-items:center; gap:.875rem;
-  transition:all .15s;
+  transition:all .15s; touch-action:none;
 }
 .order-item:hover { border-color:var(--orange); }
 .order-item.dragging { opacity:.3; }
@@ -863,11 +864,12 @@ body {
 <div id="screen-login" class="screen active">
   <div class="login-wrap">
     <div class="login-eyebrow">
-      <div class="login-pill">CT Quest · Informatika X · MAN 2 Bogor</div>
+      <div class="login-pill">CT Quest · Informatika X</div>
     </div>
     <h1 class="login-title">Belajar Berpikir<br>Kayak Ahli Komputer 🧠</h1>
-    <p class="login-desc">Selamat datang di <strong>CT Quest</strong><br> Di balik tampilan ini ada usaha seorang guru…<br>
-      jangan sampai cuma jadi pajangan ya 🤭</p>
+    <p class="login-desc">Selamat datang di CT Quest
+Di balik tampilan ini ada usaha seorang guru…
+jangan sampai cuma jadi pajangan ya 🤭</p>
 
     <div class="login-card">
       <div class="form-group">
@@ -894,7 +896,7 @@ body {
         <div class="selected-name-display" id="selected-name-display"></div>
       </div>
 
-      <button class="btn-login" id="btn-login" disabled onclick="doLogin()">Gaskeun Belajar →</button>
+      <button class="btn-login" id="btn-login" disabled onclick="doLogin()">Mulai Belajar →</button>
       <p class="login-note">⚠️ Pastikan nama dan kelas benar — nilaimu langsung dikirim ke guru setelah selesai.</p>
     </div>
   </div>
@@ -1032,7 +1034,7 @@ const STUDENTS = {
   "X-B":["ADILA SALSABILA","ALMAIDA RAMDANI","ANDAKA ALDI ROSADI","ARYU ZAKIA NURUL AEN","ATIAN SAHPUTRA","AUFA RIZAL RAIS","DAPA HAPID PIRDAUS","DESTI NUR SEPTIAN","DISNA ROSMAWATI","DZIKRA AFNAN JANNATI","GISHA ZAKIRA UMARAN","HIRZAN","IBNU AUFA BIAHDILLAH","INDAH NOVITASARI","INTAN ABDU ROHMAN","KAFA NURUL GHAOTS","KANAYA FITRI YANI","M IRFAN IRWANSYAH","MAULANA RIZKY FAUZI","MUHAMAD LUTHFI KAMIL","MUHAMAD RAUSYAN ZAHRI","MUHAMMAD IRFAN ZINDY","NAURA KAMILAH HAFIDZ","NUN NURHAENI","NUR AIDAH","PRASETYO RAMADHAN","RAKA DHIA ANAQI","REISHYLLA DWI MARTINI","RIFKI ADIRLI","RIRIN ANINDIA PUTRI","SABILA CHAERUNNISA","SALMAN ALFARISY","SITI HAMIDATUL PITRIYAH","SITI HUMAIROH","VIONA KEYLA ANASTASYA","YUS MALIA ANWAR"],
   "X-C":["AHMAD AWALUDIN","ALYA RAMADHANI","ANISA RUSDAH","DZIKRI MAULANA YUSUF","FAJRIAH NUR ALIYA","FANESA EKA PUTRI","FAZHAN HOERUL HUDA","ILHAM AZAKI","JIHAN KARINA KARIN","JIHAN RAFIFAH","KAWAKIBU AL ABROR","KAYLA FADYA ALTHAFUNNISA","KHOERUNISA","KIPA ATUL KAIS","LUTFI NAJIB DJAUHARI","M. WILDAN SOLIHIN","MAURA KEYZA RAMDAN","MOCHAMAD DHAFA ARIZQI","MUHAMAD DIKI NURDIANSYAH","MUHAMAD JIKRI AL KAHFI","MUHAMAD QAIS AL KAHFI","MUHAMAD RIZKI ALKAESAR","MUHAMMAD BAYU FIRDAUS","MUHAMMAD ROFI ALHAQ","NUR ALISA","NUR FADLAH TUNNISA","REZKI HIDAYATUL FALAH","ROIDATUN NISA","SAHWA QUROTUL AIN","SALSADILLA NINGTYAS","SASKIA FAJRIANI ROHENDI","SEPTIAN RAMADHAN","SITI KHAIRUNNISA","SOPIA APRIL","TATU HAWA","ZAKIYAH NUR ROBBY"],
   "X-D":["AWAHITA DAHAYU","AZWAR KHAIRURRIZAL","CITRA AULIA","ELIZA HOURA NINA LINDIAWATI SUPARLAN","HAURA AZKIYA","HERDY PHAIRUZ NAZMATIRA","JOE PERMANA PUTRA","KAYLA PUTRI","KHOIRUL MULYA NURASYIFA","LUSI MAULANI","LUSYANA NUR HAPSARI","M. AZZAM PRATAMA PUTRA","M. FADLIYANSYAH","MILATINA NURFAJAILA","MOHAMAD AZZAM SOBANDI","MUHAMAD RIZAL BAKRI","MUHAMAD RIZKI AL-HILMI","MUHAMMAD FARRAS AL-IKBAR BUDIMAN","MUHAMMAD LABIB MAHBUB","MUHAMMAD RIDHO","MUHAMMAD RIVA RAIHAN","NAILA PUTRI MAULIDA","PUTRI SARVINA","RAKA AFRIEZAL ALHAKAM","RATNA MILASARI","RIFA NURAINI","SABIQUL KHOIR AFWANDY","SAFARA QISTINA HASANUDIN","SITI KANDZA ARFA RAHMA IRAWAN","SITI KHOERUNISSA","SRI AMANDA","SYAKILA OKTAPIANI","SYEIRA ASLA ANASTASYA","TAZKIATUL MUSYAROFAH","WILDA AULA SYIFA","ZAHRA MAULIDA"],
-  "X-E":["AINI MAULIDA","ALISA TRI SUTONO","M.Faza Fauzan Azzima","AUFIA MANOARVA ASSAUMI","BAYU PERMANA","BIADIL ALIF","CAHAYU JIHAN KARMILA","CALYSTA ARACELLIA","DANU ARDIANSYAH","DELIA BERLIANA PUTRI","DIVA KHOERUNNISA","HAYANA RAHAYU","ILHAM MAULID","IMAM ALBANI","LARISA PUTRI RAMADHANI","M.HAIKAL ZILVINO YUSUF","MARISHA SALSABILA FITRIADI","MUHAMAD FACHRI FAHRUROZI","MUHAMAD RIDO HERMANTO","MUHAMMAD FADIL","MUHAMMAD TIAN ALPIANSYAH","MULKY ALIFA HAKIM","NAILA NURSABILA","NASYWA HUMAIRA","PELISA ANASTASYA PUTRI","PUTRI NAHARIYAH ZAHRA","RAFA RAHMANSYAH","RAHMATUL ALANI","RESVA YUNITA","RIZKY FAUZI","SILVI HANDAYANI","SITI NAZMA","SITI SOVICYAH","SUROTUL MUAWIJATAIN","SYIFA AWALYA PUTRI","YEVA YOSHI HAIKAL"],
+  "X-E":["AINI MAULIDA","ALISA TRI SUTONO","AUFIA MANOARVA ASSAUMI","BAYU PERMANA","BIADIL ALIF","CAHAYU JIHAN KARMILA","CALYSTA ARACELLIA","DANU ARDIANSYAH","DELIA BERLIANA PUTRI","DIVA KHOERUNNISA","HAYANA RAHAYU","ILHAM MAULID","IMAM ALBANI","LARISA PUTRI RAMADHANI"," M.Faza Fauzan Azzima","M.HAIKAL ZILVINO YUSUF","MARISHA SALSABILA FITRIADI","MUHAMAD FACHRI FAHRUROZI","MUHAMAD RIDO HERMANTO","MUHAMMAD FADIL","MUHAMMAD TIAN ALPIANSYAH","MULKY ALIFA HAKIM","NAILA NURSABILA","NASYWA HUMAIRA","PELISA ANASTASYA PUTRI","PUTRI NAHARIYAH ZAHRA","RAFA RAHMANSYAH","RAHMATUL ALANI","RESVA YUNITA","RIZKY FAUZI","SILVI HANDAYANI","SITI NAZMA","SITI SOVICYAH","SUROTUL MUAWIJATAIN","SYIFA AWALYA PUTRI","YEVA YOSHI HAIKAL"],
   "X-F":["AHMAD MUZAKI","AJENG RISALATUL MUAWANAH","AMIRA RAMADHANI","CAHAYA PUTRI ADILAH","DALILLAH EKA PUTRI","DAVI RIZKI PRATAMA","FAYZAN AYDIN ALHASYA","FITRI KABEIRU","GINA SYAHIRA","HILAL IBRAHIM","IFANA FEBRIANI","KALYSA ZULFA RAMADHANI BILQIS","KHAYYIRA QURRATUAIN","LULU ADHWA","M LUTHFI FIRDAUS","M. SURO","MAULIDA MUFLIH HATUNAFISA","MUHAMAD DIKI PRATAMA","MUHAMAD SYAHDAN SYAILANA","MUHAMAD ZACKY ANUGRAH","NADHITA CAHYA KHARISMA","NAJLA QURROTUAIN","NAYSILA AZKA MAULIDA","NAZWA SHOFFIA","PUTRI FATIHATUL AULIA CHANDRANI","RATU NAYSA RIZKIA","RAYYAN ANUGRAH KALBUADI","RIZKY MAULANA","RIZKYA DWI PUTRI","SAHALUDDIN","SOPI ANDINI","SYAIRA MAHARANI","UCU SYAFAAH","UMMU FATIMAH AINUN AQUILAH","YULIANTI"],
   "X-G":["ADRIANSYAH","AHMAD WADHOWI","AKMAL ZAKWAN RAMADHAN","ALMARIFA RESTIANA","AULIA SURYANI","AYYA ZAHRATU SYIFA","DENIS IRAWAN","HESTI AULIA","HILMI MUSTOPA","IFNA NUR ILMIRA","KARHAN FAUZI","LIE TRESYA MAULIDA","LULU AINUN SYIFA","M. HAIKAL FAJRI YANI","MARTHA YUSLIANI","MUHAMAD FARHAN","MUHAMAD PAISAL","MUHAMMAD PURKON","MUWAFI MAULID MUFTI SUPRIATMAN","NAFILATUL SILMAH","NAILA IZMI ZAHIRA","NEILA MIFTAH PASTIKA","NUR ASYIFA RIZKILLAH","NURAINNI SYAHILLANI","NURHANIPAH AZAHRA","NURUL SAYYIDAH MIRADEWI","RAHMI ISNAWATI","RIFKI RAJAB","RIHLATU NURUL ASSAIDAH","RUBIYAH","SHAKILA UMAIRA","SYIFANI TRIHAPSARI","VANESA FUTRI LESTARI","WILDA ZAHRANNISA KOSASIH","ZIDAN MAULANA"],
   "X-H":["AISYAH AZRA KURNIA LADANI","ALISYA PUTRI","ANISYA AWALIYA","AYDA NUR QORI'AH","AZZAM DZULKAYSI AL AFGHANY","BAGJA UTAMA PUTRA","BERLY YUNDANI","CHAIRUL AZZAM NURROHIM","CITRA LESTARI","DIMAS RAMADHAN ILHAM","EDWAR SAMUDRA","FARDA PUTRI BIANTORO","FEBI KURNIAWATI","ILIYYIN AZ ZUKHRUF IKLIMA","IMANUDIN","MAHESA RAFFA","MEILATI PUTRI HARYANTO","MUAHAMAD RIDHO ALAMSYAH","MUHAMMAD HIGH NASUTION","MUHAMMAD SYAHDAN EL SHIRAZY","MUHAMMAD VIKRY","NABILA","NILAM ANDINI FAKHIRA","NISRIINA HAANIYAH","NUR ADELA FEBRIYANIH","NURSILA GIANTI","RATU BILQIS AL SHANUM","RESTI","RIFANI WIJAYA","RIKO GHABY MARJUWWA","RIZQIA MANDARIANI","SAHILA HASNA FAJRINA","SATRIA RAKA PADILAH","SEPTRIAN RISQI RAMADHAN","SITI NUR AMALIA","SOFKHAN BIMA PRATAMA"]
@@ -1766,8 +1768,8 @@ const QUIZZES = {
       // Q5 — Analisis kesalahan decomposition
       {id:'d5',type:'mcq',pts:10,
        tag:'mcq',tagLabel:'Analisis Kritis',
-       scenario:'Mamad meng-decompose tugas "Belajar Bahasa Inggris" menjadi:\n① Beli buku grammar tebal\n② Hafal 10.000 kosa kata\n③ Lancar speaking',
-       text:'Apa masalah utama dengan decomposition yang Mamad buat?',
+       scenario:'Rizky meng-decompose tugas "Belajar Bahasa Inggris" menjadi:\n① Beli buku grammar tebal\n② Hafal 10.000 kosa kata\n③ Lancar speaking',
+       text:'Apa masalah utama dengan decomposition yang Rizky buat?',
        options:[
          'Sub-tugasnya sudah cukup baik dan logis',
          'Sub-tugas ① dan ② masih terlalu besar dan tidak konkret — "hafal 10.000 kosa kata" tidak bisa dikerjakan dalam satu sesi belajar',
@@ -1862,12 +1864,12 @@ const QUIZZES = {
       // Q2
       {id:'p2',type:'mcq',pts:9,
        tag:'mcq',tagLabel:'Identifikasi Pola',
-       scenario:'Data nilai ulangan Informatika kelas X-A selama 5 bulan:\nBulan 1: 72 | Bulan 2: 68 | Bulan 3: 75 | Bulan 4: 70 | Bulan 5: 73\nData kehadiran guru:\nBulan 1: 95% | Bulan 2: 70% | Bulan 3: 96% | Bulan 4: 75% | Bulan 5: 94%',
+       scenario:'Data nilai ulangan Matematika kelas X-A selama 5 bulan:\nBulan 1: 72 | Bulan 2: 68 | Bulan 3: 75 | Bulan 4: 70 | Bulan 5: 73\nData kehadiran guru:\nBulan 1: 95% | Bulan 2: 70% | Bulan 3: 96% | Bulan 4: 75% | Bulan 5: 94%',
        text:'Pola apa yang bisa kamu kenali dari data di atas?',
        options:[
          'Tidak ada pola yang jelas dari data tersebut',
-         'Nilai Informatika cenderung lebih tinggi di bulan ketika kehadiran guru lebih tinggi',
-         'Nilai Informatika selalu naik setiap bulannya',
+         'Nilai Matematika cenderung lebih tinggi di bulan ketika kehadiran guru lebih tinggi',
+         'Nilai Matematika selalu naik setiap bulannya',
          'Kehadiran guru tidak berpengaruh sama sekali terhadap nilai'
        ],
        correct:1,
@@ -2318,7 +2320,8 @@ function onKelasChange(){
 function populateNames(kelas,filter){
   const names=(STUDENTS[kelas]||[]).filter(n=>n.includes(filter.toUpperCase()));
   const list=$('name-list');
-  list.innerHTML=names.map(n=>`<div class="name-item" onclick="selectName('${n}')">${titleCase(n)}</div>`).join('');
+  window._ctNames=names;
+  list.innerHTML=names.map((n,i)=>`<div class="name-item" onclick="selectName(${i})">${titleCase(n)}</div>`).join('');
   if(!names.length) list.innerHTML='<div style="padding:1rem;color:var(--text-3);font-size:.85rem">Nama tidak ditemukan</div>';
 }
 
@@ -2328,19 +2331,83 @@ function filterNames(){
   populateNames(k,q);
 }
 
-function selectName(name){
+function selectName(idx){
+  const name=window._ctNames?window._ctNames[idx]:idx;
   selectedName=name;
   $('selected-name-display').textContent='✓ '+titleCase(name);
   $('selected-name-display').classList.add('visible');
-  document.querySelectorAll('.name-item').forEach(el=>el.classList.toggle('selected',el.textContent===titleCase(name)));
+  document.querySelectorAll('.name-item').forEach((el,i)=>el.classList.toggle('selected',i===idx));
   $('btn-login').disabled=false;
 }
+
+// Mapping nama misi di spreadsheet -> pillar id
+const MISI_TO_PILLAR = {
+  'Decomposition'     : 'decomposition',
+  'Pattern Recognition': 'pattern',
+  'Abstraction'       : 'abstraction',
+  'Algorithm Design'  : 'algorithm'
+};
 
 function doLogin(){
   if(!selectedName||!$('sel-kelas').value) return;
   S.name=selectedName;
   S.kelas=$('sel-kelas').value;
-  // restore quiz lock & scores from localStorage (inline, isQuizDone defined later)
+
+  const btn=$('btn-login');
+  btn.disabled=true; btn.textContent='⏳ Memuat data...';
+
+  restoreScoresFromSpreadsheet().then(()=>{
+    sessionStorage.setItem('ctq_session', JSON.stringify({name:S.name, kelas:S.kelas}));
+    btn.textContent='Mulai Belajar →';
+    renderHome();
+    showScreen('screen-home');
+    loadLeaderboard();
+  }).catch(()=>{
+    restoreScoresFromStorage();
+    sessionStorage.setItem('ctq_session', JSON.stringify({name:S.name, kelas:S.kelas}));
+    btn.disabled=false; btn.textContent='Mulai Belajar →';
+    renderHome();
+    showScreen('screen-home');
+    loadLeaderboard();
+  });
+}
+
+// Ambil data dari Spreadsheet via JSONP, filter nama+kelas, restore skor
+function restoreScoresFromSpreadsheet(){
+  return new Promise((resolve, reject)=>{
+    const cbName='_rscb'+Date.now();
+    const script=document.createElement('script');
+    const timeout=setTimeout(()=>{
+      delete window[cbName]; script.remove(); reject(new Error('timeout'));
+    }, 8000);
+    window[cbName]=function(data){
+      clearTimeout(timeout); delete window[cbName]; script.remove();
+      try{
+        const rows=(data||[]).filter(r=>
+          r.nama&&r.kelas&&
+          r.nama.toUpperCase()===S.name.toUpperCase()&&
+          r.kelas===S.kelas
+        );
+        rows.forEach(r=>{
+          const pid=MISI_TO_PILLAR[r.misi];
+          if(!pid) return;
+          const score=parseInt(r.total)||0;
+          S.scores[pid]=score;
+          S.submitted[pid]=true;
+          // Cache lokal sebagai fallback offline
+          localStorage.setItem('ctq_done||'+S.name+'||'+S.kelas+'||'+pid,'1');
+          localStorage.setItem('ctq_score||'+S.name+'||'+S.kelas+'||'+pid,score);
+        });
+      }catch(e){}
+      resolve();
+    };
+    script.onerror=()=>{ clearTimeout(timeout); script.remove(); reject(new Error('error')); };
+    script.src=APPS_SCRIPT_URL+'?callback='+cbName;
+    document.head.appendChild(script);
+  });
+}
+
+function restoreScoresFromStorage(){
   ['decomposition','pattern','abstraction','algorithm'].forEach(pid=>{
     const lk='ctq_done||'+S.name+'||'+S.kelas+'||'+pid;
     const sk='ctq_score||'+S.name+'||'+S.kelas+'||'+pid;
@@ -2350,10 +2417,26 @@ function doLogin(){
       if(sv!==null) S.scores[pid]=parseInt(sv);
     }
   });
-  renderHome();
-  showScreen('screen-home');
-  loadLeaderboard();
 }
+
+// ── Auto-restore sesi jika ada di sessionStorage ──
+(function restoreSession(){
+  try{
+    const saved=sessionStorage.getItem('ctq_session');
+    if(!saved) return;
+    const {name,kelas}=JSON.parse(saved);
+    if(!name||!kelas) return;
+    S.name=name; S.kelas=kelas;
+    // Restore dari Spreadsheet, fallback ke localStorage
+    restoreScoresFromSpreadsheet()
+      .catch(()=>restoreScoresFromStorage())
+      .finally(()=>{
+        renderHome();
+        showScreen('screen-home');
+        loadLeaderboard();
+      });
+  }catch(e){}
+})();
 
 // ═══════════════════════════════════
 // HOME / DASHBOARD
@@ -2732,8 +2815,8 @@ function selectOpt(i){
 // DRAG & DROP
 function renderDnD(q){
   return `
-    <div class="dnd-instructions">💡 Seret item dari daftar ke kotak kategori yang sesuai</div>
-    <div class="dnd-pool-title">📋 Daftar Item (seret ke bawah)</div>
+    <div class="dnd-instructions">💡 <strong>Drag</strong> item ke kotak, atau <strong>tap item</strong> lalu <strong>tap zona</strong> tujuan</div>
+    <div class="dnd-pool-title">📋 Daftar Item (seret / tap untuk memilih)</div>
     <div class="dnd-pool" id="dnd-pool">
       ${q.items.map(item=>`<div class="dnd-item" id="dnd-${item.id}" draggable="true" data-id="${item.id}"><span class="dnd-handle">⠿</span>${item.text}</div>`).join('')}
     </div>
@@ -2741,35 +2824,171 @@ function renderDnD(q){
       ${q.zones.map(z=>`
         <div class="dnd-zone" id="zone-${z.id}" data-zone="${z.id}">
           <div class="dnd-zone-title">${z.label}</div>
-          <div class="dnd-zone-items" id="zi-${z.id}"><div class="dnd-zone-empty">Seret ke sini...</div></div>
+          <div class="dnd-zone-items" id="zi-${z.id}"><div class="dnd-zone-empty">Seret / tap ke sini...</div></div>
         </div>`).join('')}
     </div>`;
 }
+/* ── DnD + Touch support ── */
 function initDnD(q){
   let dragged=null;
+  // ── ghost element untuk touch ──
+  let ghost=null;
+  let offsetX=0, offsetY=0;
+  // ── Tap-to-move state ──
+  let tapSelected=null;
+
+  // CSS for tap-selected state (inject once)
+  if(!document.getElementById('dnd-tap-style')){
+    const s=document.createElement('style');
+    s.id='dnd-tap-style';
+    s.textContent='.dnd-item.tap-selected{border-color:var(--teal);background:var(--teal-dim);transform:scale(1.03);box-shadow:0 4px 16px rgba(0,229,200,.3)}.dnd-zone.tap-target{border-color:var(--teal);background:var(--teal-dim)}.order-item.tap-selected{border-color:var(--orange);background:var(--orange-dim);transform:scale(1.03)}';
+    document.head.appendChild(s);
+  }
+
+  function getZoneAtPoint(x,y){
+    // Sembunyikan ghost sementara agar elementFromPoint tidak mendeteksinya
+    if(ghost) ghost.style.display='none';
+    const el=document.elementFromPoint(x,y);
+    if(ghost) ghost.style.display='';
+    if(!el) return null;
+    const pool=document.getElementById('dnd-pool');
+    if(pool&&pool.contains(el)) return pool;
+    for(const z of q.zones){
+      const zi=document.getElementById('zi-'+z.id);
+      if(zi&&zi.contains(el)) return zi;
+      const zEl=document.getElementById('zone-'+z.id);
+      if(zEl&&zEl.contains(el)) return zi||zEl;
+    }
+    return null;
+  }
+
+  function dropIntoZone(zone){
+    if(!dragged||!zone) return;
+    // Normalisasi: cari container zi-* (items container) yang tepat
+    let target;
+    if(zone.id==='dnd-pool'){
+      target=zone;
+    } else {
+      target=(zone.id&&zone.id.startsWith('zi-'))?zone
+        :(zone.closest('[id^="zi-"]')||zone.querySelector('[id^="zi-"]')||zone);
+    }
+    const ph=target.querySelector('.dnd-zone-empty');
+    if(ph) ph.remove();
+    target.appendChild(dragged);
+    checkDnDComplete(q);
+  }
+
   document.querySelectorAll('.dnd-item').forEach(el=>{
-    el.addEventListener('dragstart',()=>{dragged=el;setTimeout(()=>el.classList.add('dragging'),0);});
-    el.addEventListener('dragend',()=>{el.classList.remove('dragging');dragged=null;checkDnDComplete(q);});
+    // ── Tap-to-move (click) ──
+    el.addEventListener('click',()=>{
+      if(el.getAttribute('draggable')==='false') return; // sudah dikunci
+      if(tapSelected===el){
+        // Deselect
+        el.classList.remove('tap-selected');
+        tapSelected=null;
+      } else {
+        document.querySelectorAll('.dnd-item').forEach(e=>e.classList.remove('tap-selected'));
+        el.classList.add('tap-selected');
+        tapSelected=el;
+        showToast('Item dipilih — tap zona tujuan ✋','');
+      }
+    });
+
+    // ── Mouse events ──
+    el.addEventListener('dragstart',()=>{
+      dragged=el;
+      setTimeout(()=>el.classList.add('dragging'),0);
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      dragged=null;
+      checkDnDComplete(q);
+    });
+
+    // ── Touch events ──
+    el.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      dragged=el;
+      const t=e.touches[0];
+      const r=el.getBoundingClientRect();
+      offsetX=t.clientX-r.left;
+      offsetY=t.clientY-r.top;
+      // buat ghost
+      ghost=el.cloneNode(true);
+      ghost.style.cssText=`
+        position:fixed;z-index:9999;pointer-events:none;opacity:.85;
+        width:${r.width}px;left:${t.clientX-offsetX}px;top:${t.clientY-offsetY}px;
+        box-shadow:0 8px 32px rgba(0,0,0,.5);transform:scale(1.05);
+        background:var(--surface3);border:1.5px solid var(--teal);border-radius:10px;
+      `;
+      document.body.appendChild(ghost);
+      el.classList.add('dragging');
+    },{passive:false});
+
+    el.addEventListener('touchmove',e=>{
+      e.preventDefault();
+      if(!ghost) return;
+      const t=e.touches[0];
+      ghost.style.left=(t.clientX-offsetX)+'px';
+      ghost.style.top=(t.clientY-offsetY)+'px';
+      // highlight zone di bawah jari
+      document.querySelectorAll('.dnd-zone').forEach(z=>z.classList.remove('drag-over'));
+      const zone=getZoneAtPoint(t.clientX,t.clientY);
+      if(zone){
+        const zoneEl=zone.closest('.dnd-zone')||zone.parentElement?.closest('.dnd-zone');
+        if(zoneEl) zoneEl.classList.add('drag-over');
+      }
+    },{passive:false});
+
+    el.addEventListener('touchend',e=>{
+      e.preventDefault();
+      if(ghost){ghost.remove();ghost=null;}
+      el.classList.remove('dragging');
+      document.querySelectorAll('.dnd-zone').forEach(z=>z.classList.remove('drag-over'));
+      if(!dragged) return;
+      const t=e.changedTouches[0];
+      const zone=getZoneAtPoint(t.clientX,t.clientY);
+      dropIntoZone(zone);
+      dragged=null;
+    },{passive:false});
   });
-  const zones=[document.getElementById('dnd-pool'),...q.zones.map(z=>document.getElementById(`zi-${z.id}`))];
-  zones.forEach(zone=>{
+
+  // ── Mouse drop zones ──
+  const allZones=[document.getElementById('dnd-pool'),...q.zones.map(z=>document.getElementById('zi-'+z.id))];
+  allZones.forEach(zone=>{
     if(!zone) return;
-    zone.addEventListener('dragover',e=>{e.preventDefault();zone.closest('.dnd-zone')?.classList.add('drag-over');});
+    // Tap-to-move: klik zone untuk drop item yang sedang dipilih
+    zone.addEventListener('click',()=>{
+      if(!tapSelected) return;
+      dragged=tapSelected;
+      dropIntoZone(zone);
+      tapSelected.classList.remove('tap-selected');
+      tapSelected=null;
+      dragged=null;
+      document.querySelectorAll('.dnd-zone').forEach(z=>z.classList.remove('tap-target'));
+    });
+    zone.addEventListener('mouseenter',()=>{
+      if(tapSelected) zone.closest('.dnd-zone')?.classList.add('tap-target');
+    });
+    zone.addEventListener('mouseleave',()=>{
+      zone.closest('.dnd-zone')?.classList.remove('tap-target');
+    });
+    zone.addEventListener('dragover',e=>{
+      e.preventDefault();
+      zone.closest('.dnd-zone')?.classList.add('drag-over');
+    });
     zone.addEventListener('dragleave',()=>zone.closest('.dnd-zone')?.classList.remove('drag-over'));
     zone.addEventListener('drop',e=>{
       e.preventDefault();
       zone.closest('.dnd-zone')?.classList.remove('drag-over');
-      if(!dragged) return;
-      const ph=zone.querySelector('.dnd-zone-empty');
-      if(ph) ph.remove();
-      zone.appendChild(dragged);
-      checkDnDComplete(q);
+      dropIntoZone(zone);
     });
   });
 }
+
 function checkDnDComplete(q){
   const allMoved=q.items.every(item=>{
-    const el=document.getElementById(`dnd-${item.id}`);
+    const el=document.getElementById('dnd-'+item.id);
     return el&&!el.closest('#dnd-pool');
   });
   if(allMoved) $('btn-check').disabled=false;
@@ -2779,34 +2998,113 @@ function checkDnDComplete(q){
 function renderOrdering(q){
   const shuffled=[...q.items].sort(()=>Math.random()-.5);
   return `
-    <div class="dnd-instructions">💡 Seret untuk mengubah urutan</div>
+    <div class="dnd-instructions">💡 Seret untuk mengubah urutan, atau gunakan tombol ↑↓</div>
     <div class="order-list" id="order-list">
       ${shuffled.map((item,i)=>`
         <div class="order-item" draggable="true" data-id="${item.id}">
           <div class="order-num">${i+1}</div>
-          <span>${item.text}</span>
+          <span style="flex:1">${item.text}</span>
+          <div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0">
+            <button onclick="moveOrderItem(this,'up')" style="background:var(--surface3);border:1px solid var(--border);border-radius:5px;color:var(--text-2);cursor:pointer;padding:2px 7px;font-size:.75rem;line-height:1.4">↑</button>
+            <button onclick="moveOrderItem(this,'down')" style="background:var(--surface3);border:1px solid var(--border);border-radius:5px;color:var(--text-2);cursor:pointer;padding:2px 7px;font-size:.75rem;line-height:1.4">↓</button>
+          </div>
         </div>`).join('')}
     </div>`;
 }
 function initOrdering(q){
   const list=document.getElementById('order-list');
   let dragged=null;
+  let ghost=null;
+  let offsetX=0,offsetY=0;
+
+  function insertAtPoint(x,y){
+    if(!dragged) return;
+    const items=[...list.querySelectorAll('.order-item')].filter(el=>el!==dragged);
+    let inserted=false;
+    for(const item of items){
+      const r=item.getBoundingClientRect();
+      if(y<r.top+r.height/2){
+        list.insertBefore(dragged,item);
+        inserted=true; break;
+      }
+    }
+    if(!inserted) list.appendChild(dragged);
+    updateOrderNums();
+  }
+
   list.querySelectorAll('.order-item').forEach(el=>{
-    el.addEventListener('dragstart',()=>{dragged=el;setTimeout(()=>el.classList.add('dragging'),0);});
-    el.addEventListener('dragend',()=>{el.classList.remove('dragging');updateOrderNums();dragged=null;});
+    // ── Mouse ──
+    el.addEventListener('dragstart',()=>{
+      dragged=el;
+      setTimeout(()=>el.classList.add('dragging'),0);
+    });
+    el.addEventListener('dragend',()=>{
+      el.classList.remove('dragging');
+      updateOrderNums();
+      dragged=null;
+    });
     el.addEventListener('dragover',e=>{
       e.preventDefault();
       const r=el.getBoundingClientRect();
       if(e.clientY<r.top+r.height/2) list.insertBefore(dragged,el);
       else list.insertBefore(dragged,el.nextSibling);
+      updateOrderNums();
     });
+
+    // ── Touch ──
+    el.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      dragged=el;
+      const t=e.touches[0];
+      const r=el.getBoundingClientRect();
+      offsetX=t.clientX-r.left;
+      offsetY=t.clientY-r.top;
+      ghost=el.cloneNode(true);
+      ghost.style.cssText=`
+        position:fixed;z-index:9999;pointer-events:none;opacity:.85;
+        width:${r.width}px;left:${t.clientX-offsetX}px;top:${t.clientY-offsetY}px;
+        box-shadow:0 8px 32px rgba(0,0,0,.5);transform:scale(1.03);
+        background:var(--surface3);border:1.5px solid var(--orange);border-radius:12px;
+      `;
+      document.body.appendChild(ghost);
+      el.classList.add('dragging');
+    },{passive:false});
+
+    el.addEventListener('touchmove',e=>{
+      e.preventDefault();
+      if(!ghost||!dragged) return;
+      const t=e.touches[0];
+      ghost.style.left=(t.clientX-offsetX)+'px';
+      ghost.style.top=(t.clientY-offsetY)+'px';
+    },{passive:false});
+
+    el.addEventListener('touchend',e=>{
+      e.preventDefault();
+      if(ghost){ghost.remove();ghost=null;}
+      el.classList.remove('dragging');
+      if(!dragged) return;
+      const t=e.changedTouches[0];
+      insertAtPoint(t.clientX,t.clientY);
+      dragged=null;
+    },{passive:false});
   });
+
   $('btn-check').disabled=false;
 }
 function updateOrderNums(){
   document.querySelectorAll('.order-item').forEach((el,i)=>{
     el.querySelector('.order-num').textContent=i+1;
   });
+}
+function moveOrderItem(btn,dir){
+  const item=btn.closest('.order-item');
+  const list=item.parentElement;
+  if(dir==='up'&&item.previousElementSibling){
+    list.insertBefore(item,item.previousElementSibling);
+  } else if(dir==='down'&&item.nextElementSibling){
+    list.insertBefore(item.nextElementSibling,item);
+  }
+  updateOrderNums();
 }
 
 // REFLECTION
