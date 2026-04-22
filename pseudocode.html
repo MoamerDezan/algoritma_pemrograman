@@ -1413,8 +1413,8 @@ function buildExecSteps(lines, defaultVars) {
 
     if (line.startsWith("tulis ")) {
       const expr = line.slice(6).trim();
-      const val = getValue(expr, vars);
-      steps[steps.length-1].action = { type:"tulis", value: String(val) };
+      // Simpan expr mentah — evaluasi dilakukan saat stepExec agar nilai variabel loop terbaru dipakai
+      steps[steps.length-1].action = { type:"tulis", expr, value: String(getValue(expr, vars)) };
       pc++; continue;
     }
 
@@ -1543,7 +1543,9 @@ function stepExec(section) {
       addOutput(section, `→ Baca ${action.varName} = ${action.value}`, "info");
     }
     if (action.type === "tulis") {
-      addOutput(section, action.value, "out");
+      // Evaluasi ulang pakai t.vars saat ini agar nilai loop variable (i, dll) benar
+      const val = action.expr ? String(getValue(action.expr, t.vars)) : action.value;
+      addOutput(section, val, "out");
     }
     if (action.type === "assign" || action.type === "loop-init" || action.type === "loop-inc") {
       t.vars[action.varName] = action.value;
