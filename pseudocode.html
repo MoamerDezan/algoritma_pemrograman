@@ -1278,10 +1278,6 @@ function checkAllBlanks(section) {
 // ════════════════════════════════════════════
 // TRACER / INTERPRETER
 // ════════════════════════════════════════════
-function initTrace(section) {
-  const step = LESSONS[section][state[section].step];
-  const rawLines = step.code.map(l => l.replace(/<-/g, "←").trim());
-
 function onSlider(section, id, val) {
   document.getElementById(id + "-val").textContent = val;
   const step = LESSONS[section][state[section].step];
@@ -1805,28 +1801,7 @@ function kumpulkanLatihan() {
   showToast("Latihan berhasil dikumpulkan! 🎉", "success");
 }
 
-// ════════════════════════════════════════════
-// KIRIM DATA KE GOOGLE SHEETS
-// ════════════════════════════════════════════
-async function kirimData() {
-  try {
-    await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "simpanNilai",
-        nama: state.nama,
-        kelas: state.kelas,
-        xp: state.xp,
-        badge: state.badges,
-        soalSelesai: state.soalSelesai,
-        reviewDone: state.reviewDone,
-        percabanganDone: state.percabanganDone,
-        perulanganDone: state.perulanganDone,
-        latihanDone: state.latihanDone,
-      })
-    });
-  } catch(e) { /* silent fail */ }
-}
+
 
 // ════════════════════════════════════════════
 // INIT
