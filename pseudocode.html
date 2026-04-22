@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PseudoLab — Belajar Pseudocode</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:       #0d1117;
+  --bg2:      #161b22;
+  --bg3:      #1c2330;
+  --bg4:      #21262d;
+  --border:   #30363d;
+  --border2:  #3d4451;
+  --text:     #e6edf3;
+  --text2:    #8b949e;
+  --text3:    #6e7681;
+  --blue:     #3b82f6;
+  --blue2:    #1d4ed8;
+  --blue-dim: #1e3a5f;
+  --green:    #10b981;
+  --green2:   #059669;
+  --green-dim:#064e3b;
+  --yellow:   #fbbf24;
+  --yellow-dim:#451a03;
+  --red:      #f87171;
+  --red-dim:  #450a0a;
+  --purple:   #a78bfa;
+  --orange:   #fb923c;
+  --cyan:     #22d3ee;
+  --font-code:'JetBrains Mono',monospace;
+  --font-ui:  'Outfit',sans-serif;
+  --radius:   8px;
+  --radius-lg:12px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);}
+button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none;}
+input,select,textarea{font-family:var(--font-ui);outline:none;}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg2);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ═══════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════ */
+#login-screen{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;
+}
+.login-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;padding:40px;width:420px;
+  box-shadow:0 0 60px rgba(59,130,246,0.1);
+}
+.login-logo{
+  text-align:center;margin-bottom:32px;
+}
+.login-logo .logo-icon{
+  width:64px;height:64px;background:linear-gradient(135deg,var(--blue),var(--green));
+  border-radius:16px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;
+  font-size:28px;
+}
+.login-logo h1{font-size:24px;font-weight:800;color:var(--text);}
+.login-logo p{font-size:13px;color:var(--text2);margin-top:4px;}
+.login-label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.login-select{
+  width:100%;padding:10px 14px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:var(--radius);
+  color:var(--text);font-size:14px;margin-bottom:16px;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.login-select:focus{border-color:var(--blue);}
+.login-btn{
+  width:100%;padding:12px;background:linear-gradient(135deg,var(--blue),var(--green));
+  border-radius:var(--radius);color:#fff;font-size:15px;font-weight:700;
+  transition:opacity 0.2s,transform 0.1s;margin-top:8px;
+}
+.login-btn:hover{opacity:0.9;}
+.login-btn:active{transform:scale(0.98);}
+.login-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.login-error{
+  font-size:12px;color:var(--red);text-align:center;
+  margin-top:8px;min-height:18px;
+}
+
+/* ═══════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════ */
+#app{display:none;flex-direction:column;height:100vh;}
+.header{
+  display:flex;align-items:center;gap:16px;
+  padding:0 20px;height:52px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.header-logo{display:flex;align-items:center;gap:8px;}
+.header-logo .dot{
+  width:28px;height:28px;background:linear-gradient(135deg,var(--blue),var(--green));
+  border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.header-logo span{font-size:16px;font-weight:800;color:var(--text);}
+.header-user{
+  font-size:13px;color:var(--text2);
+  padding:4px 10px;background:var(--bg3);border-radius:20px;
+  border:1px solid var(--border);
+}
+.header-user strong{color:var(--blue);}
+.header-xp{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;background:var(--yellow-dim);
+  border:1px solid var(--yellow);border-radius:20px;
+  font-size:13px;font-weight:700;color:var(--yellow);
+}
+.header-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:4px 12px;background:var(--green-dim);
+  border:1px solid var(--green);border-radius:20px;
+  font-size:13px;font-weight:700;color:var(--green);
+}
+.header-progress{
+  margin-left:auto;display:flex;align-items:center;gap:10px;
+}
+.progress-bar{
+  width:120px;height:6px;background:var(--bg4);
+  border-radius:3px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--blue),var(--green));
+  border-radius:3px;transition:width 0.5s ease;
+}
+.progress-label{font-size:11px;color:var(--text3);}
+
+/* ═══════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════ */
+.tabs{
+  display:flex;gap:2px;padding:8px 20px;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.tab-btn{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 16px;border-radius:var(--radius);
+  font-size:13px;font-weight:600;color:var(--text2);
+  background:transparent;transition:all 0.15s;
+  position:relative;
+}
+.tab-btn:hover{background:var(--bg3);color:var(--text);}
+.tab-btn.active{background:var(--bg3);color:var(--text);border:1px solid var(--border);}
+.tab-btn.active::after{
+  content:'';position:absolute;bottom:-9px;left:50%;transform:translateX(-50%);
+  width:30px;height:2px;background:var(--blue);border-radius:1px;
+}
+.tab-btn.done .tab-check{
+  width:16px;height:16px;background:var(--green);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;
+  flex-shrink:0;
+}
+.tab-btn:not(.done) .tab-check{
+  width:16px;height:16px;background:var(--bg4);border-radius:50%;
+  border:1px solid var(--border2);flex-shrink:0;
+}
+.tab-icon{font-size:15px;}
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════ */
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.section{display:none;flex:1;overflow:hidden;}
+.section.active{display:flex;flex-direction:column;}
+
+/* ═══════════════════════════════════════════
+   LESSON LAYOUT (editor + output)
+═══════════════════════════════════════════ */
+.lesson{
+  flex:1;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;min-height:0;
+}
+.lesson-left{
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--border);overflow:hidden;min-height:0;
+}
+.lesson-right{
+  display:flex;flex-direction:column;overflow:hidden;min-height:0;
+}
+
+/* ═══════════════════════════════════════════
+   STEP NAVIGATOR (top of lesson)
+═══════════════════════════════════════════ */
+.step-nav{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.step-dot{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;cursor:pointer;
+  transition:all 0.2s;flex-shrink:0;
+}
+.step-dot.done{background:var(--green);color:#fff;}
+.step-dot.active{background:var(--blue);color:#fff;box-shadow:0 0 12px rgba(59,130,246,0.5);}
+.step-dot.locked{background:var(--bg4);color:var(--text3);border:1px solid var(--border);cursor:not-allowed;}
+.step-line{flex:1;height:2px;background:var(--border);}
+.step-line.done{background:var(--green);}
+.step-title{font-size:13px;font-weight:600;color:var(--text);margin-left:4px;}
+.step-mode{
+  margin-left:auto;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;
+}
+.step-mode.lihat{background:var(--blue-dim);color:var(--blue);}
+.step-mode.lengkapi{background:#2d1b69;color:var(--purple);}
+.step-mode.buat{background:var(--green-dim);color:var(--green);}
+
+/* ═══════════════════════════════════════════
+   SOAL CARD
+═══════════════════════════════════════════ */
+.soal-card{
+  padding:8px 16px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.soal-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+.soal-text{font-size:12px;color:var(--text);line-height:1.4;}
+.soal-context{
+  margin-top:6px;padding:6px 10px;
+  background:var(--bg3);border-radius:var(--radius);
+  border-left:3px solid var(--blue);
+  font-size:11px;color:var(--text2);line-height:1.4;
+}
+
+/* ═══════════════════════════════════════════
+   EDITOR
+═══════════════════════════════════════════ */
+.editor-wrap{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+.editor-header{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;background:var(--bg3);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.editor-header-title{font-size:12px;color:var(--text2);font-weight:600;}
+.editor-body{flex:1;display:flex;overflow:hidden;}
+.line-nums{
+  padding:12px 0;background:var(--bg3);
+  border-right:1px solid var(--border);
+  min-width:40px;text-align:right;
+  font-family:var(--font-code);font-size:13px;
+  line-height:1.6;color:var(--text3);
+  overflow:hidden;flex-shrink:0;
+  user-select:none;
+}
+.line-num{padding:0 10px;display:block;}
+.line-num.active-line{color:var(--yellow);background:rgba(251,191,36,0.08);}
+.code-display{
+  flex:1;padding:12px 16px;overflow:auto;
+  font-family:var(--font-code);font-size:13px;line-height:1.6;
+  background:var(--bg3);
+}
+.code-line{
+  display:block;padding:0 4px;border-radius:4px;
+  transition:background 0.2s;white-space:pre;
+}
+.code-line.active{
+  background:rgba(251,191,36,0.15);
+  box-shadow:inset 2px 0 0 var(--yellow);
+}
+.code-line.passed-true{background:rgba(16,185,129,0.08);}
+.code-line.passed-false{background:rgba(107,114,128,0.05);opacity:0.5;}
+
+/* Syntax highlighting */
+.kw{color:var(--blue);}       /* keyword: jika, untuk, baca, tulis, mulai, selesai */
+.kw2{color:var(--cyan);}      /* jika tidak, akhir */
+.str{color:var(--green);}     /* "string" */
+.num{color:var(--orange);}    /* angka */
+.op{color:var(--purple);}     /* <- / ← */
+.var{color:var(--text);}      /* variabel */
+.cmt{color:var(--text3);font-style:italic;} /* komentar */
+
+/* Input blanks for "Lengkapi" mode */
+.blank{
+  display:inline-block;
+  min-width:80px;padding:1px 6px;
+  background:rgba(167,139,250,0.1);
+  border:1px dashed var(--purple);
+  border-radius:4px;
+  color:var(--purple);font-family:var(--font-code);font-size:13px;
+  cursor:text;
+}
+.blank:focus{outline:none;border-color:var(--blue);background:rgba(59,130,246,0.1);color:var(--text);}
+.blank.correct{border-color:var(--green);background:rgba(16,185,129,0.1);color:var(--green);}
+.blank.wrong{border-color:var(--red);background:rgba(248,113,113,0.1);color:var(--red);}
+
+/* Buat sendiri textarea */
+.code-textarea{
+  flex:1;width:100%;padding:12px 16px;
+  background:var(--bg3);border:none;
+  color:var(--text);font-family:var(--font-code);font-size:13px;line-height:1.6;
+  resize:none;
+}
+.code-textarea:focus{outline:none;}
+
+/* ═══════════════════════════════════════════
+   SLIDER INPUT
+═══════════════════════════════════════════ */
+.slider-wrap{
+  padding:10px 16px;background:var(--bg2);
+  border-top:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;gap:12px;
+}
+.slider-label{font-size:12px;color:var(--text2);min-width:80px;}
+.slider-input{flex:1;accent-color:var(--blue);}
+.slider-val{
+  font-family:var(--font-code);font-size:14px;font-weight:700;
+  color:var(--blue);min-width:36px;text-align:center;
+}
+
+/* ═══════════════════════════════════════════
+   CONTROL BAR
+═══════════════════════════════════════════ */
+.control-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 16px;background:var(--bg2);
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.ctrl-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:var(--radius);
+  font-size:13px;font-weight:600;transition:all 0.15s;
+}
+.ctrl-btn.primary{background:var(--blue);color:#fff;}
+.ctrl-btn.primary:hover{background:var(--blue2);}
+.ctrl-btn.secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.ctrl-btn.secondary:hover{background:var(--bg4);color:var(--text);}
+.ctrl-btn.success{background:var(--green);color:#fff;}
+.ctrl-btn.success:hover{background:var(--green2);}
+.ctrl-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.speed-wrap{
+  margin-left:auto;display:flex;align-items:center;gap:8px;
+}
+.speed-label{font-size:11px;color:var(--text3);}
+.speed-slider{width:80px;accent-color:var(--green);}
+
+/* ═══════════════════════════════════════════
+   RIGHT PANEL
+═══════════════════════════════════════════ */
+.right-panel{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.panel-tabs{
+  display:flex;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.panel-tab{
+  flex:1;padding:8px;font-size:12px;font-weight:600;
+  color:var(--text2);background:transparent;
+  border-bottom:2px solid transparent;transition:all 0.15s;
+}
+.panel-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+.panel-tab:hover:not(.active){color:var(--text);}
+
+/* Variables panel */
+.vars-panel{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-wrap:wrap;gap:10px;align-content:flex-start;
+}
+.var-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 14px;
+  min-width:90px;text-align:center;
+  transition:all 0.3s;
+}
+.var-card.changed{
+  border-color:var(--blue);
+  box-shadow:0 0 12px rgba(59,130,246,0.3);
+  animation:varPulse 0.4s ease;
+}
+@keyframes varPulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.08);}
+  100%{transform:scale(1);}
+}
+.var-name{font-size:11px;color:var(--text2);font-family:var(--font-code);margin-bottom:4px;}
+.var-value{font-size:20px;font-weight:700;font-family:var(--font-code);color:var(--blue);}
+.var-value.str{color:var(--green);font-size:14px;}
+
+/* Output panel */
+.output-panel{
+  flex:1;overflow-y:auto;padding:16px;
+  font-family:var(--font-code);font-size:13px;line-height:1.8;
+}
+.output-line{
+  display:flex;align-items:flex-start;gap:8px;
+  padding:2px 0;animation:fadeIn 0.2s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.output-line .out-icon{color:var(--green);flex-shrink:0;}
+.output-line .out-text{color:var(--text);}
+.output-line.info .out-icon{color:var(--blue);}
+.output-line.info .out-text{color:var(--text2);}
+.output-line.warn .out-icon{color:var(--yellow);}
+.output-line.warn .out-text{color:var(--yellow);}
+.output-empty{color:var(--text3);font-size:12px;font-style:italic;}
+
+/* Branch panel */
+.branch-panel{flex:1;overflow-y:auto;padding:16px;}
+.branch-title{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;}
+.branch-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:var(--radius);
+  margin-bottom:6px;font-size:12px;font-family:var(--font-code);
+  border:1px solid transparent;
+}
+.branch-item.taken{background:var(--green-dim);border-color:var(--green);color:var(--green);}
+.branch-item.skipped{background:var(--bg3);color:var(--text3);}
+.branch-item.pending{background:var(--bg3);color:var(--text2);border:1px dashed var(--border);}
+.branch-arrow{font-size:14px;}
+
+/* ═══════════════════════════════════════════
+   FEEDBACK TOAST
+═══════════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  padding:12px 20px;border-radius:var(--radius);
+  font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+  transform:translateY(80px);opacity:0;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:9999;pointer-events:none;
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--green);color:#fff;}
+.toast.error{background:var(--red);color:#fff;}
+.toast.info{background:var(--blue);color:#fff;}
+.toast.xp{background:var(--yellow);color:#000;}
+
+/* ═══════════════════════════════════════════
+   XP POPUP
+═══════════════════════════════════════════ */
+.xp-popup{
+  position:fixed;top:60px;right:24px;
+  padding:8px 16px;border-radius:20px;
+  background:var(--yellow);color:#000;
+  font-size:14px;font-weight:800;
+  transform:translateY(-20px);opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:9999;pointer-events:none;
+}
+.xp-popup.show{transform:translateY(0);opacity:1;}
+
+/* ═══════════════════════════════════════════
+   BADGE POPUP
+═══════════════════════════════════════════ */
+.badge-popup{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0.5);
+  opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index:9999;pointer-events:none;
+  background:var(--bg2);border:2px solid var(--green);
+  border-radius:16px;padding:32px 40px;text-align:center;
+  box-shadow:0 0 60px rgba(16,185,129,0.3);
+}
+.badge-popup.show{transform:translate(-50%,-50%) scale(1);opacity:1;}
+.badge-icon{font-size:48px;margin-bottom:12px;}
+.badge-name{font-size:18px;font-weight:800;color:var(--green);}
+.badge-sub{font-size:13px;color:var(--text2);margin-top:4px;}
+
+/* ═══════════════════════════════════════════
+   SECTION INTRO
+═══════════════════════════════════════════ */
+.section-intro{
+  padding:12px 24px;background:var(--bg2);
+  border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.section-intro h2{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;}
+.section-intro p{font-size:12px;color:var(--text2);line-height:1.5;max-width:600px;}
+.syntax-ref{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;
+}
+.syntax-chip{
+  padding:4px 12px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:20px;font-family:var(--font-code);font-size:12px;color:var(--text2);
+}
+.syntax-chip .kw{color:var(--blue);}
+.syntax-chip .op{color:var(--purple);}
+
+/* ═══════════════════════════════════════════
+   SELAMAT SCREEN (per section)
+═══════════════════════════════════════════ */
+.selamat-screen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;padding:40px;text-align:center;
+}
+.selamat-screen.show{display:flex;}
+.selamat-icon{font-size:64px;margin-bottom:16px;animation:bounce 1s infinite alternate;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-10px);}}
+.selamat-title{font-size:28px;font-weight:800;color:var(--green);margin-bottom:8px;}
+.selamat-sub{font-size:15px;color:var(--text2);margin-bottom:24px;}
+.selamat-btn{
+  padding:12px 32px;background:linear-gradient(135deg,var(--blue),var(--green));
+  border-radius:var(--radius);color:#fff;font-size:15px;font-weight:700;
+  transition:opacity 0.2s;
+}
+.selamat-btn:hover{opacity:0.9;}
+
+/* ═══════════════════════════════════════════
+   LATIHAN (combined challenge)
+═══════════════════════════════════════════ */
+.latihan-wrap{
+  flex:1;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;
+}
+.lat-left{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.lat-soal{
+  padding:16px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.lat-soal h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.lat-soal p{font-size:13px;color:var(--text2);line-height:1.5;}
+.lat-soal ul{margin-top:8px;padding-left:16px;}
+.lat-soal ul li{font-size:12px;color:var(--text2);margin-bottom:3px;}
+.lat-editor{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.lat-textarea{
+  flex:1;padding:16px;background:var(--bg3);
+  border:none;color:var(--text);
+  font-family:var(--font-code);font-size:13px;line-height:1.7;resize:none;
+}
+.lat-textarea:focus{outline:none;}
+.lat-controls{
+  display:flex;gap:8px;padding:10px 16px;
+  background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;
+}
+.lat-right{display:flex;flex-direction:column;overflow:hidden;}
+.lat-output{
+  flex:1;padding:16px;overflow-y:auto;
+  font-family:var(--font-code);font-size:13px;line-height:1.7;
+}
+.lat-hint{
+  padding:12px 16px;background:var(--bg2);
+  border-top:1px solid var(--border);flex-shrink:0;
+}
+.lat-hint-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.lat-hint-ref{font-family:var(--font-code);font-size:11px;color:var(--text3);line-height:1.8;}
+.lat-hint-ref .kw{color:var(--blue);}
+.lat-hint-ref .op{color:var(--purple);}
+.lat-hint-ref .kw2{color:var(--cyan);}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">💻</div>
+      <h1>PseudoLab</h1>
+      <p>Platform Belajar Pseudocode Interaktif</p>
+    </div>
+    <div class="login-label">Pilih Kelas</div>
+    <select class="login-select" id="sel-kelas" onchange="loadNama()">
+      <option value="">— Pilih kelas kamu —</option>
+    </select>
+    <div class="login-label">Pilih Nama</div>
+    <select class="login-select" id="sel-nama" disabled>
+      <option value="">— Pilih nama kamu —</option>
+    </select>
+    <button class="login-btn" id="login-btn" onclick="doLogin()" disabled>
+      Mulai Belajar →
+    </button>
+    <div class="login-error" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="dot">💻</div>
+      <span>PseudoLab</span>
+    </div>
+    <div class="header-user">Halo, <strong id="hdr-kelas">—</strong> · <span id="hdr-nama">—</span></div>
+    <div class="header-xp">⭐ <span id="hdr-xp">0</span> XP</div>
+    <div class="header-badge">🏅 <span id="hdr-badge">0</span> Badge</div>
+    <div class="header-progress">
+      <span class="progress-label" id="hdr-prog-label">0% selesai</span>
+      <div class="progress-bar"><div class="progress-fill" id="hdr-prog" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchSection('review',this)" id="tab-review">
+      <span class="tab-icon">📖</span> Review
+      <span class="tab-check" id="check-review"></span>
+    </button>
+    <button class="tab-btn" onclick="switchSection('percabangan',this)" id="tab-percabangan">
+      <span class="tab-icon">🔀</span> Percabangan
+      <span class="tab-check" id="check-percabangan"></span>
+    </button>
+    <button class="tab-btn" onclick="switchSection('perulangan',this)" id="tab-perulangan">
+      <span class="tab-icon">🔁</span> Perulangan
+      <span class="tab-check" id="check-perulangan"></span>
+    </button>
+    <button class="tab-btn" onclick="switchSection('latihan',this)" id="tab-latihan">
+      <span class="tab-icon">🏆</span> Latihan
+      <span class="tab-check" id="check-latihan"></span>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ SECTION: REVIEW ══ -->
+    <div class="section active" id="sec-review">
+      <div class="section-intro">
+        <h2>📖 Review Materi</h2>
+        <p>Sebelum belajar percabangan dan perulangan, kita ingat kembali dasar-dasar pseudocode yang sudah dipelajari.</p>
+        <div class="syntax-ref">
+          <span class="syntax-chip"><span class="kw">mulai</span> / <span class="kw">selesai</span></span>
+          <span class="syntax-chip"><span class="kw">baca</span> variabel</span>
+          <span class="syntax-chip"><span class="kw">tulis</span> "teks"</span>
+          <span class="syntax-chip">variabel <span class="op">←</span> nilai</span>
+        </div>
+      </div>
+      <div id="review-lesson" class="lesson">
+        <!-- Diisi JS -->
+      </div>
+    </div>
+
+    <!-- ══ SECTION: PERCABANGAN ══ -->
+    <div class="section" id="sec-percabangan">
+      <div class="section-intro">
+        <h2>🔀 Percabangan</h2>
+        <p>Percabangan membuat program bisa "memilih" jalur yang berbeda berdasarkan kondisi tertentu.</p>
+        <div class="syntax-ref">
+          <span class="syntax-chip"><span class="kw">jika</span> kondisi <span class="kw">maka</span></span>
+          <span class="syntax-chip"><span class="kw2">jika tidak jika</span> kondisi <span class="kw">maka</span></span>
+          <span class="syntax-chip"><span class="kw2">jika tidak</span></span>
+          <span class="syntax-chip"><span class="kw2">akhir jika</span></span>
+        </div>
+      </div>
+      <div id="percabangan-lesson" class="lesson"></div>
+    </div>
+
+    <!-- ══ SECTION: PERULANGAN ══ -->
+    <div class="section" id="sec-perulangan">
+      <div class="section-intro">
+        <h2>🔁 Perulangan</h2>
+        <p>Perulangan membuat program menjalankan blok kode berulang kali secara otomatis.</p>
+        <div class="syntax-ref">
+          <span class="syntax-chip"><span class="kw">untuk</span> i <span class="op">←</span> 1 <span class="kw">sampai</span> n <span class="kw">lakukan</span></span>
+          <span class="syntax-chip"><span class="kw2">akhir untuk</span></span>
+        </div>
+      </div>
+      <div id="perulangan-lesson" class="lesson"></div>
+    </div>
+
+    <!-- ══ SECTION: LATIHAN ══ -->
+    <div class="section" id="sec-latihan">
+      <div class="section-intro">
+        <h2>🏆 Latihan Gabungan</h2>
+        <p>Kombinasikan percabangan dan perulangan untuk menyelesaikan soal berikut. Tulis pseudocode-mu sendiri!</p>
+      </div>
+      <div class="latihan-wrap">
+        <div class="lat-left">
+          <div class="lat-soal">
+            <h3>📝 Soal: Rekap Nilai Kelas</h3>
+            <p>Buat program untuk membaca nilai dari 5 siswa satu per satu, lalu:</p>
+            <ul>
+              <li>Tampilkan <strong>LULUS</strong> jika nilai ≥ 75, <strong>REMEDI</strong> jika tidak</li>
+              <li>Hitung dan tampilkan <strong>berapa siswa yang lulus</strong></li>
+              <li>Hitung dan tampilkan <strong>nilai rata-rata kelas</strong></li>
+            </ul>
+          </div>
+          <div class="lat-editor">
+            <textarea class="lat-textarea" id="lat-code" placeholder="Tulis pseudocode-mu di sini...&#10;&#10;Contoh awal:&#10;mulai&#10;  ...&#10;selesai" spellcheck="false"></textarea>
+          </div>
+          <div class="lat-controls">
+            <button class="ctrl-btn primary" onclick="jalankanLatihan()">▶ Jalankan</button>
+            <button class="ctrl-btn secondary" onclick="resetLatihan()">↺ Reset</button>
+            <button class="ctrl-btn success" onclick="kumpulkanLatihan()" id="btn-kumpul" style="margin-left:auto;" disabled>✓ Kumpulkan</button>
+          </div>
+        </div>
+        <div class="lat-right">
+          <div style="padding:10px 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;">Output</div>
+          <div class="lat-output" id="lat-output"><span style="color:var(--text3);font-style:italic;">Output akan muncul di sini...</span></div>
+          <div class="lat-hint">
+            <div class="lat-hint-title">Referensi Sintaks</div>
+            <div class="lat-hint-ref">
+              <span class="kw">untuk</span> i <span class="op">←</span> 1 <span class="kw">sampai</span> 5 <span class="kw">lakukan</span><br>
+              &nbsp;&nbsp;<span class="kw">jika</span> nilai &gt;= 75 <span class="kw">maka</span><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">tulis</span> "LULUS"<br>
+              &nbsp;&nbsp;<span class="kw2">jika tidak</span><br>
+              &nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">tulis</span> "REMEDI"<br>
+              &nbsp;&nbsp;<span class="kw2">akhir jika</span><br>
+              <span class="kw2">akhir untuk</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</div><!-- end #app -->
+
+<!-- TOAST & POPUPS -->
+<div class="toast" id="toast"></div>
+<div class="xp-popup" id="xp-popup"></div>
+<div class="badge-popup" id="badge-popup">
+  <div class="badge-icon" id="badge-icon"></div>
+  <div class="badge-name" id="badge-name"></div>
+  <div class="badge-sub" id="badge-sub"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+// CONFIG — GANTI URL INI SETELAH DEPLOY APPS SCRIPT
+// ════════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyjWruq_TpAaC5KVjUlLUAnSg2h8ZHUa0jTQAmUh8FLVxhAONaBnbMgCVVs5KJj4eqP7g/exec";
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let state = {
+  nama: "", kelas: "",
+  xp: 0, badges: 0,
+  reviewDone: false,
+  percabanganDone: false,
+  perulanganDone: false,
+  latihanDone: false,
+  soalSelesai: 0,
+  currentSection: "review",
+  // per-section step tracking
+  review: { step: 0 },
+  percabangan: { step: 0 },
+  perulangan: { step: 0 },
+};
+
+// Per-section tracing state — each section has its own isolated state
+const tracingMap = {};
+function getTracing(section) {
+  if (!tracingMap[section]) {
+    tracingMap[section] = {
+      section,
+      lines: [], vars: {}, outputs: [],
+      stepIdx: 0, running: false,
+      timer: null, speed: 600,
+      branches: [], lineStates: {},
+    };
+  }
+  return tracingMap[section];
+}
+// Legacy alias so functions that use tracing.speed still work
+let tracing = { speed: 600 };
+
+let siswadata = {};
+
+// ════════════════════════════════════════════
+// LESSON DATA
+// ════════════════════════════════════════════
+const LESSONS = {
+  review: [
+    {
+      title: "Hitung Total Belanja",
+      mode: "lihat",
+      soal: "Perhatikan program di bawah. Program ini membaca dua harga barang, lalu menghitung dan menampilkan totalnya.",
+      context: "Contoh: harga1 = 5000, harga2 = 8000 → total = 13000",
+      slider: null,
+      code: [
+        "mulai",
+        "  baca harga1",
+        "  baca harga2",
+        "  total ← harga1 + harga2",
+        "  tulis \"Total belanja: \"",
+        "  tulis total",
+        "selesai"
+      ],
+      defaults: { harga1: 5000, harga2: 8000 },
+      xp: 20,
+    },
+    {
+      title: "Hitung Kembalian",
+      mode: "lengkapi",
+      soal: "Lengkapi program berikut untuk menghitung kembalian dari pembayaran.",
+      context: "Kembalian = bayar - harga",
+      slider: null,
+      code: [
+        "mulai",
+        "  baca harga",
+        "  baca bayar",
+        "  kembalian ← [BLANK:bayar - harga]",
+        "  tulis \"Kembalian: \"",
+        "  tulis [BLANK:kembalian]",
+        "selesai"
+      ],
+      defaults: { harga: 12000, bayar: 20000 },
+      xp: 40,
+    },
+  ],
+  percabangan: [
+    {
+      title: "Lulus atau Remedi?",
+      mode: "lihat",
+      soal: "Program memeriksa apakah nilai ujian seorang siswa lulus atau harus remedi.",
+      context: "Geser slider untuk mengubah nilai dan lihat bagaimana alur program berubah!",
+      slider: { label: "Nilai ujian", id: "nilai", min: 0, max: 100, step: 1, def: 75 },
+      code: [
+        "mulai",
+        "  baca nilai",
+        "  jika nilai >= 75 maka",
+        "    tulis \"Selamat, kamu LULUS!\"",
+        "  jika tidak",
+        "    tulis \"Kamu harus REMEDI\"",
+        "  akhir jika",
+        "selesai"
+      ],
+      defaults: { nilai: 75 },
+      xp: 30,
+    },
+    {
+      title: "Kategori Nilai A/B/C/D",
+      mode: "lihat",
+      soal: "Program menentukan kategori nilai huruf berdasarkan nilai angka yang dimasukkan.",
+      context: "A ≥ 90 · B ≥ 80 · C ≥ 70 · D < 70",
+      slider: { label: "Nilai ujian", id: "nilai2", min: 0, max: 100, step: 1, def: 85 },
+      code: [
+        "mulai",
+        "  baca nilai",
+        "  jika nilai >= 90 maka",
+        "    tulis \"Nilai A - Sangat Baik\"",
+        "  jika tidak jika nilai >= 80 maka",
+        "    tulis \"Nilai B - Baik\"",
+        "  jika tidak jika nilai >= 70 maka",
+        "    tulis \"Nilai C - Cukup\"",
+        "  jika tidak",
+        "    tulis \"Nilai D - Perlu Belajar Lagi\"",
+        "  akhir jika",
+        "selesai"
+      ],
+      defaults: { nilai: 85 },
+      xp: 40,
+    },
+    {
+      title: "Boleh Ikut Ujian?",
+      mode: "lengkapi",
+      soal: "Lengkapi program yang memeriksa syarat keikutsertaan ujian: hadir ≥ 80% DAN nilai tugas ≥ 60.",
+      context: "Gunakan AND (&&) untuk kondisi ganda",
+      slider: null,
+      code: [
+        "mulai",
+        "  baca hadir",
+        "  baca tugas",
+        "  jika [BLANK:hadir >= 80] && tugas >= 60 maka",
+        "    tulis \"Boleh ikut ujian\"",
+        "  jika tidak",
+        "    tulis [BLANK:\"Tidak boleh ikut ujian\"]",
+        "  akhir jika",
+        "selesai"
+      ],
+      defaults: { hadir: 85, tugas: 70 },
+      xp: 60,
+    },
+  ],
+  perulangan: [
+    {
+      title: "Daftar Absensi",
+      mode: "lihat",
+      soal: "Program menampilkan nomor urut siswa dari 1 sampai N.",
+      context: "Geser slider untuk mengubah jumlah siswa!",
+      slider: { label: "Jumlah siswa", id: "n_absen", min: 1, max: 10, step: 1, def: 5 },
+      code: [
+        "mulai",
+        "  baca n",
+        "  untuk i ← 1 sampai n lakukan",
+        "    tulis \"Siswa ke-\" + i",
+        "  akhir untuk",
+        "selesai"
+      ],
+      defaults: { n: 5 },
+      xp: 30,
+    },
+    {
+      title: "Total Belanja Kantin",
+      mode: "lihat",
+      soal: "Program menghitung total belanja dari beberapa item di kantin.",
+      context: "Setiap iterasi menambahkan harga satu item ke total",
+      slider: { label: "Jumlah item", id: "n_item", min: 1, max: 6, step: 1, def: 3 },
+      code: [
+        "mulai",
+        "  baca n",
+        "  total ← 0",
+        "  untuk i ← 1 sampai n lakukan",
+        "    baca harga",
+        "    total ← total + harga",
+        "  akhir untuk",
+        "  tulis \"Total: \" + total",
+        "selesai"
+      ],
+      defaults: { n: 3, harga: 5000 },
+      xp: 40,
+    },
+    {
+      title: "Rata-Rata Nilai",
+      mode: "lengkapi",
+      soal: "Lengkapi program untuk menghitung rata-rata nilai dari N siswa.",
+      context: "rata-rata = total ÷ n",
+      slider: null,
+      code: [
+        "mulai",
+        "  baca n",
+        "  total ← 0",
+        "  untuk i ← 1 sampai n lakukan",
+        "    baca nilai",
+        "    total ← [BLANK:total + nilai]",
+        "  akhir untuk",
+        "  rata ← [BLANK:total / n]",
+        "  tulis \"Rata-rata: \" + rata",
+        "selesai"
+      ],
+      defaults: { n: 4, nilai: 80 },
+      xp: 60,
+    },
+  ],
+};
+
+// ════════════════════════════════════════════
+// LOGIN
+// ════════════════════════════════════════════
+function normalisasiData(data) {
+  if (!data || typeof data !== "object") return data;
+  const keys = Object.keys(data);
+  if (keys.length === 0) return data;
+  // Jika key pertama cocok pola kelas (X-, XI-, XII-), struktur sudah benar
+  const kelasPattern = /^(X|XI|XII)[\s\-_]/i;
+  if (kelasPattern.test(keys[0])) return data;
+  // Struktur terbalik: { "NAMA SISWA": "X-A" } — balik jadi { "X-A": ["NAMA",...] }
+  const hasil = {};
+  keys.forEach(nama => {
+    let kelas = data[nama];
+    if (Array.isArray(kelas)) kelas = kelas[0];
+    if (!kelas) return;
+    kelas = String(kelas).trim();
+    if (!hasil[kelas]) hasil[kelas] = [];
+    hasil[kelas].push(String(nama).trim());
+  });
+  return hasil;
+}
+
+async function initLogin() {
+  const errEl = document.getElementById("login-error");
+  // Jika dibuka dari file:// lokal, langsung pakai data lokal (JSONP diblokir browser)
+  if (location.protocol === "file:" || APPS_SCRIPT_URL === "GANTI_DENGAN_URL_APPS_SCRIPT_ANDA") {
+    loadDummyData(errEl); return;
+  }
+  errEl.textContent = "Memuat data siswa...";
+  // Gunakan JSONP untuk bypass CORS dari file lokal
+  fetchJSONP(APPS_SCRIPT_URL + "?action=getSiswa&callback=onSiswaLoaded", "onSiswaLoaded",
+    (json) => {
+      if (!json.success) { errEl.textContent = "⚠ Gagal: " + (json.error||"unknown"); loadDummyData(null); return; }
+      siswadata = normalisasiData(json.data);
+      errEl.textContent = "";
+      const selKelas = document.getElementById("sel-kelas");
+      Object.keys(siswadata).sort().forEach(k => {
+        const opt = document.createElement("option");
+        opt.value = k; opt.textContent = k;
+        selKelas.appendChild(opt);
+      });
+    },
+    (err) => { errEl.textContent = "⚠ Gagal terhubung — pakai data demo"; loadDummyData(null); }
+  );
+}
+
+function fetchJSONP(url, callbackName, onSuccess, onError) {
+  window[callbackName] = function(data) {
+    delete window[callbackName];
+    document.getElementById("jsonp-script") && document.getElementById("jsonp-script").remove();
+    onSuccess(data);
+  };
+  const script = document.createElement("script");
+  script.id = "jsonp-script";
+  script.src = url;
+  script.onerror = onError;
+  document.head.appendChild(script);
+}
+
+async function kirimData() {
+  if (APPS_SCRIPT_URL === "GANTI_DENGAN_URL_APPS_SCRIPT_ANDA") return;
+  // Kirim via fetch dengan mode no-cors (fire and forget)
+  try {
+    fetch(APPS_SCRIPT_URL, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({
+        action: "simpanNilai",
+        nama: state.nama, kelas: state.kelas,
+        xp: state.xp, badge: state.badges,
+        soalSelesai: state.soalSelesai,
+        reviewDone: state.reviewDone,
+        percabanganDone: state.percabanganDone,
+        perulanganDone: state.perulanganDone,
+        latihanDone: state.latihanDone,
+      })
+    });
+  } catch(e) { /* silent */ }
+}
+
+function loadDummyData(errEl) {
+  siswadata = {
+    "X-A": ["Ahmad Fauzi","Siti Rahmah","Budi Santoso","Nurul Hidayah","Rizky Pratama"],
+    "X-B": ["Dewi Lestari","Fajar Ramadan","Hana Pertiwi","Ilham Maulana","Jihan Amelia"],
+  };
+  const selKelas = document.getElementById("sel-kelas");
+  Object.keys(siswadata).sort().forEach(k => {
+    const opt = document.createElement("option");
+    opt.value = k; opt.textContent = k;
+    selKelas.appendChild(opt);
+  });
+  if (errEl) errEl.textContent = "Mode demo — Apps Script belum terhubung";
+}
+
+function loadNama() {
+  const kelas = document.getElementById("sel-kelas").value;
+  const selNama = document.getElementById("sel-nama");
+  const btn = document.getElementById("login-btn");
+  selNama.innerHTML = '<option value="">— Pilih nama kamu —</option>';
+  selNama.disabled = !kelas;
+  btn.disabled = true;
+  if (!kelas) return;
+  (siswadata[kelas] || []).forEach(n => {
+    const opt = document.createElement("option");
+    opt.value = n; opt.textContent = n;
+    selNama.appendChild(opt);
+  });
+  selNama.onchange = () => { btn.disabled = !selNama.value; };
+}
+
+function doLogin() {
+  const kelas = document.getElementById("sel-kelas").value;
+  const nama  = document.getElementById("sel-nama").value;
+  if (!kelas || !nama) return;
+  state.nama = nama; state.kelas = kelas;
+  document.getElementById("hdr-nama").textContent = nama;
+  document.getElementById("hdr-kelas").textContent = kelas;
+
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+  ["review","percabangan","perulangan"].forEach(sec => {
+    buildLesson(sec);
+    showLesson(sec, 0);
+  });
+}
+
+// ════════════════════════════════════════════
+// SECTION SWITCHING
+// ════════════════════════════════════════════
+function switchSection(name, btn) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("sec-" + name).classList.add("active");
+  btn.classList.add("active");
+  state.currentSection = name;
+}
+
+// ════════════════════════════════════════════
+// BUILD LESSON UI
+// ════════════════════════════════════════════
+function buildLesson(section) {
+  const steps = LESSONS[section];
+  const container = document.getElementById(section + "-lesson");
+  container.innerHTML = `
+    <div class="lesson-left" id="${section}-left">
+      <div class="step-nav" id="${section}-stepnav"></div>
+      <div class="soal-card" id="${section}-soal"></div>
+      <div class="editor-wrap">
+        <div class="editor-header">
+          <span class="editor-header-title">📄 pseudocode.txt</span>
+        </div>
+        <div class="editor-body">
+          <div class="line-nums" id="${section}-linenums"></div>
+          <div class="code-display" id="${section}-code"></div>
+        </div>
+      </div>
+      <div id="${section}-slider-wrap" class="slider-wrap" style="display:none"></div>
+      <div class="control-bar">
+        <button class="ctrl-btn secondary" onclick="tracePrev('${section}')" id="${section}-btn-prev" disabled>⏮</button>
+        <button class="ctrl-btn primary" onclick="traceNext('${section}')" id="${section}-btn-next">⏭ Langkah</button>
+        <button class="ctrl-btn secondary" onclick="traceAuto('${section}')" id="${section}-btn-auto">▶ Auto</button>
+        <button class="ctrl-btn secondary" onclick="traceReset('${section}')" id="${section}-btn-reset">↺ Reset</button>
+        <div class="speed-wrap">
+          <span class="speed-label">Kecepatan</span>
+          <input type="range" class="speed-slider" min="1" max="5" value="3"
+            oninput="setSpeed(this.value)" style="width:70px;">
+        </div>
+      </div>
+    </div>
+    <div class="lesson-right" id="${section}-right">
+      <div class="panel-tabs">
+        <button class="panel-tab active" onclick="switchPanel('${section}','vars',this)">📦 Variabel</button>
+        <button class="panel-tab" onclick="switchPanel('${section}','output',this)">📤 Output</button>
+        <button class="panel-tab" onclick="switchPanel('${section}','branch',this)">🔀 Percabangan</button>
+      </div>
+      <div class="vars-panel" id="${section}-vars"></div>
+      <div class="output-panel" id="${section}-output" style="display:none">
+        <span class="output-empty">Belum ada output. Klik ⏭ Langkah untuk mulai.</span>
+      </div>
+      <div class="branch-panel" id="${section}-branch" style="display:none">
+        <div class="branch-title">Alur Percabangan</div>
+        <div id="${section}-branch-list"><span style="font-size:12px;color:var(--text3)">Belum ada percabangan.</span></div>
+      </div>
+    </div>
+  `;
+}
+
+function showLesson(section, stepIdx) {
+  const steps = LESSONS[section];
+  const step = steps[stepIdx];
+  state[section].step = stepIdx;
+
+  // Step nav
+  const navEl = document.getElementById(section + "-stepnav");
+  let navHtml = `<span class="step-title">${step.title}</span>`;
+  navEl.innerHTML = navHtml;
+
+  // Mode badge
+  const modeMap = { lihat: "👁 Lihat", lengkapi: "✏️ Lengkapi", buat: "🖊 Buat Sendiri" };
+  navEl.innerHTML += `<span class="step-mode ${step.mode}">${modeMap[step.mode]}</span>`;
+
+  // Step dots
+  let dotsHtml = "";
+  steps.forEach((s, i) => {
+    const cls = i < stepIdx ? "done" : i === stepIdx ? "active" : "locked";
+    dotsHtml += (i > 0 ? `<div class="step-line ${i <= stepIdx ? 'done' : ''}"></div>` : "");
+    dotsHtml += `<div class="step-dot ${cls}" onclick="tryGoStep('${section}',${i})">${i + 1}</div>`;
+  });
+  navEl.innerHTML = dotsHtml + navEl.innerHTML;
+
+  // Soal
+  const soalEl = document.getElementById(section + "-soal");
+  soalEl.innerHTML = `
+    <div class="soal-title">Soal ${stepIdx + 1} dari ${steps.length}</div>
+    <div class="soal-text">${step.soal}</div>
+    ${step.context ? `<div class="soal-context">${step.context}</div>` : ""}
+  `;
+
+  // Slider
+  const sliderWrap = document.getElementById(section + "-slider-wrap");
+  if (step.slider) {
+    const s = step.slider;
+    sliderWrap.style.display = "flex";
+    sliderWrap.innerHTML = `
+      <span class="slider-label">${s.label}</span>
+      <input type="range" class="slider-input" id="${s.id}"
+        min="${s.min}" max="${s.max}" step="${s.step}" value="${s.def}"
+        oninput="onSlider('${section}','${s.id}',this.value)">
+      <span class="slider-val" id="${s.id}-val">${s.def}</span>
+    `;
+  } else {
+    sliderWrap.style.display = "none";
+  }
+
+  // Reset trace
+  initTrace(section);
+}
+
+function tryGoStep(section, idx) {
+  const steps = LESSONS[section];
+  const cur = state[section].step;
+  if (idx > cur) { showToast("Selesaikan soal ini dulu!", "error"); return; }
+  showLesson(section, idx);
+}
+
+// ════════════════════════════════════════════
+// RENDER CODE with syntax highlighting
+// ════════════════════════════════════════════
+
+// Escape raw text before inserting as HTML
+function escHtml(t) {
+  return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+// Highlight a plain-text line (no HTML inside yet)
+function highlight(plain) {
+  // escape first so < > don't become tags
+  let s = escHtml(plain);
+  // arrow
+  s = s.replace(/←/g, '<span class="op">←</span>');
+  // longer keywords first to avoid partial matches
+  s = s.replace(/\b(jika tidak jika|jika tidak|akhir jika|akhir untuk)\b/g, '<span class="kw2">$1</span>');
+  s = s.replace(/\b(mulai|selesai|baca|tulis|sampai|lakukan|maka|jika|untuk)\b/g, '<span class="kw">$1</span>');
+  // strings — only handle &quot;...&quot; (escaped form of " chars)
+  s = s.replace(/&quot;([^"<]*?)&quot;/g, '<span class="str">"$1"</span>');
+  // numbers (not inside words)
+  s = s.replace(/(?<![a-zA-Z_])(\d+)(?![a-zA-Z_])/g, '<span class="num">$1</span>');
+  return s;
+}
+
+function renderCode(section, activeLine = -1, states = {}) {
+  const step = LESSONS[section][state[section].step];
+  const codeEl = document.getElementById(section + "-code");
+  const lineEl = document.getElementById(section + "-linenums");
+  if (!codeEl) return;
+
+  const rawLines = step.code.map(l => l.replace(/<-/g, "←"));
+
+  let codeHtml = "";
+  let lineHtml = "";
+
+  rawLines.forEach((raw, i) => {
+    const isActive = i === activeLine;
+    const lineState = states[i] || "";
+    let cls = "code-line";
+    if (isActive) cls += " active";
+    if (lineState === "taken") cls += " passed-true";
+    if (lineState === "skipped") cls += " passed-false";
+
+    if (step.mode === "lengkapi" && raw.includes("[BLANK:")) {
+      // Split line into text segments and blank placeholders
+      let parts = "";
+      let lastIdx = 0;
+      const re = /\[BLANK:([^\]]+)\]/g;
+      let m;
+      while ((m = re.exec(raw)) !== null) {
+        // highlight text before blank
+        parts += highlight(raw.slice(lastIdx, m.index));
+        const answer = m[1].trim();
+        parts += `<span contenteditable="true" class="blank" data-answer="${escHtml(answer)}" onblur="checkBlank(this,'${section}')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"></span>`;
+        lastIdx = m.index + m[0].length;
+      }
+      parts += highlight(raw.slice(lastIdx));
+      codeHtml += `<span class="${cls}">${parts}</span>`;
+    } else {
+      const plain = raw.replace(/\[BLANK:[^\]]+\]/g, "___");
+      codeHtml += `<span class="${cls}">${highlight(plain)}</span>`;
+    }
+
+    lineHtml += `<span class="line-num ${isActive ? "active-line" : ""}">${i + 1}</span>`;
+  });
+
+  codeEl.innerHTML = codeHtml;
+  lineEl.innerHTML = lineHtml;
+}
+
+function checkBlank(el, section) {
+  const answer = el.dataset.answer;
+  const typed = el.innerText.trim();
+  if (typed.toLowerCase() === answer.toLowerCase()) {
+    el.classList.add("correct");
+    el.classList.remove("wrong");
+    el.contentEditable = false;
+    checkAllBlanks(section);
+  } else if (typed.length > 0) {
+    el.classList.add("wrong");
+    el.classList.remove("correct");
+  }
+}
+
+function checkAllBlanks(section) {
+  const blanks = document.querySelectorAll(`#${section}-code .blank`);
+  if ([...blanks].every(b => b.classList.contains("correct"))) {
+    showToast("Semua jawaban benar! 🎉", "success");
+    giveXP(section, LESSONS[section][state[section].step].xp);
+    setTimeout(() => nextStep(section), 1500);
+  }
+}
+
+// ════════════════════════════════════════════
+// TRACER / INTERPRETER
+// ════════════════════════════════════════════
+function initTrace(section) {
+  const step = LESSONS[section][state[section].step];
+  const rawLines = step.code.map(l => l.replace(/<-/g, "←").trim());
+
+function onSlider(section, id, val) {
+  document.getElementById(id + "-val").textContent = val;
+  const step = LESSONS[section][state[section].step];
+  const varName = id === "nilai2" ? "nilai" : (id.startsWith("n_") ? "n" : id);
+  getTracing(section).vars[varName] = Number(val);
+  if (step.defaults) step.defaults[varName] = Number(val);
+  initTrace(section);
+}
+
+function setSpeed(v) {
+  const speeds = [1200, 900, 600, 400, 200];
+  const s = speeds[v - 1] || 600;
+  // apply to all active section tracers
+  ["review","percabangan","perulangan"].forEach(sec => getTracing(sec).speed = s);
+}
+
+function getValue(expr, vars) {
+  expr = String(expr).trim();
+  if (expr === "") return "";
+  if (!isNaN(expr)) return Number(expr);
+  if (expr.startsWith('"') && expr.endsWith('"')) return expr.slice(1,-1);
+  if (expr in vars) return vars[expr];
+  if (expr.includes("&&")) {
+    const parts = expr.split("&&");
+    return evalCond(parts[0].trim(), vars) && evalCond(parts[1].trim(), vars);
+  }
+  // arithmetic
+  if (expr.includes("+")) {
+    const idx = expr.lastIndexOf("+");
+    const a = getValue(expr.slice(0,idx).trim(), vars);
+    const b = getValue(expr.slice(idx+1).trim(), vars);
+    return (typeof a === "string" || typeof b === "string") ? String(a)+String(b) : a+b;
+  }
+  if (expr.includes("-")) {
+    const parts = expr.split("-");
+    let v = getValue(parts[0].trim(), vars);
+    for (let i=1;i<parts.length;i++) v -= getValue(parts[i].trim(), vars);
+    return v;
+  }
+  if (expr.includes("*")) {
+    const parts = expr.split("*");
+    return parts.reduce((a,b) => a * getValue(b.trim(), vars), 1);
+  }
+  if (expr.includes("/")) {
+    const [a,b] = expr.split("/").map(e => getValue(e.trim(), vars));
+    return Math.round((a/b) * 100) / 100;
+  }
+  return expr;
+}
+
+function evalCond(cond, vars) {
+  cond = cond.trim();
+  if (cond.includes("&&")) {
+    const [a,b] = cond.split("&&").map(c => evalCond(c.trim(), vars));
+    return a && b;
+  }
+  if (cond.includes(">=")) { const [a,b] = cond.split(">=").map(e => getValue(e.trim(),vars)); return a>=b; }
+  if (cond.includes("<=")) { const [a,b] = cond.split("<=").map(e => getValue(e.trim(),vars)); return a<=b; }
+  if (cond.includes("!=")) { const [a,b] = cond.split("!=").map(e => getValue(e.trim(),vars)); return a!=b; }
+  if (cond.includes(">"))  { const [a,b] = cond.split(">").map(e => getValue(e.trim(),vars)); return a>b; }
+  if (cond.includes("<"))  { const [a,b] = cond.split("<").map(e => getValue(e.trim(),vars)); return a<b; }
+  if (cond.includes("="))  { const [a,b] = cond.split("=").map(e => getValue(e.trim(),vars)); return a==b; }
+  return false;
+}
+
+// Step-by-step interpreter using explicit PC
+function buildExecSteps(lines, defaultVars) {
+  // Precompute execution order with full trace
+  const steps = [];
+  const vars = Object.assign({}, defaultVars);
+  let pc = 0;
+  let safety = 0;
+  const loopStack = [];
+  // ifStack menyimpan hasil kondisi jika terbaru, agar jika-tidak tahu harus dijalankan atau di-skip
+  const ifStack = []; // stack of { condResult }
+
+  function skipToEndIf(fromPc) {
+    // Skip dari posisi saat ini ke akhir jika (depth-aware), return pc akhir jika
+    let depth = 1, p = fromPc;
+    while (p < lines.length && depth > 0) {
+      p++;
+      const l = lines[p] || "";
+      if ((l.startsWith("jika ") && l.endsWith("maka")) || l.startsWith("jika tidak jika ")) depth++;
+      if (l === "akhir jika") depth--;
+    }
+    return p;
+  }
+
+  function skipToNextElseOrEnd(fromPc) {
+    // Dari dalam blok jika-benar, skip ke jika-tidak / jika-tidak-jika / akhir-jika
+    let depth = 1, p = fromPc;
+    while (p < lines.length) {
+      p++;
+      const l = lines[p] || "";
+      if (l.startsWith("jika ") && l.endsWith("maka")) depth++;
+      if (l === "akhir jika") { depth--; if (depth === 0) return p; }
+      if (depth === 1 && (l === "jika tidak" || l.startsWith("jika tidak jika "))) return p;
+    }
+    return p;
+  }
+
+  while (pc < lines.length && safety++ < 500) {
+    const line = lines[pc];
+    steps.push({ pc, vars: Object.assign({}, vars), action: null });
+
+    if (line === "mulai" || line === "selesai") { pc++; continue; }
+
+    if (line === "akhir jika") { ifStack.pop(); pc++; continue; }
+    // "akhir untuk" handled below in loop logic
+
+    // jika tidak — hanya dieksekusi jika kondisi jika sebelumnya TRUE (artinya kita harus skip blok else)
+    if (line === "jika tidak") {
+      // Jika kita sampai di sini, berarti blok jika-TRUE sudah selesai, sekarang skip else
+      pc = skipToEndIf(pc);
+      ifStack.pop();
+      pc++; continue;
+    }
+
+    // jika tidak jika ... maka — sama, kita skip saja karena sudah masuk blok true sebelumnya
+    if (line.startsWith("jika tidak jika ") && line.endsWith("maka")) {
+      // Sampai di sini berarti blok jika sebelumnya sudah true, skip semua sampai akhir jika
+      pc = skipToEndIf(pc);
+      ifStack.pop();
+      pc++; continue;
+    }
+
+    if (line.startsWith("baca ")) {
+      const varName = line.slice(5).trim();
+      // use current default value
+      steps[steps.length-1].action = { type:"baca", varName, value: vars[varName] !== undefined ? vars[varName] : 0 };
+      pc++; continue;
+    }
+
+    if (line.startsWith("tulis ")) {
+      const expr = line.slice(6).trim();
+      const val = getValue(expr, vars);
+      steps[steps.length-1].action = { type:"tulis", value: String(val) };
+      pc++; continue;
+    }
+
+    if (line.includes("←")) {
+      const [lhs, rhs] = line.split("←").map(s => s.trim());
+      const val = getValue(rhs, vars);
+      vars[lhs] = val;
+      steps[steps.length-1].action = { type:"assign", varName: lhs, value: val };
+      pc++; continue;
+    }
+
+    if (line.startsWith("jika ") && line.endsWith("maka")) {
+      const cond = line.slice(5, -5).trim();
+      const result = evalCond(cond, vars);
+      steps[steps.length-1].action = { type:"branch", cond, result };
+      ifStack.push({ condResult: result });
+      if (!result) {
+        // kondisi FALSE: skip ke jika-tidak / jika-tidak-jika / akhir-jika
+        pc = skipToNextElseOrEnd(pc);
+      }
+      pc++; continue;
+    }
+
+    // jika tidak jika ... maka — ini hanya dicapai jika kondisi sebelumnya FALSE
+    if (line.startsWith("jika tidak jika ") && line.endsWith("maka")) {
+      const cond = line.slice(16, -5).trim();
+      const result = evalCond(cond, vars);
+      steps[steps.length-1].action = { type:"branch", cond, result };
+      // Update kondisi teratas di ifStack
+      if (ifStack.length > 0) ifStack[ifStack.length-1].condResult = result;
+      if (!result) {
+        pc = skipToNextElseOrEnd(pc);
+      }
+      pc++; continue;
+    }
+
+    if (line.startsWith("untuk ") && line.endsWith("lakukan")) {
+      // untuk i ← 1 sampai n lakukan
+      const inner = line.slice(6, -8).trim();
+      const arrowIdx = inner.indexOf("←");
+      const sampaiIdx = inner.indexOf("sampai");
+      const varName = inner.slice(0, arrowIdx).trim();
+      const startVal = getValue(inner.slice(arrowIdx+1, sampaiIdx).trim(), vars);
+      const endVal = getValue(inner.slice(sampaiIdx+6).trim(), vars);
+      vars[varName] = startVal;
+      steps[steps.length-1].action = { type:"loop-init", varName, value: startVal, end: endVal };
+
+      // find akhir untuk
+      let depth = 1, searchPc = pc;
+      while (searchPc < lines.length && depth > 0) {
+        searchPc++;
+        if (lines[searchPc] && lines[searchPc].startsWith("untuk ")) depth++;
+        if (lines[searchPc] === "akhir untuk") depth--;
+      }
+
+      if (startVal > endVal) { pc = searchPc + 1; continue; }
+      loopStack.push({ startPc: pc, varName, end: endVal, endPc: searchPc });
+      pc++; continue;
+    }
+
+    if (line === "akhir untuk") {
+      if (loopStack.length > 0) {
+        const loop = loopStack[loopStack.length - 1];
+        vars[loop.varName]++;
+        if (vars[loop.varName] <= loop.end) {
+          steps[steps.length-1].action = { type:"loop-inc", varName: loop.varName, value: vars[loop.varName] };
+          pc = loop.startPc + 1; continue;
+        } else {
+          loopStack.pop();
+        }
+      }
+      pc++; continue;
+    }
+
+    pc++;
+  }
+  return steps;
+}
+
+function initTrace(section) {
+  const t = getTracing(section);
+  const step = LESSONS[section][state[section].step];
+  const rawLines = step.code.map(l => l.replace(/<-/g, "←").trim());
+
+  t.execSteps = buildExecSteps(rawLines, Object.assign({}, step.defaults || {}));
+  t.execIdx = 0;
+  t.outputs = [];
+  t.branches = [];
+  t.vars = Object.assign({}, step.defaults || {});
+  t.lineStates = {};
+
+  renderCode(section, -1, {});
+  renderVars(section, {});
+  document.getElementById(section + "-output").innerHTML =
+    '<span class="output-empty">Belum ada output. Klik ⏭ Langkah untuk mulai.</span>';
+  document.getElementById(section + "-branch-list").innerHTML =
+    '<span style="font-size:12px;color:var(--text3)">Belum ada percabangan.</span>';
+  document.getElementById(section + "-btn-prev").disabled = true;
+  document.getElementById(section + "-btn-next").disabled = false;
+  if (t.timer) { clearInterval(t.timer); t.timer = null; }
+}
+
+function stepExec(section) {
+  const t = getTracing(section);
+  if (t.execIdx >= t.execSteps.length) {
+    document.getElementById(section + "-btn-next").disabled = true;
+    if (LESSONS[section][state[section].step].mode === "lihat") {
+      setTimeout(() => {
+        giveXP(section, LESSONS[section][state[section].step].xp);
+        nextStep(section);
+      }, 800);
+    }
+    return;
+  }
+
+  const s = t.execSteps[t.execIdx];
+  const { pc, action, vars } = s;
+
+  t.lineStates[pc] = "active";
+  renderCode(section, pc, t.lineStates);
+  t.vars = Object.assign({}, vars);
+
+  if (action) {
+    if (action.type === "baca") {
+      t.vars[action.varName] = action.value;
+      addOutput(section, `→ Baca ${action.varName} = ${action.value}`, "info");
+    }
+    if (action.type === "tulis") {
+      addOutput(section, action.value, "out");
+    }
+    if (action.type === "assign" || action.type === "loop-init" || action.type === "loop-inc") {
+      t.vars[action.varName] = action.value;
+    }
+    if (action.type === "branch") {
+      t.branches.push({ cond: action.cond, result: action.result, line: pc });
+      renderBranch(section);
+      t.lineStates[pc] = action.result ? "taken" : "skipped";
+    }
+  }
+
+  renderVars(section, t.vars);
+  t.execIdx++;
+  document.getElementById(section + "-btn-prev").disabled = t.execIdx <= 1;
+  document.getElementById(section + "-btn-next").disabled = t.execIdx >= t.execSteps.length;
+}
+
+function traceNext(section) {
+  const t = getTracing(section);
+  if (t.timer) { clearInterval(t.timer); t.timer = null; document.getElementById(section+"-btn-auto").textContent = "▶ Auto"; return; }
+  stepExec(section);
+}
+
+function tracePrev(section) {
+  const t = getTracing(section);
+  if (t.execIdx <= 1) return;
+  t.execIdx = Math.max(0, t.execIdx - 2);
+  t.outputs = [];
+  t.branches = [];
+  t.lineStates = {};
+  t.vars = Object.assign({}, LESSONS[section][state[section].step].defaults || {});
+  document.getElementById(section + "-output").innerHTML = '<span class="output-empty">...</span>';
+  document.getElementById(section + "-branch-list").innerHTML = '';
+  const target = t.execIdx;
+  t.execIdx = 0;
+  for (let i = 0; i < target; i++) stepExecSilent(section);
+  renderCode(section, t.execSteps[t.execIdx] ? t.execSteps[t.execIdx].pc : -1, t.lineStates);
+  renderVars(section, t.vars);
+}
+
+function stepExecSilent(section) {
+  const t = getTracing(section);
+  if (t.execIdx >= t.execSteps.length) return;
+  const s = t.execSteps[t.execIdx];
+  const { pc, action, vars } = s;
+  t.lineStates[pc] = "active";
+  t.vars = Object.assign({}, vars);
+  if (action) {
+    if (action.type === "baca") { t.vars[action.varName] = action.value; addOutput(section, `→ Baca ${action.varName} = ${action.value}`, "info"); }
+    if (action.type === "tulis") addOutput(section, action.value, "out");
+    if (action.type === "branch") { t.branches.push({ cond: action.cond, result: action.result }); renderBranch(section); t.lineStates[pc] = action.result ? "taken" : "skipped"; }
+  }
+  t.execIdx++;
+}
+
+function traceAuto(section) {
+  const t = getTracing(section);
+  const btn = document.getElementById(section + "-btn-auto");
+  if (t.timer) {
+    clearInterval(t.timer); t.timer = null;
+    btn.textContent = "▶ Auto"; return;
+  }
+  btn.textContent = "⏸ Pause";
+  t.timer = setInterval(() => {
+    const tc = getTracing(section);
+    if (tc.execIdx >= tc.execSteps.length) {
+      clearInterval(tc.timer); tc.timer = null;
+      btn.textContent = "▶ Auto"; return;
+    }
+    stepExec(section);
+  }, t.speed || 600);
+}
+
+function traceReset(section) {
+  const t = getTracing(section);
+  if (t.timer) { clearInterval(t.timer); t.timer = null; }
+  document.getElementById(section + "-btn-auto").textContent = "▶ Auto";
+  initTrace(section);
+}
+
+// ════════════════════════════════════════════
+// RENDER HELPERS
+// ════════════════════════════════════════════
+function renderVars(section, vars) {
+  const el = document.getElementById(section + "-vars");
+  if (!el) return;
+  if (Object.keys(vars).length === 0) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--text3)">Variabel akan muncul saat program berjalan.</span>';
+    return;
+  }
+  el.innerHTML = Object.entries(vars).map(([k, v]) => `
+    <div class="var-card changed" onanimationend="this.classList.remove('changed')">
+      <div class="var-name">${k}</div>
+      <div class="var-value ${typeof v === 'string' ? 'str' : ''}">${v}</div>
+    </div>
+  `).join("");
+}
+
+function addOutput(section, text, type = "out") {
+  const t = getTracing(section);
+  t.outputs.push({ text, type });
+  const el = document.getElementById(section + "-output");
+  const icons = { out: "▸", info: "ℹ", warn: "⚠" };
+  el.innerHTML = t.outputs.map(o =>
+    `<div class="output-line ${o.type}"><span class="out-icon">${icons[o.type]||"▸"}</span><span class="out-text">${o.text}</span></div>`
+  ).join("");
+  el.scrollTop = el.scrollHeight;
+}
+
+function renderBranch(section) {
+  const t = getTracing(section);
+  const el = document.getElementById(section + "-branch-list");
+  if (!el || t.branches.length === 0) return;
+  el.innerHTML = t.branches.map(b => `
+    <div class="branch-item ${b.result ? 'taken' : 'skipped'}">
+      <span class="branch-arrow">${b.result ? "✓" : "✗"}</span>
+      <span>${b.cond}</span>
+      <span style="margin-left:auto;font-size:11px;">${b.result ? "BENAR → masuk" : "SALAH → lewati"}</span>
+    </div>
+  `).join("");
+}
+
+function switchPanel(section, panel, btn) {
+  const panels = ["vars", "output", "branch"];
+  panels.forEach(p => {
+    const el = document.getElementById(section + "-" + p);
+    if (el) el.style.display = p === panel ? "flex" : "none";
+    if (p === "output" || p === "branch") {
+      const pEl = document.getElementById(section + "-" + p);
+      if (pEl) pEl.style.display = p === panel ? "block" : "none";
+    }
+  });
+  document.querySelectorAll(`#${section}-right .panel-tab`).forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+// ════════════════════════════════════════════
+// STEP PROGRESSION
+// ════════════════════════════════════════════
+function nextStep(section) {
+  const steps = LESSONS[section];
+  const cur = state[section].step;
+  if (cur + 1 < steps.length) {
+    showLesson(section, cur + 1);
+  } else {
+    // Section complete!
+    state[section + "Done"] = true;
+    markTabDone(section);
+    updateProgress();
+    showBadge(section);
+    kirimData();
+  }
+}
+
+function markTabDone(section) {
+  const tab = document.getElementById("tab-" + section);
+  const check = document.getElementById("check-" + section);
+  tab.classList.add("done");
+  check.textContent = "✓";
+}
+
+function updateProgress() {
+  const done = ["review","percabangan","perulangan","latihan"].filter(s => state[s+"Done"]).length;
+  const pct = Math.round(done / 4 * 100);
+  document.getElementById("hdr-prog").style.width = pct + "%";
+  document.getElementById("hdr-prog-label").textContent = pct + "% selesai";
+}
+
+// ════════════════════════════════════════════
+// GAMIFICATION
+// ════════════════════════════════════════════
+function giveXP(section, amount) {
+  state.xp += amount;
+  state.soalSelesai++;
+  document.getElementById("hdr-xp").textContent = state.xp;
+  showXPPopup("+" + amount + " XP");
+}
+
+function showXPPopup(text) {
+  const el = document.getElementById("xp-popup");
+  el.textContent = text;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 1500);
+}
+
+const badges = {
+  review:       { icon: "📖", name: "Dasar Kuat!", sub: "Review materi berhasil diselesaikan" },
+  percabangan:  { icon: "🔀", name: "Master Percabangan!", sub: "Semua soal percabangan selesai" },
+  perulangan:   { icon: "🔁", name: "Looping Pro!", sub: "Semua soal perulangan selesai" },
+  latihan:      { icon: "🏆", name: "Pseudocode Expert!", sub: "Latihan gabungan berhasil dikumpulkan" },
+};
+
+function showBadge(section) {
+  const b = badges[section];
+  state.badges++;
+  document.getElementById("hdr-badge").textContent = state.badges;
+  document.getElementById("badge-icon").textContent = b.icon;
+  document.getElementById("badge-name").textContent = b.name;
+  document.getElementById("badge-sub").textContent = b.sub;
+  const el = document.getElementById("badge-popup");
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 3000);
+}
+
+function showToast(msg, type = "info") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "toast " + type + " show";
+  setTimeout(() => el.classList.remove("show"), 2500);
+}
+
+// ════════════════════════════════════════════
+// LATIHAN GABUNGAN
+// ════════════════════════════════════════════
+function jalankanLatihan() {
+  const code = document.getElementById("lat-code").value;
+  const out = document.getElementById("lat-output");
+  const lines = code.split("\n").map(l => l.replace(/<-/g,"←").trim()).filter(l => l);
+
+  const defaultVars = { n: 5, nilai: 80, hadir: 85 };
+  const steps = buildExecSteps(lines, defaultVars);
+
+  const outputs = [];
+  steps.forEach(s => {
+    if (s.action && s.action.type === "tulis") outputs.push(s.action.value);
+    if (s.action && s.action.type === "baca") outputs.push(`→ ${s.action.varName} = ${s.action.value}`);
+  });
+
+  if (outputs.length === 0) {
+    out.innerHTML = '<span style="color:var(--red)">Tidak ada output. Cek pseudocode-mu!</span>';
+    return;
+  }
+
+  out.innerHTML = outputs.map(o =>
+    `<div class="output-line out"><span class="out-icon">▸</span><span class="out-text">${o}</span></div>`
+  ).join("");
+
+  document.getElementById("btn-kumpul").disabled = false;
+  showToast("Program berhasil dijalankan!", "success");
+}
+
+function resetLatihan() {
+  document.getElementById("lat-code").value = "";
+  document.getElementById("lat-output").innerHTML = '<span style="color:var(--text3);font-style:italic;">Output akan muncul di sini...</span>';
+  document.getElementById("btn-kumpul").disabled = true;
+}
+
+function kumpulkanLatihan() {
+  state.latihanDone = true;
+  giveXP("latihan", 100);
+  markTabDone("latihan");
+  updateProgress();
+  showBadge("latihan");
+  kirimData();
+  showToast("Latihan berhasil dikumpulkan! 🎉", "success");
+}
+
+// ════════════════════════════════════════════
+// KIRIM DATA KE GOOGLE SHEETS
+// ════════════════════════════════════════════
+async function kirimData() {
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        action: "simpanNilai",
+        nama: state.nama,
+        kelas: state.kelas,
+        xp: state.xp,
+        badge: state.badges,
+        soalSelesai: state.soalSelesai,
+        reviewDone: state.reviewDone,
+        percabanganDone: state.percabanganDone,
+        perulanganDone: state.perulanganDone,
+        latihanDone: state.latihanDone,
+      })
+    });
+  } catch(e) { /* silent fail */ }
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+initLogin();
+</script>
+</body>
+</html>
