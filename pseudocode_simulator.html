@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PseudoKode — Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --surface: #161b27;
+    --surface2: #1e2535;
+    --border: #2a3347;
+    --accent: #4f8ef7;
+    --accent2: #38d9a9;
+    --accent3: #f7c948;
+    --red: #ff6b6b;
+    --text: #e8edf5;
+    --text-muted: #8899b0;
+    --keyword: #c792ea;
+    --string: #c3e88d;
+    --number: #f78c6c;
+    --variable: #82aaff;
+    --operator: #89ddff;
+    --editor-font-size: 13px;
+    --editor-line-height: 22px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh; /* dynamic viewport height for mobile */
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 14px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .header-subtitle {
+    color: var(--text-muted);
+    font-size: 11px;
+    display: none; /* hidden on mobile, shown on desktop */
+  }
+
+  .header-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  /* Mobile: vertical stack. Desktop: horizontal split */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    flex-direction: column; /* stack vertically on mobile */
+  }
+
+  /* ── EDITOR PANEL ── */
+  .editor-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* takes up more space on mobile */
+    min-height: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .panel-header .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent3);
+  }
+
+  .panel-header .filename {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+  }
+
+  .editor-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+  }
+
+  .line-numbers {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 12px 0;
+    min-width: 40px;
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--editor-font-size);
+    color: var(--text-muted);
+    user-select: none;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .line-numbers div {
+    padding: 0 8px 0 4px;
+    line-height: var(--editor-line-height);
+  }
+
+  .line-numbers div.active-line {
+    color: var(--accent);
+    background: rgba(79,142,247,0.08);
+  }
+
+  .editor-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #highlight-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    pointer-events: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--editor-font-size);
+    line-height: var(--editor-line-height);
+    padding: 12px;
+    white-space: pre;
+    word-wrap: normal;
+    overflow: visible;
+    z-index: 2;
+    box-sizing: border-box;
+  }
+
+  #editor {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    /*
+      iPhone Safari fix:
+      - `color: transparent` breaks caret rendering in Safari/WebKit
+      - `-webkit-text-fill-color: transparent` hides text visually
+        but Safari still renders the caret correctly using `caret-color`
+      - This is the standard trick for syntax-highlighted textareas on iOS
+    */
+    color: #e8edf5;
+    -webkit-text-fill-color: transparent;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: var(--editor-font-size);
+    line-height: var(--editor-line-height);
+    padding: 12px;
+    resize: none;
+    caret-color: #e8edf5;
+    tab-size: 2;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: pre;
+    overflow-wrap: normal;
+    z-index: 1;
+    box-sizing: border-box;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  #editor::selection {
+    background: rgba(79,142,247,0.4);
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* SYNTAX COLORS */
+  .hl-keyword   { color: #c792ea; }
+  .hl-io        { color: #38d9a9; }
+  .hl-branch    { color: #89ddff; }
+  .hl-loop      { color: #ffcb6b; }  /* selama, untuk, dari, sampai, lakukan, langkah */
+  .hl-string    { color: #c3e88d; }
+  .hl-number    { color: #f78c6c; }
+  .hl-operator  { color: #89ddff; }
+  .hl-variable  { color: #e8edf5; }
+
+  /* ── HINT BAR (scrollable horizontal) ── */
+  .hint-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 6px 10px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .hint-bar::-webkit-scrollbar { display: none; }
+
+  .hint-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--keyword);
+    cursor: pointer;
+    transition: all 0.12s;
+    user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    /* Larger tap target */
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    -webkit-tap-highlight-color: rgba(199,146,234,0.15);
+  }
+
+  .hint-chip:active { background: rgba(199,146,234,0.12); }
+  .hint-chip.green { color: var(--accent2); }
+  .hint-chip.green:active { background: rgba(56,217,169,0.12); }
+  .hint-chip.blue { color: var(--variable); }
+  .hint-chip.blue:active { background: rgba(130,170,255,0.12); }
+
+  /* ── TOOLBAR ── */
+  .toolbar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s ease;
+    min-height: 40px;
+    white-space: nowrap;
+  }
+
+  .btn-run { background: var(--accent); color: #fff; flex: 1; }
+  .btn-run:active { opacity: 0.85; }
+
+  .btn-reset {
+    background: var(--surface2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    flex: 0 0 auto;
+    font-size: 16px;
+    padding: 9px 12px;
+  }
+  .btn-reset:active { color: var(--text); }
+
+  .btn-example {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    flex: 0 0 auto;
+    display: none; /* hidden on small phones, shown wider */
+  }
+
+  .toolbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .status-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .status-dot.running { background: var(--accent3); animation: pulse 0.8s infinite; }
+  .status-dot.success { background: var(--accent2); }
+  .status-dot.error { background: var(--red); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── BOTTOM PANEL (Variabel / Output) ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 38%; /* fixed 38% height on mobile */
+    min-height: 0;
+    border-top: 2px solid var(--accent);
+  }
+
+  .tab-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    user-select: none;
+    min-height: 44px;
+  }
+
+  .tab:active { color: var(--text); }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: rgba(79,142,247,0.05);
+  }
+
+  .tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-content.active { display: block; }
+
+  /* Variables */
+  .var-empty, .out-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 20px;
+    line-height: 1.8;
+  }
+
+  .var-empty .icon, .out-empty .icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 6px;
+    opacity: 0.4;
+  }
+
+  .var-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 7px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .var-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--variable);
+    font-weight: 600;
+    min-width: 60px;
+  }
+
+  .var-arrow {
+    color: var(--operator);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  .var-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    word-break: break-all;
+  }
+
+  .var-type {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--surface);
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* Output */
+  .output-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    padding: 2px 0;
+    color: var(--string);
+    animation: fadeIn 0.15s ease;
+    word-break: break-word;
+  }
+
+  .output-line.error { color: var(--red); }
+  .output-line.system {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 11px;
+  }
+
+  /* ── INPUT MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: flex-end; /* slides up from bottom on mobile */
+    justify-content: center;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px 16px 0 0;
+    padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    animation: modalUp 0.25s ease;
+  }
+
+  @keyframes modalUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .modal-title .icon { font-size: 18px; }
+
+  .modal-subtitle {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .modal-subtitle span {
+    color: var(--variable);
+    font-weight: 600;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px; /* 16px prevents iOS zoom */
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 14px;
+  }
+
+  .modal-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.15);
+  }
+
+  .modal-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    min-height: 50px;
+  }
+
+  .modal-btn:active { background: #3a7de8; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── DESKTOP LAYOUT OVERRIDE ── */
+  @media (min-width: 640px) {
+    .main {
+      flex-direction: row; /* side by side on tablet/desktop */
+    }
+    .editor-panel {
+      flex: 1;
+      border-bottom: none;
+      border-right: 1px solid var(--border);
+    }
+    .right-panel {
+      flex: 0 0 320px;
+      border-top: none;
+      border-top: none;
+    }
+    .header-subtitle { display: inline; }
+    .btn-example { display: flex; }
+    .modal {
+      border-radius: 12px;
+      width: 360px;
+      padding: 24px;
+    }
+    .modal-overlay { align-items: center; }
+    @keyframes modalUp {
+      from { opacity: 0; transform: scale(0.95) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+  }
+
+  /* Wider phones - show example button */
+  @media (min-width: 380px) {
+    .btn-example { display: flex; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⌨</div>
+    Pseudo<span>Kode</span>
+  </div>
+  <span class="header-subtitle">— Simulator Pseudocode Interaktif</span>
+  <div class="header-right">
+    <span class="badge">v1.0</span>
+  </div>
+</header>
+
+<div class="main">
+  <!-- EDITOR -->
+  <div class="editor-panel">
+    <div class="panel-header">
+      <div class="dot"></div>
+      <span class="filename">pseudocode.txt</span>
+    </div>
+    <div class="editor-container">
+      <div class="line-numbers" id="lineNumbers">
+        <div>1</div>
+      </div>
+      <div class="editor-wrapper">
+        <div id="highlight-layer" aria-hidden="true"></div>
+        <textarea id="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Tulis pseudocode di sini..."></textarea>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn btn-run" onclick="runProgram()">▶ Jalankan</button>
+      <button class="btn btn-reset" onclick="resetAll()" title="Reset">↺</button>
+      <button class="btn btn-example" onclick="loadExample()">📄 Contoh</button>
+      <div class="toolbar-right">
+        <div class="status-indicator" id="statusIndicator">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Siap</span>
+        </div>
+      </div>
+    </div>
+    <div class="hint-bar">
+      <span class="hint-chip" onclick="insertSnippet('mulai\n  \nselesai')">mulai/selesai</span>
+      <span class="hint-chip green" onclick="insertSnippet('baca ')">baca</span>
+      <span class="hint-chip green" onclick="insertSnippet('tulis ')">tulis</span>
+      <span class="hint-chip blue" onclick="insertSnippet(' ← ')">←</span>
+      <span class="hint-chip" onclick="insertSnippet('jika  maka\n  \nakhir jika')">jika...maka</span>
+      <span class="hint-chip" onclick="insertSnippet('jika  maka\n  \njika tidak\n  \nakhir jika')">jika...tidak</span>
+      <span class="hint-chip" onclick="insertSnippet('jika  maka\n  \njika tidak jika  maka\n  \njika tidak\n  \nakhir jika')">jika...tidak jika</span>
+      <span class="hint-chip" style="color:var(--accent3)" onclick="insertSnippet('selama  lakukan\n  \nakhir selama')">selama...lakukan</span>
+      <span class="hint-chip" style="color:var(--accent3)" onclick="insertSnippet('untuk i dari 1 sampai 10 lakukan\n  \nakhir untuk')">untuk...dari...sampai</span>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="tab-bar">
+      <div class="tab active" onclick="switchTab('variabel')" id="tab-variabel">
+        📦 Variabel
+      </div>
+      <div class="tab" onclick="switchTab('output')" id="tab-output">
+        🖥 Output
+      </div>
+    </div>
+    <div class="tab-content active" id="content-variabel">
+      <div class="var-empty" id="varEmpty">
+        <span class="icon">📦</span>
+        Variabel akan muncul<br>saat program berjalan
+      </div>
+      <div id="varList"></div>
+    </div>
+    <div class="tab-content" id="content-output">
+      <div class="out-empty" id="outEmpty">
+        <span class="icon">🖥</span>
+        Output akan muncul<br>saat program berjalan
+      </div>
+      <div id="outputList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span class="icon">⌨️</span> Input Data
+    </div>
+    <div class="modal-subtitle">Masukkan nilai untuk variabel: <span id="modalVarName">x</span></div>
+    <input type="text" class="modal-input" id="modalInput" placeholder="Ketik nilai di sini..." />
+    <button class="modal-btn" onclick="submitInput()">OK — Lanjutkan ▶</button>
+  </div>
+</div>
+
+<script>
+  // ─── LINE NUMBERS + HIGHLIGHT ───────────────────────────────────
+  const editor = document.getElementById('editor');
+  const lineNumbers = document.getElementById('lineNumbers');
+  const highlightLayer = document.getElementById('highlight-layer');
+
+  // Escape HTML for safe insertion into highlight layer
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // Tokenize & colorize one line
+  function highlightLine(line) {
+    if (line === '') return '\n';
+
+    const lo = line.trimStart().toLowerCase();
+    let result = '';
+    const indent = line.length - line.trimStart().length;
+    const indentStr = escHtml(line.substring(0, indent));
+
+    // Helper: wrap rest of line
+    const wrap = (cls, text) => `<span class="${cls}">${escHtml(text)}</span>`;
+
+    // Full-line keyword patterns (order matters — most specific first)
+    if (/^(mulai|selesai|akhir jika|akhir selama|akhir untuk)$/i.test(lo)) {
+      return indentStr + wrap('hl-keyword', line.trim()) + '\n';
+    }
+    if (/^jika tidak jika\b/i.test(lo)) {
+      return indentStr + highlightBranchLine(line.trim()) + '\n';
+    }
+    if (/^jika tidak$/i.test(lo)) {
+      return indentStr + wrap('hl-branch', 'jika tidak') + '\n';
+    }
+    if (/^jika\b/i.test(lo) && /maka\s*$/i.test(lo)) {
+      return indentStr + highlightBranchLine(line.trim()) + '\n';
+    }
+    // SELAMA ... LAKUKAN
+    if (/^selama\b/i.test(lo) && /lakukan\s*$/i.test(lo)) {
+      return indentStr + highlightLoopLine(line.trim(), 'selama', 'lakukan') + '\n';
+    }
+    // UNTUK ... DARI ... SAMPAI ... LAKUKAN
+    if (/^untuk\b/i.test(lo) && /lakukan\s*$/i.test(lo)) {
+      return indentStr + highlightUntukLine(line.trim()) + '\n';
+    }
+    if (/^baca\b/i.test(lo)) {
+      const rest = line.trim().substring(4).trim();
+      return indentStr + wrap('hl-io', 'baca') + ' ' + wrap('hl-variable', rest) + '\n';
+    }
+    if (/^tulis\b/i.test(lo)) {
+      const rest = line.trim().substring(5).trim();
+      return indentStr + wrap('hl-io', 'tulis') + ' ' + highlightExpr(rest) + '\n';
+    }
+    if (line.includes('←')) {
+      const idx = line.indexOf('←');
+      const varPart = line.substring(0, idx);
+      const exprPart = line.substring(idx + 1);
+      const varIndent = varPart.length - varPart.trimStart().length;
+      return escHtml(varPart.substring(0, varIndent))
+        + wrap('hl-variable', varPart.trim())
+        + ' ' + wrap('hl-operator', '←') + ' '
+        + highlightExpr(exprPart.trim()) + '\n';
+    }
+
+    // Default: escape and return
+    return escHtml(line) + '\n';
+  }
+
+  function highlightBranchLine(text) {
+    // Highlight: jika [cond] maka  OR  jika tidak jika [cond] maka
+    const loText = text.toLowerCase();
+    let prefix = '';
+    let rest = text;
+
+    if (/^jika tidak jika\b/i.test(loText)) {
+      prefix = '<span class="hl-branch">jika tidak jika</span> ';
+      rest = text.substring('jika tidak jika'.length).trim();
+    } else {
+      prefix = '<span class="hl-branch">jika</span> ';
+      rest = text.substring('jika'.length).trim();
+    }
+
+    // rest ends with "maka"
+    const makaIdx = rest.toLowerCase().lastIndexOf(' maka');
+    if (makaIdx !== -1) {
+      const cond = rest.substring(0, makaIdx).trim();
+      return prefix + highlightExpr(cond) + ' <span class="hl-branch">maka</span>';
+    }
+    return prefix + escHtml(rest);
+  }
+
+  function highlightLoopLine(text, openKw, closeKw) {
+    const w = (cls, t) => `<span class="${cls}">${escHtml(t)}</span>`;
+    const lo = text.toLowerCase();
+    const closeIdx = lo.lastIndexOf(' ' + closeKw);
+    const condPart = text.substring(openKw.length, closeIdx).trim();
+    return w('hl-loop', openKw) + ' ' + highlightExpr(condPart) + ' ' + w('hl-loop', closeKw);
+  }
+
+  function highlightUntukLine(text) {
+    const w = (cls, t) => `<span class="${cls}">${escHtml(t)}</span>`;
+    let mid = text.replace(/^untuk\s+/i, '').replace(/\s+lakukan\s*$/i, '');
+    const lo = mid.toLowerCase();
+    const dariIdx = lo.indexOf(' dari ');
+    const sampaiIdx = lo.indexOf(' sampai ');
+    const langkahIdx = lo.indexOf(' langkah ');
+    if (dariIdx !== -1 && sampaiIdx !== -1) {
+      const varName = mid.substring(0, dariIdx).trim();
+      const startPart = mid.substring(dariIdx + 6, sampaiIdx).trim();
+      let endPart, stepPart = null;
+      if (langkahIdx !== -1 && langkahIdx > sampaiIdx) {
+        endPart = mid.substring(sampaiIdx + 8, langkahIdx).trim();
+        stepPart = mid.substring(langkahIdx + 8).trim();
+      } else {
+        endPart = mid.substring(sampaiIdx + 8).trim();
+      }
+      let result = w('hl-loop','untuk') + ' ' + w('hl-variable', varName)
+        + ' ' + w('hl-loop','dari') + ' ' + highlightExpr(startPart)
+        + ' ' + w('hl-loop','sampai') + ' ' + highlightExpr(endPart);
+      if (stepPart !== null) result += ' ' + w('hl-loop','langkah') + ' ' + highlightExpr(stepPart);
+      return result + ' ' + w('hl-loop','lakukan');
+    }
+    return escHtml(text);
+  }
+
+  function highlightExpr(expr) {
+    // Tokenize expression: strings, numbers, operators, identifiers
+    let result = '';
+    let i = 0;
+    while (i < expr.length) {
+      // String
+      if (expr[i] === '"' || expr[i] === "'") {
+        const q = expr[i];
+        let j = i + 1;
+        while (j < expr.length && expr[j] !== q) j++;
+        result += `<span class="hl-string">${escHtml(expr.substring(i, j+1))}</span>`;
+        i = j + 1;
+        continue;
+      }
+      // Number
+      if (/[0-9]/.test(expr[i])) {
+        let j = i;
+        while (j < expr.length && /[0-9.]/.test(expr[j])) j++;
+        result += `<span class="hl-number">${escHtml(expr.substring(i, j))}</span>`;
+        i = j;
+        continue;
+      }
+      // Operators: ←, >=, <=, <>, !=, +, -, *, /, =, <, >
+      if (/[←+\-*/<>=!]/.test(expr[i])) {
+        let op = expr[i];
+        if (i+1 < expr.length && /[=]/.test(expr[i+1]) && /[<>!]/.test(expr[i])) {
+          op = expr.substring(i, i+2); i += 2;
+        } else { i++; }
+        result += `<span class="hl-operator">${escHtml(op)}</span>`;
+        continue;
+      }
+      // Identifier
+      if (/[a-zA-Z_]/.test(expr[i])) {
+        let j = i;
+        while (j < expr.length && /[a-zA-Z0-9_]/.test(expr[j])) j++;
+        const word = expr.substring(i, j);
+        const lo = word.toLowerCase();
+        if (['dan','atau','tidak','mod'].includes(lo)) {
+          result += `<span class="hl-branch">${escHtml(word)}</span>`;
+        } else {
+          result += `<span class="hl-variable">${escHtml(word)}</span>`;
+        }
+        i = j;
+        continue;
+      }
+      result += escHtml(expr[i]);
+      i++;
+    }
+    return result;
+  }
+
+  function updateHighlight() {
+    const lines = editor.value.split('\n');
+    highlightLayer.innerHTML = lines.map(highlightLine).join('');
+    syncScroll();
+  }
+
+  function syncScroll() {
+    lineNumbers.scrollTop = editor.scrollTop;
+    highlightLayer.style.transform =
+      `translate(${-editor.scrollLeft}px, ${-editor.scrollTop}px)`;
+  }
+
+  // Extra scroll listener for mobile touch scrolling
+  editor.addEventListener('touchmove', () => requestAnimationFrame(syncScroll), { passive: true });
+  editor.addEventListener('touchend', () => requestAnimationFrame(syncScroll), { passive: true });
+
+  function updateLineNumbers() {
+    const lines = editor.value.split('\n');
+    const cursorLine = editor.value.substring(0, editor.selectionStart).split('\n').length;
+    lineNumbers.innerHTML = lines.map((_, i) =>
+      `<div class="${i+1 === cursorLine ? 'active-line' : ''}">${i+1}</div>`
+    ).join('');
+  }
+
+  function updateAll() {
+    updateLineNumbers();
+    updateHighlight();
+  }
+
+  editor.addEventListener('input', () => { updateAll(); requestAnimationFrame(syncScroll); });
+  editor.addEventListener('click', updateAll);
+  editor.addEventListener('keyup', updateAll);
+  editor.addEventListener('scroll', syncScroll);
+
+  // Tab support in editor
+  editor.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const start = editor.selectionStart;
+      const end = editor.selectionEnd;
+      editor.value = editor.value.substring(0, start) + '  ' + editor.value.substring(end);
+      editor.selectionStart = editor.selectionEnd = start + 2;
+      updateAll();
+    }
+  });
+
+  updateAll();
+
+  // ─── SNIPPET INSERT ─────────────────────────────────────────────
+  function insertSnippet(text) {
+    const start = editor.selectionStart;
+    const before = editor.value.substring(0, start);
+    const after = editor.value.substring(editor.selectionEnd);
+    editor.value = before + text + after;
+    editor.focus();
+    editor.selectionStart = editor.selectionEnd = start + text.length;
+    updateAll();
+  }
+
+  // ─── TAB SWITCH ─────────────────────────────────────────────────
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('content-' + tab).classList.add('active');
+  }
+
+  // ─── STATE ──────────────────────────────────────────────────────
+  let variables = {};
+  let outputLines = [];
+  let programLines = [];
+  let currentLine = 0;
+  let waitingForInput = false;
+  let inputResolve = null;
+
+  // ─── UI HELPERS ─────────────────────────────────────────────────
+  function setStatus(state, text) {
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    dot.className = 'status-dot ' + state;
+    txt.textContent = text;
+  }
+
+  function renderVariables() {
+    const list = document.getElementById('varList');
+    const empty = document.getElementById('varEmpty');
+    const keys = Object.keys(variables);
+    if (keys.length === 0) {
+      empty.style.display = 'block';
+      list.innerHTML = '';
+      return;
+    }
+    empty.style.display = 'none';
+    list.innerHTML = keys.map(k => {
+      const v = variables[k];
+      const type = typeof v === 'number' ? 'angka' : 'teks';
+      return `<div class="var-item">
+        <span class="var-name">${k}</span>
+        <span class="var-arrow">←</span>
+        <span class="var-value">${v}</span>
+        <span class="var-type">${type}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function addOutput(text, cls = '') {
+    outputLines.push({ text, cls });
+    const empty = document.getElementById('outEmpty');
+    const list = document.getElementById('outputList');
+    empty.style.display = 'none';
+    const div = document.createElement('div');
+    div.className = 'output-line ' + cls;
+    div.textContent = text;
+    list.appendChild(div);
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function clearAll() {
+    variables = {};
+    outputLines = [];
+    document.getElementById('varList').innerHTML = '';
+    document.getElementById('outputList').innerHTML = '';
+    document.getElementById('varEmpty').style.display = 'block';
+    document.getElementById('outEmpty').style.display = 'block';
+  }
+
+  // ─── INPUT MODAL ────────────────────────────────────────────────
+  function askInput(varName) {
+    return new Promise((resolve) => {
+      document.getElementById('modalVarName').textContent = varName;
+      document.getElementById('modalInput').value = '';
+      document.getElementById('modalOverlay').classList.add('show');
+      document.getElementById('modalInput').focus();
+      inputResolve = resolve;
+    });
+  }
+
+  function submitInput() {
+    const val = document.getElementById('modalInput').value.trim();
+    document.getElementById('modalOverlay').classList.remove('show');
+    if (inputResolve) {
+      inputResolve(val);
+      inputResolve = null;
+    }
+  }
+
+  document.getElementById('modalInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') submitInput();
+  });
+
+  // ─── EXPRESSION EVALUATOR ───────────────────────────────────────
+  function evalExpr(expr) {
+    expr = expr.trim();
+
+    // String literal
+    if ((expr.startsWith('"') && expr.endsWith('"')) ||
+        (expr.startsWith("'") && expr.endsWith("'"))) {
+      return expr.slice(1, -1);
+    }
+
+    // Number
+    if (!isNaN(expr) && expr !== '') return Number(expr);
+
+    // Variable
+    if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(expr)) {
+      if (expr in variables) return variables[expr];
+      throw new Error(`Variabel "${expr}" belum didefinisikan`);
+    }
+
+    // Arithmetic/comparison expression — replace variable names
+    let jsExpr = expr;
+
+    // Replace ← with = (shouldn't happen here but safe)
+    jsExpr = jsExpr.replace(/←/g, '=');
+
+    // Replace variable names with their values
+    jsExpr = jsExpr.replace(/[a-zA-Z_][a-zA-Z0-9_]*/g, (match) => {
+      const ml = match.toLowerCase();
+      if (ml === 'mod') return '%';
+      if (ml === 'dan') return '&&';
+      if (ml === 'atau') return '||';
+      if (ml === 'tidak') return '!';
+      if (match in variables) {
+        const v = variables[match];
+        return typeof v === 'string' ? `"${v}"` : v;
+      }
+      return match;
+    });
+
+    // Safe eval: only allow safe characters
+    if (!/^[0-9+\-*/().<>!=&| "'\s%]+$/.test(jsExpr)) {
+      throw new Error(`Ekspresi tidak valid: ${expr}`);
+    }
+
+    try {
+      // eslint-disable-next-line no-new-func
+      return Function(`"use strict"; return (${jsExpr})`)();
+    } catch {
+      throw new Error(`Tidak bisa menghitung: ${expr}`);
+    }
+  }
+
+  // ─── CONDITION EVALUATOR ────────────────────────────────────────
+  function evalCondition(cond) {
+    cond = cond.trim();
+    // Replace = (single) with == for comparison but not inside <=, >=, !=
+    cond = cond.replace(/(?<![<>!])=(?!=)/g, '==');
+    // Replace <> with !=
+    cond = cond.replace(/<>/g, '!=');
+    return evalExpr(cond);
+  }
+
+  // ─── PARSER / INTERPRETER ───────────────────────────────────────
+  async function runProgram() {
+    const code = editor.value;
+    const rawLines = code.split('\n');
+
+    // Tokenize lines
+    programLines = rawLines.map((l, i) => ({
+      raw: l,
+      trimmed: l.trim().toLowerCase(),
+      original: l.trim(),
+      num: i + 1
+    }));
+
+    clearAll();
+    setStatus('running', 'Berjalan...');
+    switchTab('output');
+
+    try {
+      await interpret(programLines, 0);
+      setStatus('success', 'Selesai');
+      addOutput('— Program selesai —', 'system');
+    } catch (err) {
+      setStatus('error', 'Error');
+      addOutput('⚠ Error: ' + err.message, 'error');
+    }
+  }
+
+  // Find matching akhir jika for a given jika line index
+  function findAkhirJika(lines, startIdx) {
+    let depth = 0;
+    for (let i = startIdx; i < lines.length; i++) {
+      const t = lines[i].trimmed;
+      if (t.startsWith('jika ') && t.endsWith('maka') && !t.startsWith('jika tidak jika')) depth++;
+      if (t === 'akhir jika') {
+        if (depth === 1) return i;
+        depth--;
+      }
+    }
+    return -1;
+  }
+
+  // Execute a block of lines (array slice), returns nothing
+  async function executeBlock(lines) {
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      const t = line.trimmed;
+      const orig = line.original;
+
+      if (t === '' || t.startsWith('//') || t.startsWith('#')) { i++; continue; }
+      if (t === 'mulai' || t === 'selesai') { i++; continue; }
+
+      // BACA
+      if (t.startsWith('baca ')) {
+        const varName = orig.substring(5).trim();
+        if (!varName) throw new Error(`Baris ${line.num}: Nama variabel kosong setelah "baca"`);
+        const val = await askInput(varName);
+        variables[varName] = isNaN(val) || val === '' ? val : Number(val);
+        renderVariables();
+        i++; continue;
+      }
+
+      // TULIS
+      if (t.startsWith('tulis ')) {
+        const arg = orig.substring(6).trim();
+        let out = '';
+        // concatenation: split by +
+        const parts = splitByPlus(arg);
+        for (const part of parts) {
+          out += String(evalExpr(part.trim()));
+        }
+        addOutput(out);
+        i++; continue;
+      }
+
+      // ASSIGNMENT: varname ← expr
+      if (orig.includes('←')) {
+        const idx = orig.indexOf('←');
+        const varName = orig.substring(0, idx).trim();
+        const expr = orig.substring(idx + 1).trim();
+        if (!varName) throw new Error(`Baris ${line.num}: Nama variabel kosong`);
+        variables[varName] = evalExpr(expr);
+        renderVariables();
+        i++; continue;
+      }
+
+      // JIKA ... MAKA
+      if (t.startsWith('jika ') && t.endsWith('maka')) {
+        // Extract condition
+        const condRaw = orig.substring(4, orig.length - 4).trim(); // remove 'jika' and 'maka'
+        // Actually: "jika COND maka" — remove first word 'jika' and last word 'maka'
+        const condPart = orig.replace(/^jika\s+/i, '').replace(/\s+maka\s*$/i, '');
+
+        // Find the end of this if block (akhir jika) — relative to current slice
+        const endIdx = findAkhirJikaLocal(lines, i);
+        if (endIdx === -1) throw new Error(`Baris ${line.num}: "akhir jika" tidak ditemukan`);
+
+        // Collect branches
+        const branches = collectBranches(lines, i, endIdx);
+
+        // Evaluate branches
+        let executed = false;
+        for (const branch of branches) {
+          if (branch.type === 'jika' || branch.type === 'jika tidak jika') {
+            let result = false;
+            try { result = evalCondition(branch.condition); } catch(e) { throw e; }
+            if (result && !executed) {
+              await executeBlock(branch.body);
+              executed = true;
+            }
+          } else if (branch.type === 'jika tidak') {
+            if (!executed) {
+              await executeBlock(branch.body);
+              executed = true;
+            }
+          }
+        }
+
+        i = endIdx + 1;
+        continue;
+      }
+
+      // SELAMA ... LAKUKAN (while loop)
+      if (t.startsWith('selama ') && t.endsWith('lakukan')) {
+        const condPart = orig.replace(/^selama\s+/i, '').replace(/\s+lakukan\s*$/i, '');
+        const endIdx = findEndLoop(lines, i, 'selama', 'akhir selama');
+        if (endIdx === -1) throw new Error(`Baris ${line.num}: "akhir selama" tidak ditemukan`);
+        const body = lines.slice(i + 1, endIdx);
+        let itr = 0;
+        while (evalCondition(condPart)) {
+          if (++itr > 10000) throw new Error(`Baris ${line.num}: Loop tidak berakhir (melebihi 10.000 iterasi)`);
+          await executeBlock(body);
+        }
+        i = endIdx + 1;
+        continue;
+      }
+
+      // UNTUK var DARI start SAMPAI end [LANGKAH step] LAKUKAN (for loop)
+      if (t.startsWith('untuk ') && t.endsWith('lakukan')) {
+        const mid = orig.replace(/^untuk\s+/i, '').replace(/\s+lakukan\s*$/i, '');
+        const lo2 = mid.toLowerCase();
+        const dariIdx = lo2.indexOf(' dari ');
+        const sampaiIdx = lo2.indexOf(' sampai ');
+        const langkahIdx = lo2.indexOf(' langkah ');
+        if (dariIdx === -1 || sampaiIdx === -1) throw new Error(`Baris ${line.num}: Sintaks "untuk" salah. Gunakan: untuk VAR dari START sampai END lakukan`);
+        const varName = mid.substring(0, dariIdx).trim();
+        const startVal = evalExpr(mid.substring(dariIdx + 6, sampaiIdx).trim());
+        let endVal, stepVal;
+        if (langkahIdx !== -1 && langkahIdx > sampaiIdx) {
+          endVal = evalExpr(mid.substring(sampaiIdx + 8, langkahIdx).trim());
+          stepVal = evalExpr(mid.substring(langkahIdx + 8).trim());
+        } else {
+          endVal = evalExpr(mid.substring(sampaiIdx + 8).trim());
+          stepVal = startVal <= endVal ? 1 : -1;
+        }
+        const endIdx = findEndLoop(lines, i, 'untuk', 'akhir untuk');
+        if (endIdx === -1) throw new Error(`Baris ${line.num}: "akhir untuk" tidak ditemukan`);
+        const body = lines.slice(i + 1, endIdx);
+        variables[varName] = startVal;
+        renderVariables();
+        let itr = 0;
+        const going = stepVal > 0 ? () => variables[varName] <= endVal : () => variables[varName] >= endVal;
+        while (going()) {
+          if (++itr > 10000) throw new Error(`Baris ${line.num}: Loop tidak berakhir (melebihi 10.000 iterasi)`);
+          await executeBlock(body);
+          variables[varName] += stepVal;
+          renderVariables();
+        }
+        i = endIdx + 1;
+        continue;
+      }
+
+      // AKHIR SELAMA / AKHIR UNTUK — handled by parent
+      if (t === 'akhir selama' || t === 'akhir untuk') { i++; continue; }
+
+      // AKHIR JIKA / JIKA TIDAK / JIKA TIDAK JIKA — should be handled by parent
+      if (t === 'akhir jika' || t === 'jika tidak' || t.startsWith('jika tidak jika')) {
+        i++; continue;
+      }
+
+      // Unknown
+      if (t !== '') {
+        throw new Error(`Baris ${line.num}: Perintah tidak dikenal → "${orig}"`);
+      }
+
+      i++;
+    }
+  }
+
+  function findAkhirJikaLocal(lines, startIdx) {
+    let depth = 0;
+    for (let i = startIdx; i < lines.length; i++) {
+      const t = lines[i].trimmed;
+      // Only count genuine opening jika (not "jika tidak jika")
+      if (t.startsWith('jika ') && t.endsWith('maka') && !t.startsWith('jika tidak jika')) depth++;
+      if (t === 'akhir jika') {
+        depth--;
+        if (depth === 0) return i;
+      }
+    }
+    return -1;
+  }
+
+  function findEndLoop(lines, startIdx, openKw, closeKw) {
+    let depth = 0;
+    for (let i = startIdx; i < lines.length; i++) {
+      const t = lines[i].trimmed;
+      if (t.startsWith(openKw + ' ') && t.endsWith('lakukan')) depth++;
+      if (t === closeKw) {
+        depth--;
+        if (depth === 0) return i;
+      }
+    }
+    return -1;
+  }
+
+  function collectBranches(lines, startIdx, endIdx) {
+    // Parse branches between startIdx (jika) and endIdx (akhir jika)
+    const branches = [];
+    let i = startIdx;
+
+    while (i <= endIdx) {
+      const t = lines[i].trimmed;
+      const orig = lines[i].original;
+
+      if (t.startsWith('jika ') && t.endsWith('maka') && !t.startsWith('jika tidak jika')) {
+        const cond = orig.replace(/^jika\s+/i, '').replace(/\s+maka\s*$/i, '');
+        const body = [];
+        i++;
+        while (i <= endIdx) {
+          const t2 = lines[i].trimmed;
+          if (t2 === 'jika tidak' || t2.startsWith('jika tidak jika') || t2 === 'akhir jika') break;
+          body.push(lines[i]);
+          i++;
+        }
+        branches.push({ type: 'jika', condition: cond, body });
+      } else if (t.startsWith('jika tidak jika')) {
+        const cond = orig.replace(/^jika tidak jika\s+/i, '').replace(/\s+maka\s*$/i, '');
+        const body = [];
+        i++;
+        while (i <= endIdx) {
+          const t2 = lines[i].trimmed;
+          if (t2 === 'jika tidak' || t2.startsWith('jika tidak jika') || t2 === 'akhir jika') break;
+          body.push(lines[i]);
+          i++;
+        }
+        branches.push({ type: 'jika tidak jika', condition: cond, body });
+      } else if (t === 'jika tidak') {
+        const body = [];
+        i++;
+        while (i <= endIdx) {
+          const t2 = lines[i].trimmed;
+          if (t2 === 'akhir jika') break;
+          body.push(lines[i]);
+          i++;
+        }
+        branches.push({ type: 'jika tidak', condition: null, body });
+      } else {
+        i++;
+      }
+    }
+
+    return branches;
+  }
+
+  // Split expression by + (but not inside strings)
+  function splitByPlus(expr) {
+    const parts = [];
+    let current = '';
+    let inString = false;
+    let strChar = '';
+    for (let i = 0; i < expr.length; i++) {
+      const c = expr[i];
+      if (inString) {
+        current += c;
+        if (c === strChar) inString = false;
+      } else if (c === '"' || c === "'") {
+        inString = true;
+        strChar = c;
+        current += c;
+      } else if (c === '+') {
+        parts.push(current);
+        current = '';
+      } else {
+        current += c;
+      }
+    }
+    if (current) parts.push(current);
+    return parts;
+  }
+
+  async function interpret(lines, startFrom) {
+    await executeBlock(lines);
+  }
+
+  // ─── RESET ──────────────────────────────────────────────────────
+  function resetAll() {
+    clearAll();
+    setStatus('', 'Siap');
+    document.getElementById('modalOverlay').classList.remove('show');
+    inputResolve = null;
+  }
+
+  // ─── EXAMPLE ────────────────────────────────────────────────────
+  let exampleIndex = 0;
+  const examples = [
+    // 0: Percabangan (existing)
+    `mulai
+  baca nilai
+  jika nilai >= 90 maka
+    tulis "Nilai: " + nilai
+    tulis "Grade: A"
+  jika tidak jika nilai >= 75 maka
+    tulis "Nilai: " + nilai
+    tulis "Grade: B"
+  jika tidak jika nilai >= 60 maka
+    tulis "Nilai: " + nilai
+    tulis "Grade: C"
+  jika tidak
+    tulis "Nilai: " + nilai
+    tulis "Grade: D - Perlu belajar lebih giat!"
+  akhir jika
+selesai`,
+    // 1: Perulangan untuk (for)
+    `mulai
+  tulis "=== Tabel Perkalian ==="
+  baca n
+  untuk i dari 1 sampai 10 lakukan
+    hasil ← n * i
+    tulis n + " x " + i + " = " + hasil
+  akhir untuk
+  tulis "=== Selesai ==="
+selesai`,
+    // 2: Perulangan selama (while)
+    `mulai
+  tulis "=== Hitung Mundur ==="
+  baca mulai
+  selama mulai > 0 lakukan
+    tulis mulai
+    mulai ← mulai - 1
+  akhir selama
+  tulis "Selesai!"
+selesai`,
+    // 3: Gabungan loop + percabangan
+    `mulai
+  tulis "=== Bilangan Ganjil/Genap ==="
+  untuk i dari 1 sampai 10 lakukan
+    jika i mod 2 = 0 maka
+      tulis i + " -> Genap"
+    jika tidak
+      tulis i + " -> Ganjil"
+    akhir jika
+  akhir untuk
+selesai`
+  ];
+
+  const exampleLabels = [
+    '📄 Percabangan',
+    '📄 Untuk (For)',
+    '📄 Selama (While)',
+    '📄 Loop + Cabang'
+  ];
+
+  function loadExample() {
+    editor.value = examples[exampleIndex];
+    document.querySelector('.btn-example').textContent = exampleLabels[(exampleIndex + 1) % examples.length];
+    exampleIndex = (exampleIndex + 1) % examples.length;
+    updateAll();
+    resetAll();
+  }
+
+  // Init button label
+  document.querySelector('.btn-example').textContent = exampleLabels[0];
+</script>
+</body>
+</html>
