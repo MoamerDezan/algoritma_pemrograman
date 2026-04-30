@@ -4,7 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PseudoKode — Simulator</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Fallback fonts — work offline and on file:// */
+</style>
+<script>
+// Load Google Fonts only when on http/https, silently skip on file://
+if (window.location.protocol !== 'file:') {
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+  document.head.appendChild(link);
+}
+</script>
 <style>
   :root {
     --bg: #0e1117;
@@ -180,10 +191,15 @@
     overflow: hidden;
   }
 
+  /*
+    HIGHLIGHT LAYER — sits below the textarea visually,
+    shows through because textarea text is made transparent.
+    pointer-events:none so clicks pass through to textarea.
+  */
   #highlight-layer {
     position: absolute;
     top: 0; left: 0;
-    width: 100%;
+    right: 0; bottom: 0;
     pointer-events: none;
     font-family: 'JetBrains Mono', monospace;
     font-size: var(--editor-font-size);
@@ -191,9 +207,15 @@
     padding: 12px;
     white-space: pre;
     word-wrap: normal;
-    overflow: visible;
-    z-index: 2;
+    overflow: auto;
+    z-index: 1;
     box-sizing: border-box;
+    /* background paints the editor area — textarea is transparent on top */
+    background: var(--bg);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  #highlight-layer::-webkit-scrollbar { display: none;
   }
 
   #editor {
@@ -201,38 +223,41 @@
     top: 0; left: 0;
     width: 100%;
     height: 100%;
-    background: transparent;
+    /* MUST be transparent so highlight layer below shows through */
+    background: transparent !important;
     border: none;
     outline: none;
     /*
-      iPhone Safari fix:
-      - `color: transparent` breaks caret rendering in Safari/WebKit
-      - `-webkit-text-fill-color: transparent` hides text visually
-        but Safari still renders the caret correctly using `caret-color`
-      - This is the standard trick for syntax-highlighted textareas on iOS
+      CROSS-BROWSER TEXT TRANSPARENCY:
+      - `color` = fallback for browsers that ignore -webkit-text-fill-color
+      - `-webkit-text-fill-color: transparent` = hides text in WebKit/Safari
+        WITHOUT hiding the caret (caret uses `caret-color` separately)
+      Both together = invisible text + visible caret on ALL browsers
     */
-    color: #e8edf5;
-    -webkit-text-fill-color: transparent;
+    color: rgba(0,0,0,0);
+    -webkit-text-fill-color: rgba(0,0,0,0);
+    caret-color: #e8edf5;
     font-family: 'JetBrains Mono', monospace;
     font-size: var(--editor-font-size);
     line-height: var(--editor-line-height);
     padding: 12px;
     resize: none;
-    caret-color: #e8edf5;
     tab-size: 2;
     overflow-y: auto;
     overflow-x: auto;
     white-space: pre;
     overflow-wrap: normal;
-    z-index: 1;
+    z-index: 2;
     box-sizing: border-box;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
 
   #editor::selection {
-    background: rgba(79,142,247,0.4);
-    -webkit-text-fill-color: transparent;
+    /* Selection highlight still visible */
+    background: rgba(79,142,247,0.45);
+    -webkit-text-fill-color: rgba(0,0,0,0);
+    color: rgba(0,0,0,0);
   }
 
   /* SYNTAX COLORS */
@@ -596,6 +621,74 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+  /* ── SHARE BUTTON ── */
+  .btn-share {
+    background: var(--surface2);
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    font-size: 13px;
+    flex: 0 0 auto;
+  }
+  .btn-share:active { background: rgba(56,217,169,0.12); }
+
+  /* ── SHARE MODAL ── */
+  .share-link-box {
+    background: var(--bg);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    word-break: break-all;
+    line-height: 1.6;
+    max-height: 80px;
+    overflow-y: auto;
+    user-select: all;
+    -webkit-user-select: all;
+  }
+
+  .share-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .btn-copy {
+    background: var(--accent);
+  }
+  .btn-copy.copied {
+    background: var(--accent2);
+  }
+
+  .btn-wa {
+    background: #25d366;
+  }
+  .btn-wa:active { background: #1da851; }
+
+  .share-info {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .share-close {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    color: var(--text-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    min-height: 44px;
+  }
+  .share-close:active { color: var(--text); }
+
   /* ── DESKTOP LAYOUT OVERRIDE ── */
   @media (min-width: 640px) {
     .main {
@@ -664,6 +757,7 @@
       <button class="btn btn-run" onclick="runProgram()">▶ Jalankan</button>
       <button class="btn btn-reset" onclick="resetAll()" title="Reset">↺</button>
       <button class="btn btn-example" onclick="loadExample()">📄 Contoh</button>
+      <button class="btn btn-share" onclick="openShare()">🔗 Bagikan</button>
       <div class="toolbar-right">
         <div class="status-indicator" id="statusIndicator">
           <div class="status-dot" id="statusDot"></div>
@@ -720,6 +814,31 @@
     <div class="modal-subtitle">Masukkan nilai untuk variabel: <span id="modalVarName">x</span></div>
     <input type="text" class="modal-input" id="modalInput" placeholder="Ketik nilai di sini..." />
     <button class="modal-btn" onclick="submitInput()">OK — Lanjutkan ▶</button>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareOverlay" onclick="closeShare(event)">
+  <div class="modal" id="shareModal">
+    <div class="modal-title">
+      <span class="icon">🔗</span> Bagikan Kode
+    </div>
+    <div class="modal-subtitle" id="shareSubtitle">Salin link di bawah dan kirim ke guru</div>
+
+    <div class="share-link-box" id="shareLinkBox">
+      <span id="shareLinkText"></span>
+    </div>
+
+    <div class="share-actions">
+      <button class="modal-btn btn-copy" id="copyBtn" onclick="copyShareLink()">📋 Salin Link</button>
+      <button class="modal-btn btn-wa" onclick="shareWhatsApp()">💬 Kirim via WhatsApp</button>
+    </div>
+
+    <div class="share-info">
+      <span id="shareCharCount"></span>
+    </div>
+
+    <button class="share-close" onclick="closeShare()">✕ Tutup</button>
   </div>
 </div>
 
@@ -906,8 +1025,9 @@
 
   function syncScroll() {
     lineNumbers.scrollTop = editor.scrollTop;
-    highlightLayer.style.transform =
-      `translate(${-editor.scrollLeft}px, ${-editor.scrollTop}px)`;
+    // Mirror textarea scroll position directly on the highlight layer
+    highlightLayer.scrollTop = editor.scrollTop;
+    highlightLayer.scrollLeft = editor.scrollLeft;
   }
 
   // Extra scroll listener for mobile touch scrolling
@@ -1475,14 +1595,151 @@ selesai`
 
   function loadExample() {
     editor.value = examples[exampleIndex];
-    document.querySelector('.btn-example').textContent = exampleLabels[(exampleIndex + 1) % examples.length];
     exampleIndex = (exampleIndex + 1) % examples.length;
+    var btn = document.querySelector('.btn-example');
+    if (btn) btn.textContent = exampleLabels[exampleIndex];
     updateAll();
     resetAll();
   }
 
   // Init button label
-  document.querySelector('.btn-example').textContent = exampleLabels[0];
+  (function() {
+    var btn = document.querySelector('.btn-example');
+    if (btn) btn.textContent = exampleLabels[0];
+  })();
+
+  // ─── SHARE / LOAD FROM URL ──────────────────────────────────────
+
+  // Encode code to URL-safe base64
+  function encodeCode(code) {
+    try {
+      // Use btoa with UTF-8 safe encoding
+      return btoa(unescape(encodeURIComponent(code)));
+    } catch(e) {
+      return btoa(code);
+    }
+  }
+
+  function decodeCode(b64) {
+    try {
+      return decodeURIComponent(escape(atob(b64)));
+    } catch(e) {
+      return atob(b64);
+    }
+  }
+
+  function getShareURL() {
+    var code = editor.value.trim();
+    if (!code) return null;
+    var encoded = encodeCode(code);
+    var href = window.location.href;
+    var base = href.split('#')[0].split('?')[0];
+    // If running on file:// — remind user to host the file
+    // Still generate the link so they can see the encoded code
+    return base + '?kode=' + encodeURIComponent(encoded);
+  }
+
+  function openShare() {
+    const code = editor.value.trim();
+    if (!code) {
+      alert('Tulis kode dulu sebelum dibagikan!');
+      return;
+    }
+    const url = getShareURL();
+    document.getElementById('shareLinkText').textContent = url;
+    var isFile = window.location.protocol === 'file:';
+    document.getElementById('shareCharCount').textContent =
+      'Panjang link: ' + url.length + ' karakter  •  Kode: ' + code.split('\n').length + ' baris';
+    document.getElementById('shareSubtitle').textContent = isFile
+      ? '⚠️ Buka via web agar link bisa diklik. Atau salin kode manual.'
+      : 'Salin link di bawah dan kirim ke guru';
+    document.getElementById('copyBtn').textContent = '📋 Salin Link';
+    document.getElementById('copyBtn').classList.remove('copied');
+    document.getElementById('shareOverlay').classList.add('show');
+  }
+
+  function closeShare(e) {
+    if (!e || e.target === document.getElementById('shareOverlay')) {
+      document.getElementById('shareOverlay').classList.remove('show');
+    }
+  }
+
+  function copyShareLink() {
+    const url = getShareURL();
+    if (!url) return;
+    // Try modern clipboard API, fallback to execCommand
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showCopied();
+      }).catch(() => fallbackCopy(url));
+    } else {
+      fallbackCopy(url);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); showCopied(); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  function showCopied() {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✅ Tersalin!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Salin Link';
+      btn.classList.remove('copied');
+    }, 2500);
+  }
+
+  function shareWhatsApp() {
+    const url = getShareURL();
+    if (!url) return;
+    const msg = encodeURIComponent('Ini kode pseudocode saya 📝\n\n' + url);
+    window.open('https://wa.me/?text=' + msg, '_blank');
+  }
+
+  // Auto-load kode dari URL saat halaman dibuka
+  (function loadFromURL() {
+    try {
+      // Safe URL parsing — works on file:// and http://
+      var search = window.location.search || window.location.href.split('?')[1] || '';
+      if (!search) return;
+      var match = search.match(/[?&]?kode=([^&]*)/);
+      if (!match) return;
+      var kode = decodeURIComponent(match[1]);
+      if (!kode) return;
+      var decoded = decodeCode(kode);
+      if (!decoded || !decoded.trim()) return;
+      editor.value = decoded;
+      updateAll();
+      // Tampilkan notif — pakai style property satu per satu (tidak pakai template literal)
+      var notif = document.createElement('div');
+      notif.style.position = 'fixed';
+      notif.style.top = '60px';
+      notif.style.left = '50%';
+      notif.style.transform = 'translateX(-50%)';
+      notif.style.background = '#38d9a9';
+      notif.style.color = '#000';
+      notif.style.padding = '10px 18px';
+      notif.style.borderRadius = '20px';
+      notif.style.fontSize = '13px';
+      notif.style.fontWeight = '600';
+      notif.style.zIndex = '999';
+      notif.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
+      notif.style.whiteSpace = 'nowrap';
+      notif.textContent = 'Kode berhasil dimuat dari link!';
+      document.body.appendChild(notif);
+      setTimeout(function() { notif.remove(); }, 3000);
+    } catch(e) { console.error('Load from URL failed:', e); }
+  })();
 </script>
 </body>
 </html>
