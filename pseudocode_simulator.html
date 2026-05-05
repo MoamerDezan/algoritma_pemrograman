@@ -1818,7 +1818,8 @@ selesai`
   })();
 
   // ─── SUBMIT / KUMPULKAN TUGAS ────────────────────────────────────
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZubQrC1X7rwKVoZwhDUUMLmrTL-3z_7hf4UZ-kVCS0x6Zi8K_zYha3zp2EpMPUxmL0A/exec';
+  // Ganti URL ini dengan URL Web App Apps Script Anda setelah deploy
+  var APPS_SCRIPT_URL = 'GANTI_DENGAN_URL_APPS_SCRIPT_ANDA';
 
   function openSubmit() {
     var code = editor.value.trim();
@@ -1874,23 +1875,23 @@ selesai`
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     });
 
-    var payload = {
-      nama: nama,
+    // Kirim via GET + URLSearchParams — satu-satunya cara yang selalu
+    // berhasil dengan Apps Script tanpa CORS issue (POST+JSON tidak bisa)
+    var params = new URLSearchParams({
+      nama:  nama,
       kelas: kelas,
       judul: judul,
-      link: link,
+      link:  link,
       waktu: waktu
-    };
+    });
 
-    // Kirim ke Apps Script via no-cors (Apps Script perlu handle CORS)
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-    .then(function() {
-      // no-cors selalu resolve (tidak bisa baca response) — anggap sukses
+    var img = new Image();
+    var done = false;
+
+    // Gunakan Image trick — tidak kena CORS, tidak butuh response
+    img.onload = img.onerror = function() {
+      if (done) return;
+      done = true;
       btn.textContent = '✅ Berhasil Dikumpulkan!';
       btn.style.background = '#38d9a9';
       setTimeout(function() {
@@ -1900,12 +1901,14 @@ selesai`
         btn.style.background = '';
         showNotif('✅ Tugas berhasil dikumpulkan!', '#38d9a9', '#000');
       }, 1800);
-    })
-    .catch(function(err) {
-      btn.disabled = false;
-      btn.textContent = '📤 Kirim ke Guru';
-      errEl.textContent = '❌ Gagal mengirim. Cek koneksi internet.';
-    });
+    };
+
+    // Fallback timeout — jika onload/onerror tidak terpanggil
+    setTimeout(function() {
+      if (!done) { done = true; img.onload = img.onerror = null; img.src = ''; }
+    }, 8000);
+
+    img.src = APPS_SCRIPT_URL + '?' + params.toString();
   }
 
   function showNotif(text, bg, color) {
