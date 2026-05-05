@@ -621,6 +621,51 @@ if (window.location.protocol !== 'file:') {
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+  /* ── SUBMIT BUTTON ── */
+  .btn-submit {
+    background: #f7c948;
+    color: #1a1a1a;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    flex: 0 0 auto;
+  }
+  .btn-submit:active { opacity: 0.85; }
+
+  /* ── SUBMIT MODAL ── */
+  .submit-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    margin-top: 12px;
+  }
+  .modal-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  .submit-error {
+    color: var(--red);
+    font-size: 12px;
+    min-height: 18px;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .btn-submit-ok {
+    background: #f7c948;
+    color: #1a1a1a;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  .btn-submit-ok:active { opacity: 0.85; }
+  .btn-submit-ok:disabled {
+    background: var(--surface2);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
   /* ── SHARE BUTTON ── */
   .btn-share {
     background: var(--surface2);
@@ -758,6 +803,7 @@ if (window.location.protocol !== 'file:') {
       <button class="btn btn-reset" onclick="resetAll()" title="Reset">↺</button>
       <button class="btn btn-example" onclick="loadExample()">📄 Contoh</button>
       <button class="btn btn-share" onclick="openShare()">🔗 Bagikan</button>
+      <button class="btn btn-submit" onclick="openSubmit()">📤 Kumpulkan</button>
       <div class="toolbar-right">
         <div class="status-indicator" id="statusIndicator">
           <div class="status-dot" id="statusDot"></div>
@@ -839,6 +885,36 @@ if (window.location.protocol !== 'file:') {
     </div>
 
     <button class="share-close" onclick="closeShare()">✕ Tutup</button>
+  </div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submitOverlay" onclick="closeSubmit(event)">
+  <div class="modal" id="submitModal">
+    <div class="modal-title">
+      <span class="icon">📤</span> Kumpulkan Tugas
+    </div>
+    <div class="modal-subtitle">Isi data diri sebelum mengumpulkan</div>
+
+    <label class="submit-label">Nama Lengkap</label>
+    <input type="text" class="modal-input" id="submitNama" placeholder="Contoh: Budi Santoso" />
+
+    <label class="submit-label">Kelas</label>
+    <select class="modal-input modal-select" id="submitKelas">
+      <option value="">-- Pilih Kelas --</option>
+      <option>XA</option><option>XB</option><option>XC</option><option>XD</option>
+      <option>XE</option><option>XF</option><option>XG</option><option>XH</option>
+    </select>
+
+    <label class="submit-label">Judul Tugas</label>
+    <input type="text" class="modal-input" id="submitJudul" placeholder="Contoh: Kasir Kantin" />
+
+    <div id="submitError" class="submit-error"></div>
+
+    <button class="modal-btn btn-submit-ok" id="submitBtn" onclick="doSubmit()">
+      📤 Kirim ke Guru
+    </button>
+    <button class="share-close" onclick="closeSubmit()" style="margin-top:8px">✕ Batal</button>
   </div>
 </div>
 
@@ -1740,6 +1816,117 @@ selesai`
       setTimeout(function() { notif.remove(); }, 3000);
     } catch(e) { console.error('Load from URL failed:', e); }
   })();
+
+  // ─── SUBMIT / KUMPULKAN TUGAS ────────────────────────────────────
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxZubQrC1X7rwKVoZwhDUUMLmrTL-3z_7hf4UZ-kVCS0x6Zi8K_zYha3zp2EpMPUxmL0A/exec';
+
+  function openSubmit() {
+    var code = editor.value.trim();
+    if (!code) { alert('Tulis kode dulu sebelum dikumpulkan!'); return; }
+    document.getElementById('submitError').textContent = '';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = '📤 Kirim ke Guru';
+    document.getElementById('submitOverlay').classList.add('show');
+    // Pre-fill nama & kelas dari localStorage jika pernah isi sebelumnya
+    try {
+      var saved = JSON.parse(localStorage.getItem('ps_identity') || '{}');
+      if (saved.nama) document.getElementById('submitNama').value = saved.nama;
+      if (saved.kelas) document.getElementById('submitKelas').value = saved.kelas;
+    } catch(e) {}
+    setTimeout(function() {
+      document.getElementById('submitNama').focus();
+    }, 300);
+  }
+
+  function closeSubmit(e) {
+    if (!e || e.target === document.getElementById('submitOverlay')) {
+      document.getElementById('submitOverlay').classList.remove('show');
+    }
+  }
+
+  function doSubmit() {
+    var nama  = document.getElementById('submitNama').value.trim();
+    var kelas = document.getElementById('submitKelas').value;
+    var judul = document.getElementById('submitJudul').value.trim();
+    var errEl = document.getElementById('submitError');
+
+    // Validasi
+    if (!nama)  { errEl.textContent = '⚠️ Nama tidak boleh kosong'; return; }
+    if (!kelas) { errEl.textContent = '⚠️ Pilih kelas terlebih dahulu'; return; }
+    if (!judul) { errEl.textContent = '⚠️ Judul tugas tidak boleh kosong'; return; }
+    if (APPS_SCRIPT_URL === 'GANTI_DENGAN_URL_APPS_SCRIPT_ANDA') {
+      errEl.textContent = '⚠️ URL Apps Script belum dikonfigurasi oleh guru';
+      return;
+    }
+
+    // Simpan identitas ke localStorage supaya tidak perlu isi ulang
+    try { localStorage.setItem('ps_identity', JSON.stringify({nama: nama, kelas: kelas})); } catch(e) {}
+
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Mengirim...';
+    errEl.textContent = '';
+
+    var link = getShareURL();
+    var waktu = new Date().toLocaleString('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+
+    var payload = {
+      nama: nama,
+      kelas: kelas,
+      judul: judul,
+      link: link,
+      waktu: waktu
+    };
+
+    // Kirim ke Apps Script via no-cors (Apps Script perlu handle CORS)
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function() {
+      // no-cors selalu resolve (tidak bisa baca response) — anggap sukses
+      btn.textContent = '✅ Berhasil Dikumpulkan!';
+      btn.style.background = '#38d9a9';
+      setTimeout(function() {
+        document.getElementById('submitOverlay').classList.remove('show');
+        btn.disabled = false;
+        btn.textContent = '📤 Kirim ke Guru';
+        btn.style.background = '';
+        showNotif('✅ Tugas berhasil dikumpulkan!', '#38d9a9', '#000');
+      }, 1800);
+    })
+    .catch(function(err) {
+      btn.disabled = false;
+      btn.textContent = '📤 Kirim ke Guru';
+      errEl.textContent = '❌ Gagal mengirim. Cek koneksi internet.';
+    });
+  }
+
+  function showNotif(text, bg, color) {
+    var notif = document.createElement('div');
+    notif.style.position = 'fixed';
+    notif.style.top = '60px';
+    notif.style.left = '50%';
+    notif.style.transform = 'translateX(-50%)';
+    notif.style.background = bg || '#38d9a9';
+    notif.style.color = color || '#000';
+    notif.style.padding = '10px 20px';
+    notif.style.borderRadius = '20px';
+    notif.style.fontSize = '13px';
+    notif.style.fontWeight = '600';
+    notif.style.zIndex = '9999';
+    notif.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
+    notif.style.whiteSpace = 'nowrap';
+    notif.textContent = text;
+    document.body.appendChild(notif);
+    setTimeout(function() { notif.remove(); }, 3000);
+  }
 </script>
 </body>
 </html>
